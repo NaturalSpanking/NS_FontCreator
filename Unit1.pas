@@ -16,12 +16,12 @@ type
     FontDialog1: TFontDialog;
     Button3: TButton;
     StringGrid1: TStringGrid;
-    Panel1: TPanel;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
     Button4: TButton;
     Edit1: TEdit;
+    CheckBox4: TCheckBox;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -53,19 +53,20 @@ end;
 
 procedure TForm1.Button1Click(Sender: TObject);
 var
-  x, i, j: integer;
-  c: short;
+  x, i, j, k: integer;
+  c: byte;
 begin
   glyph_index := FT_Get_Char_Index(face, ord(Edit1.Text[1]));
 
-  load_flags := [
-  ftlfMonochrome,
-  ftlfRender
-  ];
-  if not CheckBox1.Checked then load_flags := load_flags + [ftlfNoHinting];
-  if CheckBox2.Checked then load_flags := load_flags + [ftlfForceAutohint];
-  if CheckBox3.Checked then load_flags := load_flags + [ftlfTargetMono];
-
+  load_flags := [ftlfMonochrome, ftlfRender];
+  if not CheckBox1.Checked then
+    load_flags := load_flags + [ftlfNoHinting];
+  if CheckBox2.Checked then
+    load_flags := load_flags + [ftlfForceAutohint];
+  if CheckBox3.Checked then
+    load_flags := load_flags + [ftlfTargetMono];
+  if CheckBox4.Checked then // фигня какая-то
+    load_flags := load_flags + [ftlfAdvanceOnly];
 
   x := FT_Load_Glyph(face, glyph_index, load_flags);
   if x <> 0 then
@@ -77,30 +78,52 @@ begin
   // разыменовывание указателя происходит тут
   // к этому моменту в буфере что-то есть уже
   // x := FT_Render_Glyph(face.Glyph^, ftrmMono);
-//  if x <> 0 then
-//  begin
-//    AddLog('Failed to render the glyph');
-//  end;
+  // if x <> 0 then
+  // begin
+  // AddLog('Failed to render the glyph');
+  // end;
 
-  StringGrid1.ColCount := face.Glyph.Bitmap.Width+5;
-  StringGrid1.RowCount := face.Glyph.Bitmap.Rows;
   for i := 0 to StringGrid1.ColCount do
-  for j := 0 to StringGrid1.RowCount do
-        StringGrid1.Cells[j, i] := '';
+    for j := 0 to StringGrid1.RowCount do
+      StringGrid1.Cells[i, j] := '';
+
+  // StringGrid1.ColCount := face.Glyph.Bitmap.Pitch * 8;
+  StringGrid1.RowCount := face.Glyph.Bitmap.Rows;
+  StringGrid1.ColCount := face.Glyph.Bitmap.Width;
+
   {
     Glyph.Bitmap.Pitch в монохромном режиме выдает количество байт на строку, четное число
     при этом используется 1 бит на пиксель
   }
-  for i := 0 to face.Glyph.Bitmap.Rows do
+  k := 0;
+  for i := 0 to (face.Glyph.Bitmap.Rows * face.Glyph.Bitmap.Pitch) - 1 do
   begin
-    c := face.Glyph.Bitmap.Buffer[i * face.Glyph.Bitmap.Pitch];
+    for j := 0 to 7 do
+    begin
+      if face.Glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
+        StringGrid1.Cells[k * 8 + j, i div face.Glyph.Bitmap.Pitch] := 'X';
+    end;
+    inc(k);
+    if k = face.Glyph.Bitmap.Pitch then
+      k := 0;
+
+  end;
+
+  { не правильно работает
+    for i := 0 to (face.Glyph.Bitmap.Rows) - 1 do
+    begin
+    for k := 0 to face.Glyph.Bitmap.Pitch - 1 do
+    begin
+    c := face.Glyph.Bitmap.Buffer[i * face.Glyph.Bitmap.Pitch + k];
+    // c := c + (face.Glyph.Bitmap.Buffer[i * face.Glyph.Bitmap.Pitch +1] shl 8);
     for j := 0 to face.Glyph.Bitmap.Width do
     begin
-
-      if (c shr (j+1)) and 1 > 0 then
-        StringGrid1.Cells[face.Glyph.Bitmap.Width-j, i] := 'X';
+    if (c shr (j)) and 1 > 0 then // +face.Glyph.BitmapLeft
+    StringGrid1.Cells[8*k + face.Glyph.Bitmap.Width - j, i] := 'X';
     end;
-  end;
+    end;
+    end;
+  }
 
 end;
 
@@ -125,7 +148,7 @@ procedure TForm1.Button4Click(Sender: TObject);
 var
   x, major, minor, patch: integer;
 begin
-x := FT_Init_FreeType(ft_lib);
+  x := FT_Init_FreeType(ft_lib);
   if x <> 0 then
   begin
     AddLog('init fail');

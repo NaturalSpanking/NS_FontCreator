@@ -23,16 +23,14 @@ object Form1: TForm1
     OnClick = Button1Click
   end
   object Memo1: TMemo
-    Left = 919
+    Left = 944
     Top = 0
-    Width = 172
+    Width = 147
     Height = 638
     Align = alRight
     Lines.Strings = (
       'Memo1')
     TabOrder = 1
-    ExplicitLeft = 680
-    ExplicitHeight = 929
   end
   object Button2: TButton
     Left = 824
@@ -60,21 +58,18 @@ object Form1: TForm1
     Align = alLeft
     DefaultColWidth = 32
     TabOrder = 4
-    ExplicitHeight = 929
-  end
-  object Panel1: TPanel
-    Left = 791
-    Top = 304
-    Width = 108
-    Height = 41
-    Caption = 'Panel1'
-    Font.Charset = RUSSIAN_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -19
-    Font.Name = 'Times New Roman'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 5
+    ColWidths = (
+      32
+      32
+      32
+      32
+      32)
+    RowHeights = (
+      24
+      24
+      24
+      24
+      24)
   end
   object CheckBox1: TCheckBox
     Left = 791
@@ -82,7 +77,7 @@ object Form1: TForm1
     Width = 97
     Height = 17
     Caption = 'Hiting'
-    TabOrder = 6
+    TabOrder = 5
     OnClick = Button1Click
   end
   object CheckBox2: TCheckBox
@@ -91,7 +86,7 @@ object Form1: TForm1
     Width = 130
     Height = 17
     Caption = 'Force auto-hit'
-    TabOrder = 7
+    TabOrder = 6
     OnClick = Button1Click
   end
   object CheckBox3: TCheckBox
@@ -100,7 +95,7 @@ object Form1: TForm1
     Width = 130
     Height = 17
     Caption = 'Target mono'
-    TabOrder = 8
+    TabOrder = 7
     OnClick = Button1Click
   end
   object Button4: TButton
@@ -109,7 +104,7 @@ object Form1: TForm1
     Width = 75
     Height = 25
     Caption = 'Init'
-    TabOrder = 9
+    TabOrder = 8
     OnClick = Button4Click
   end
   object Edit1: TEdit
@@ -117,8 +112,17 @@ object Form1: TForm1
     Top = 46
     Width = 27
     Height = 29
-    TabOrder = 10
+    TabOrder = 9
     Text = 'g'
+  end
+  object CheckBox4: TCheckBox
+    Left = 791
+    Top = 280
+    Width = 130
+    Height = 17
+    Caption = 'AdvanceOnly'
+    TabOrder = 10
+    OnClick = Button1Click
   end
   object FontDialog1: TFontDialog
     Ctl3D = False
