@@ -843,7 +843,7 @@ Type
    Const
       sError          = 'The error %d occured in a FreeType call: %s.';
       FREETYPE_MAJOR  = 2;
-      FREETYPE_MINOR  = 11;
+      FREETYPE_MINOR  = 12;
       FREETYPE_PATCH  = 0;
       cMem: TFTMemory = (User: NIL; AllocFunc: TFTManager.MemAlloc; FreeFunc: TFTManager.MemFree; ReallocFunc: TFTManager.MemRealloc);
    Private

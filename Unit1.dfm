@@ -2,25 +2,19 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 428
-  ClientWidth = 852
+  ClientHeight = 638
+  ClientWidth = 1091
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'Tahoma'
+  Font.Height = -19
+  Font.Name = 'Times New Roman'
   Font.Style = []
   OldCreateOrder = False
   PixelsPerInch = 96
-  TextHeight = 13
-  object Image1: TImage
-    Left = 24
-    Top = 32
-    Width = 193
-    Height = 273
-  end
+  TextHeight = 21
   object Button1: TButton
-    Left = 344
+    Left = 824
     Top = 48
     Width = 75
     Height = 25
@@ -29,17 +23,19 @@ object Form1: TForm1
     OnClick = Button1Click
   end
   object Memo1: TMemo
-    Left = 544
+    Left = 919
     Top = 0
-    Width = 308
-    Height = 428
+    Width = 172
+    Height = 638
     Align = alRight
     Lines.Strings = (
       'Memo1')
     TabOrder = 1
+    ExplicitLeft = 680
+    ExplicitHeight = 929
   end
   object Button2: TButton
-    Left = 344
+    Left = 824
     Top = 88
     Width = 75
     Height = 25
@@ -48,13 +44,55 @@ object Form1: TForm1
     OnClick = Button2Click
   end
   object Button3: TButton
-    Left = 344
+    Left = 824
     Top = 128
     Width = 75
     Height = 25
     Caption = 'Button3'
     TabOrder = 3
     OnClick = Button3Click
+  end
+  object StringGrid1: TStringGrid
+    Left = 0
+    Top = 0
+    Width = 785
+    Height = 638
+    Align = alLeft
+    DefaultColWidth = 32
+    TabOrder = 4
+    ExplicitHeight = 929
+  end
+  object Panel1: TPanel
+    Left = 791
+    Top = 304
+    Width = 108
+    Height = 41
+    Caption = 'Panel1'
+    Font.Charset = RUSSIAN_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Times New Roman'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 5
+  end
+  object CheckBox1: TCheckBox
+    Left = 791
+    Top = 184
+    Width = 97
+    Height = 17
+    Caption = 'Hiting'
+    TabOrder = 6
+    OnClick = Button1Click
+  end
+  object CheckBox2: TCheckBox
+    Left = 791
+    Top = 216
+    Width = 130
+    Height = 17
+    Caption = 'Force auto-hit'
+    TabOrder = 7
+    OnClick = Button1Click
   end
   object FontDialog1: TFontDialog
     Ctl3D = False
@@ -63,7 +101,7 @@ object Form1: TForm1
     Font.Height = -11
     Font.Name = 'Tahoma'
     Font.Style = []
-    Left = 480
+    Left = 960
     Top = 16
   end
 end

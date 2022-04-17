@@ -5,3 +5,4 @@ __recovery/
 *.res
 *.stat
 Win32/
+Win64/
