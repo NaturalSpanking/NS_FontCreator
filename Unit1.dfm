@@ -18,7 +18,7 @@ object Form1: TForm1
     Top = 48
     Width = 75
     Height = 25
-    Caption = 'Button1'
+    Caption = 'Draw'
     TabOrder = 0
     OnClick = Button1Click
   end
@@ -48,7 +48,7 @@ object Form1: TForm1
     Top = 128
     Width = 75
     Height = 25
-    Caption = 'Button3'
+    Caption = 'Free'
     TabOrder = 3
     OnClick = Button3Click
   end
@@ -93,6 +93,32 @@ object Form1: TForm1
     Caption = 'Force auto-hit'
     TabOrder = 7
     OnClick = Button1Click
+  end
+  object CheckBox3: TCheckBox
+    Left = 791
+    Top = 248
+    Width = 130
+    Height = 17
+    Caption = 'Target mono'
+    TabOrder = 8
+    OnClick = Button1Click
+  end
+  object Button4: TButton
+    Left = 824
+    Top = 8
+    Width = 75
+    Height = 25
+    Caption = 'Init'
+    TabOrder = 9
+    OnClick = Button4Click
+  end
+  object Edit1: TEdit
+    Left = 791
+    Top = 46
+    Width = 27
+    Height = 29
+    TabOrder = 10
+    Text = 'g'
   end
   object FontDialog1: TFontDialog
     Ctl3D = False

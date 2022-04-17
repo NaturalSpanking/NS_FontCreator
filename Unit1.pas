@@ -19,9 +19,13 @@ type
     Panel1: TPanel;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
+    CheckBox3: TCheckBox;
+    Button4: TButton;
+    Edit1: TEdit;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
     ft_lib: TFTLibrary;
     face: TFTFace;
@@ -50,10 +54,78 @@ end;
 procedure TForm1.Button1Click(Sender: TObject);
 var
   x, i, j: integer;
-  major, minor, patch: integer;
   c: short;
 begin
-  x := FT_Init_FreeType(ft_lib);
+  glyph_index := FT_Get_Char_Index(face, ord(Edit1.Text[1]));
+
+  load_flags := [
+  ftlfMonochrome,
+  ftlfRender
+  ];
+  if not CheckBox1.Checked then load_flags := load_flags + [ftlfNoHinting];
+  if CheckBox2.Checked then load_flags := load_flags + [ftlfForceAutohint];
+  if CheckBox3.Checked then load_flags := load_flags + [ftlfTargetMono];
+
+
+  x := FT_Load_Glyph(face, glyph_index, load_flags);
+  if x <> 0 then
+  begin
+    AddLog('Failed to load glyph');
+  end;
+
+  // рендер уже сделан выше
+  // разыменовывание указателя происходит тут
+  // к этому моменту в буфере что-то есть уже
+  // x := FT_Render_Glyph(face.Glyph^, ftrmMono);
+//  if x <> 0 then
+//  begin
+//    AddLog('Failed to render the glyph');
+//  end;
+
+  StringGrid1.ColCount := face.Glyph.Bitmap.Width+5;
+  StringGrid1.RowCount := face.Glyph.Bitmap.Rows;
+  for i := 0 to StringGrid1.ColCount do
+  for j := 0 to StringGrid1.RowCount do
+        StringGrid1.Cells[j, i] := '';
+  {
+    Glyph.Bitmap.Pitch в монохромном режиме выдает количество байт на строку, четное число
+    при этом используется 1 бит на пиксель
+  }
+  for i := 0 to face.Glyph.Bitmap.Rows do
+  begin
+    c := face.Glyph.Bitmap.Buffer[i * face.Glyph.Bitmap.Pitch];
+    for j := 0 to face.Glyph.Bitmap.Width do
+    begin
+
+      if (c shr (j+1)) and 1 > 0 then
+        StringGrid1.Cells[face.Glyph.Bitmap.Width-j, i] := 'X';
+    end;
+  end;
+
+end;
+
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+  FontDialog1.Font := Form1.Font;
+  if FontDialog1.Execute(Application.Handle) then
+  begin
+    Form1.Font := FontDialog1.Font;
+  end;
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+begin
+  face.Glyph.Bitmap.Done;
+  FT_Done_Face(face);
+  FT_Done_FreeType(ft_lib);
+  FreeMem(pFont);
+end;
+
+procedure TForm1.Button4Click(Sender: TObject);
+var
+  x, major, minor, patch: integer;
+begin
+x := FT_Init_FreeType(ft_lib);
   if x <> 0 then
   begin
     AddLog('init fail');
@@ -86,73 +158,6 @@ begin
   begin
     AddLog('Failed to set pixel size');
   end;
-
-  glyph_index := FT_Get_Char_Index(face, ord('g'));
-
-  load_flags := [
-  ftlfMonochrome,
-//  ftlfNoHinting,
-//  ftlfForceAutohint,
-  ftlfTargetMono,
-  ftlfRender
-  ];
-  if not CheckBox1.Checked then load_flags := load_flags + ftlfNoHinting;
-
-  x := FT_Load_Glyph(face, glyph_index, load_flags);
-  if x <> 0 then
-  begin
-    AddLog('Failed to load glyph');
-  end;
-
-  // разыменовывание указателя происходит тут
-  // к этому моменту в буфере что-то есть уже
-  // x := FT_Render_Glyph(face.Glyph^, ftrmMono);
-  if x <> 0 then
-  begin
-    AddLog('Failed to render the glyph');
-  end;
-
-  StringGrid1.ColCount := face.Glyph.Bitmap.Width+5;
-  StringGrid1.RowCount := face.Glyph.Bitmap.Rows;
-  {
-    Glyph.Bitmap.Pitch в монохромном режиме выдает количество байт на строку, четное число
-    при этом используется 1 бит на пиксель
-  }
-  for i := 0 to face.Glyph.Bitmap.Rows do
-  begin
-    c := face.Glyph.Bitmap.Buffer[i * face.Glyph.Bitmap.Pitch];
-    for j := 0 to face.Glyph.Bitmap.Width do
-    begin
-
-      if (c shr (j+1)) and 1 > 0 then
-        StringGrid1.Cells[face.Glyph.Bitmap.Width-j, i] := 'X'
-      else
-        StringGrid1.Cells[face.Glyph.Bitmap.Width-j, i] := '';
-    end;
-  end;
-
-  FT_Done_Face(face);
-  FT_Done_FreeType(ft_lib);
-end;
-
-procedure TForm1.Button2Click(Sender: TObject);
-begin
-  FontDialog1.Font := Form1.Font;
-  if FontDialog1.Execute(Application.Handle) then
-  begin
-    Form1.Font := FontDialog1.Font;
-  end;
-end;
-
-procedure TForm1.Button3Click(Sender: TObject);
-begin
-  // Image1.Picture.Bitmap.Canvas.Pen.Width := 2;
-  // Image1.Picture.Bitmap.Canvas.Pen.Color := clBlack;
-  // Image1.Picture.Bitmap.Canvas.LineTo(100, 100);
-  Form1.Canvas.Pen.Width := 2;
-  Form1.Canvas.Pen.Color := clYellow;
-  Form1.Canvas.MoveTo(0, 0);
-  Form1.Canvas.LineTo(100, 100);
 end;
 
 end.
