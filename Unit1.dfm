@@ -76,7 +76,7 @@ object Form1: TForm1
     Top = 184
     Width = 97
     Height = 17
-    Caption = 'Hiting'
+    Caption = 'NoHinting'
     TabOrder = 5
     OnClick = Button1Click
   end
@@ -122,6 +122,24 @@ object Form1: TForm1
     Height = 17
     Caption = 'AdvanceOnly'
     TabOrder = 10
+    OnClick = Button1Click
+  end
+  object CheckBox5: TCheckBox
+    Left = 791
+    Top = 312
+    Width = 130
+    Height = 17
+    Caption = 'ComputeMetrics'
+    TabOrder = 11
+    OnClick = Button1Click
+  end
+  object CheckBox6: TCheckBox
+    Left = 791
+    Top = 344
+    Width = 97
+    Height = 17
+    Caption = 'NoScale'
+    TabOrder = 12
     OnClick = Button1Click
   end
   object FontDialog1: TFontDialog

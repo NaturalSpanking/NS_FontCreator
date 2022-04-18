@@ -22,6 +22,8 @@ type
     Button4: TButton;
     Edit1: TEdit;
     CheckBox4: TCheckBox;
+    CheckBox5: TCheckBox;
+    CheckBox6: TCheckBox;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -59,7 +61,7 @@ begin
   glyph_index := FT_Get_Char_Index(face, ord(Edit1.Text[1]));
 
   load_flags := [ftlfMonochrome, ftlfRender];
-  if not CheckBox1.Checked then
+  if CheckBox1.Checked then
     load_flags := load_flags + [ftlfNoHinting];
   if CheckBox2.Checked then
     load_flags := load_flags + [ftlfForceAutohint];
@@ -67,6 +69,10 @@ begin
     load_flags := load_flags + [ftlfTargetMono];
   if CheckBox4.Checked then // фигня какая-то
     load_flags := load_flags + [ftlfAdvanceOnly];
+  if CheckBox5.Checked then
+    load_flags := load_flags + [ftlfComputeMetrics];
+  if CheckBox6.Checked then
+    load_flags := load_flags +[ftlfNoScale];
 
   x := FT_Load_Glyph(face, glyph_index, load_flags);
   if x <> 0 then
@@ -87,9 +93,10 @@ begin
     for j := 0 to StringGrid1.RowCount do
       StringGrid1.Cells[i, j] := '';
 
-  // StringGrid1.ColCount := face.Glyph.Bitmap.Pitch * 8;
-  StringGrid1.RowCount := face.Glyph.Bitmap.Rows;
-  StringGrid1.ColCount := face.Glyph.Bitmap.Width;
+
+//  StringGrid1.RowCount := face.Glyph.Metrics.Height div 64;
+  StringGrid1.RowCount := face.Size.Metrics.Height div 64;
+  StringGrid1.ColCount := face.Glyph.Metrics.Width div 64;
 
   {
     Glyph.Bitmap.Pitch в монохромном режиме выдает количество байт на строку, четное число
@@ -101,7 +108,7 @@ begin
     for j := 0 to 7 do
     begin
       if face.Glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
-        StringGrid1.Cells[k * 8 + j, i div face.Glyph.Bitmap.Pitch] := 'X';
+        StringGrid1.Cells[k * 8 + j,(face.Size.Metrics.Ascender - face.Glyph.Metrics.HorzBearingY) div 64 + i div face.Glyph.Bitmap.Pitch] := 'X';
     end;
     inc(k);
     if k = face.Glyph.Bitmap.Pitch then
@@ -177,6 +184,7 @@ begin
   end;
 
   x := FT_Set_Pixel_Sizes(face, 0, Form1.Font.Size);
+//  x := FT_Set_Char_Size(face,0,Form1.Font.Size,96,96);
   if x <> 0 then
   begin
     AddLog('Failed to set pixel size');
