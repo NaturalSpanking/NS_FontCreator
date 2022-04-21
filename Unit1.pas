@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.Imaging.jpeg, Vcl.Grids, Vcl.ComCtrls, Vcl.Menus;
+  Vcl.Imaging.jpeg, Vcl.Grids, Vcl.ComCtrls, Vcl.Menus, NS_Rasterizer;
 
 type
   TForm1 = class(TForm)
@@ -29,7 +29,9 @@ type
     File1: TMenuItem;
     StatusBar1: TStatusBar;
     procedure Button1Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
+    raster: TRasterizer;
     procedure AddLog(S: string);
   public
     { Public declarations }
@@ -62,6 +64,13 @@ begin
     Glyph.Bitmap.Pitch в монохромном режиме выдает количество байт на строку, четное число
     при этом используется 1 бит на пиксель
   }
+end;
+
+procedure TForm1.Button4Click(Sender: TObject);
+begin
+  raster := TRasterizer.Create;
+  raster.Font := FontDialog1.Font;
+  raster.Free;
 end;
 
 end.

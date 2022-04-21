@@ -107,6 +107,7 @@ object Form1: TForm1
       Height = 25
       Caption = 'Init'
       TabOrder = 3
+      OnClick = Button4Click
     end
     object CheckBox1: TCheckBox
       Left = 15

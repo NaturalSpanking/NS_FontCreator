@@ -21,15 +21,16 @@ type
     load_flags: TFTLoadFlags;
     rendef_flags: TFTRenderMode;
     ver: TLibVersion;
-    font: TFont;
     pFont: PByte;
     font_mem_size: integer;
     glyph_index: integer;
     procedure set_font(font: TFont);
     procedure do_render;
   public
+    property Font:TFont write set_font;
+    procedure Free;
     constructor Create;
-    destructor Free;
+    destructor Destroy;
   end;
 
 implementation
@@ -39,10 +40,10 @@ implementation
 constructor TRasterizer.Create;
 begin
   if FT_Init_FreeType(ft_lib) <> 0 then
-  begin
-    raise Exception.Create('Error Message');
-  end;
+    raise Exception.Create('Failed to init FreeType library.');
   FT_Library_Version(ft_lib, ver.major, ver.minor, ver.patch);
+  pFont := nil;
+  font_mem_size := 0;
 end;
 
 procedure TRasterizer.do_render;
@@ -81,47 +82,48 @@ begin
   }
 end;
 
-destructor TRasterizer.Free;
+destructor TRasterizer.Destroy;
 begin
   ft_face.Glyph.Bitmap.Done;
   FT_Done_Face(ft_face);
   FT_Done_FreeType(ft_lib);
-  FreeMem(pFont);
+  if font_mem_size > 0 then
+    FreeMem(pFont);
 end;
 
 procedure TRasterizer.set_font(font: TFont);
+var
+  dc: HDC;
 begin
+  dc := CreateDC('DISPLAY', nil, nil, nil);
+  SelectObject(dc, font.Handle);
+  if font_mem_size > 0 then
+  begin
+    FT_Done_Face(ft_face);
+    FreeMem(pFont);
+  end;
+  font_mem_size := GetFontData(dc, 0, 0, nil, font_mem_size);
+  GetMem(pFont, font_mem_size);
+  if GetFontData(dc, 0, 0, pFont, font_mem_size) = GDI_ERROR then
+    raise Exception.Create('Failed to get font data.');
   // x := FT_New_Face(ft_lib, PAnsiChar(FontDialog1.Font.GetNamePath), 0, face);
-  {
-    x := FT_New_Memory_Face(ft_lib, pFont, font_mem_size, 0, face);
-    if x <> 0 then
-    begin
-    AddLog('Failed to load face');
-    end;
+  if FT_New_Memory_Face(ft_lib, pFont, font_mem_size, 0, ft_face) <> 0 then
+    raise Exception.Create('Failed to get font face.');
+  // x := FT_Set_Char_Size(face,0,Form1.Font.Size,96,96);
+  if FT_Set_Pixel_Sizes(ft_face, 0, font.Size) <> 0 then
+    raise Exception.Create('Failed to set pixel size.');
+  CancelDC(dc);
+  DeleteDC(dc);
+end;
 
-    x := FT_Set_Pixel_Sizes(face, 0, Form1.Font.Size);
-    // x := FT_Set_Char_Size(face,0,Form1.Font.Size,96,96);
-    if x <> 0 then
-    begin
-    AddLog('Failed to set pixel size');
-    end;
-  }
+procedure TRasterizer.Free;
+begin
+  // under ARC, this method isn't actually called since the compiler translates
+  // the call to be a mere nil assignment to the instance variable, which then calls _InstClear
+{$IFNDEF AUTOREFCOUNT}
+  if Self <> nil then
+    Destroy;
+{$ENDIF}
 end;
 
 end.
-
-{
-  FontDialog1.Font := Form1.Font;
-  if FontDialog1.Execute(Application.Handle) then
-  begin
-    Form1.Font := FontDialog1.Font;
-    font_mem_size := GetFontData(Form1.Canvas.Handle, 0, 0, nil, font_mem_size);
-    GetMem(pFont, font_mem_size);
-    if GetFontData(Form1.Canvas.Handle, 0, 0, pFont, font_mem_size) = GDI_ERROR
-    then
-    begin
-      FreeMem(pFont);
-      exit;
-    end;
-  end;
-}
