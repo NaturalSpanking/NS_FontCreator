@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 841
+  ClientHeight = 821
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -20,7 +20,7 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 717
+    Top = 697
     Width = 1424
     Height = 105
     Align = alBottom
@@ -30,7 +30,7 @@ object Form1: TForm1
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 714
+    Top = 694
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -42,7 +42,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 145
     Top = 0
-    Height = 714
+    Height = 694
     ExplicitLeft = 168
     ExplicitTop = 280
     ExplicitHeight = 100
@@ -51,14 +51,10 @@ object Form1: TForm1
     Left = 148
     Top = 0
     Width = 1049
-    Height = 714
+    Height = 694
     Align = alClient
     DefaultColWidth = 32
     TabOrder = 0
-    ExplicitLeft = 208
-    ExplicitTop = 8
-    ExplicitWidth = 545
-    ExplicitHeight = 537
     ColWidths = (
       32
       32
@@ -76,12 +72,9 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 714
+    Height = 694
     Align = alRight
     TabOrder = 1
-    ExplicitLeft = 816
-    ExplicitTop = -8
-    ExplicitHeight = 687
     object Button1: TButton
       Left = 110
       Top = 48
@@ -98,7 +91,6 @@ object Form1: TForm1
       Height = 25
       Caption = 'Font'
       TabOrder = 1
-      OnClick = Button2Click
     end
     object Button3: TButton
       Left = 110
@@ -107,7 +99,6 @@ object Form1: TForm1
       Height = 25
       Caption = 'Free'
       TabOrder = 2
-      OnClick = Button3Click
     end
     object Button4: TButton
       Left = 110
@@ -116,7 +107,6 @@ object Form1: TForm1
       Height = 25
       Caption = 'Init'
       TabOrder = 3
-      OnClick = Button4Click
     end
     object CheckBox1: TCheckBox
       Left = 15
@@ -158,20 +148,20 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 145
-    Height = 714
+    Height = 694
     Align = alLeft
     Indent = 19
     TabOrder = 2
-    ExplicitHeight = 687
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 822
+    Top = 802
     Width = 1424
     Height = 19
-    Panels = <>
-    ExplicitTop = 660
-    ExplicitWidth = 1091
+    Panels = <
+      item
+        Width = 50
+      end>
   end
   object FontDialog1: TFontDialog
     Ctl3D = False
