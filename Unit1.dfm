@@ -75,9 +75,11 @@ object Form1: TForm1
     Height = 694
     Align = alRight
     TabOrder = 1
+    ExplicitLeft = 1203
+    ExplicitTop = -3
     object Button1: TButton
-      Left = 110
-      Top = 48
+      Left = 70
+      Top = 39
       Width = 75
       Height = 25
       Caption = 'Draw'
@@ -85,8 +87,8 @@ object Form1: TForm1
       OnClick = Button1Click
     end
     object Button2: TButton
-      Left = 110
-      Top = 88
+      Left = 70
+      Top = 70
       Width = 75
       Height = 25
       Caption = 'Font'
@@ -94,8 +96,8 @@ object Form1: TForm1
       OnClick = Button2Click
     end
     object Button3: TButton
-      Left = 110
-      Top = 128
+      Left = 70
+      Top = 101
       Width = 75
       Height = 25
       Caption = 'Free'
@@ -103,7 +105,7 @@ object Form1: TForm1
       OnClick = Button3Click
     end
     object Button4: TButton
-      Left = 110
+      Left = 70
       Top = 8
       Width = 75
       Height = 25
@@ -139,8 +141,8 @@ object Form1: TForm1
       OnClick = Button1Click
     end
     object Edit1: TEdit
-      Left = 54
-      Top = 46
+      Left = 6
+      Top = 126
       Width = 27
       Height = 29
       TabOrder = 7
@@ -154,6 +156,36 @@ object Form1: TForm1
       Caption = 'Button5'
       TabOrder = 8
       OnClick = Button5Click
+    end
+    object Button6: TButton
+      Left = 31
+      Top = 70
+      Width = 33
+      Height = 25
+      Caption = 'a'
+      Font.Charset = RUSSIAN_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 9
+      OnClick = Button6Click
+    end
+    object Button7: TButton
+      Left = 151
+      Top = 70
+      Width = 33
+      Height = 25
+      Caption = 'a'
+      Font.Charset = RUSSIAN_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -29
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 10
+      OnClick = Button7Click
     end
   end
   object TreeView1: TTreeView

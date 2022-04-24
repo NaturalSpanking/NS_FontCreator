@@ -29,11 +29,15 @@ type
     File1: TMenuItem;
     StatusBar1: TStatusBar;
     Button5: TButton;
+    Button6: TButton;
+    Button7: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
+    procedure Button7Click(Sender: TObject);
   private
     face: TFTFace;
     pFont: PByte;
@@ -64,7 +68,7 @@ var
   x, i, j, k: integer;
   c: byte;
 begin
-  glyph_index := FT_Get_Char_Index(face, ord(Edit1.Text[1]));
+  glyph_index := face.GetCharIndex(ord(Edit1.Text[1]));
 
   load_flags := [ftlfMonochrome, ftlfRender];
   if CheckBox1.Checked then
@@ -75,31 +79,34 @@ begin
     load_flags := load_flags + [ftlfTargetMono]; // другие флаги фигня
 
   face.LoadGlyph(glyph_index, load_flags);
+  if ftffGlyphNames in face.FaceFlags then
+    StatusBar1.Panels[0].Text := face.GetGlyphName(glyph_index)
+  else
+    StatusBar1.Panels[0].Text := 'Face hasn'' t glyph names ';
 
-  for i := 0 to StringGrid1.ColCount do
-    for j := 0 to StringGrid1.RowCount do
-      StringGrid1.Cells[i, j] := '';
+      for i := 0 to StringGrid1.ColCount do for j :=
+      0 to StringGrid1.RowCount do StringGrid1.Cells[i, j] := '';
 
   // StringGrid1.RowCount := face.Glyph.Metrics.Height div 64;
   StringGrid1.RowCount := face.Size.Metrics.Height div 64 + 1;
-  StringGrid1.ColCount := face.Glyph.Metrics.Width div 64;
+  StringGrid1.ColCount := face.glyph.Metrics.Width div 64;
 
   {
     Glyph.Bitmap.Pitch в монохромном режиме выдает количество байт на строку, четное число
     при этом используется 1 бит на пиксель
   }
   k := 0;
-  for i := 0 to (face.Glyph.Bitmap.Rows * face.Glyph.Bitmap.Pitch) - 1 do
+  for i := 0 to (face.glyph.Bitmap.Rows * face.glyph.Bitmap.Pitch) - 1 do
   begin
     for j := 0 to 7 do
     begin
-      if face.Glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
+      if face.glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
         StringGrid1.Cells[k * 8 + j,
-          (face.Size.Metrics.Ascender - face.Glyph.Metrics.HorzBearingY) div 64
-          + i div face.Glyph.Bitmap.Pitch + 1] := 'X';
+          (face.Size.Metrics.Ascender - face.glyph.Metrics.HorzBearingY) div 64
+          + i div face.glyph.Bitmap.Pitch + 1] := 'X';
     end;
     inc(k);
-    if k = face.Glyph.Bitmap.Pitch then
+    if k = face.glyph.Bitmap.Pitch then
       k := 0;
 
   end;
@@ -113,7 +120,7 @@ end;
 
 procedure TForm1.Button3Click(Sender: TObject);
 begin
-  face.Glyph.Bitmap.Done;
+  face.glyph.Bitmap.Done;
   FT_Done_Face(face);
   FreeMem(pFont);
   font_mem_size := 0;
@@ -136,6 +143,20 @@ var
 begin
   for i := 1 to 1000 do
     Set_FT_Font;
+end;
+
+procedure TForm1.Button6Click(Sender: TObject);
+begin
+  FontDialog1.Font.Size := FontDialog1.Font.Size - 1;
+  Set_FT_Font;
+  Button1.Click;
+end;
+
+procedure TForm1.Button7Click(Sender: TObject);
+begin
+  FontDialog1.Font.Size := FontDialog1.Font.Size + 1;
+  Set_FT_Font;
+  Button1.Click;
 end;
 
 procedure TForm1.Set_FT_Font;
