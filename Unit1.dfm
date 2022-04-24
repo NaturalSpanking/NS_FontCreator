@@ -187,6 +187,16 @@ object Form1: TForm1
       TabOrder = 10
       OnClick = Button7Click
     end
+    object Memo1: TMemo
+      Left = 1
+      Top = 376
+      Width = 225
+      Height = 317
+      Align = alBottom
+      Lines.Strings = (
+        'Memo1')
+      TabOrder = 11
+    end
   end
   object TreeView1: TTreeView
     Left = 0

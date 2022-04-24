@@ -9,6 +9,14 @@ uses
   Vcl.Imaging.jpeg, Vcl.Grids, Vcl.ComCtrls, Vcl.Menus;
 
 type
+  TSymb = record
+    Width: integer;
+    Heigth: integer;
+    BytesPerColumn: integer;
+    BufferSize: integer;
+    Buffer: PByte;
+  end;
+
   TForm1 = class(TForm)
     Button1: TButton;
     Button2: TButton;
@@ -31,6 +39,7 @@ type
     Button5: TButton;
     Button6: TButton;
     Button7: TButton;
+    Memo1: TMemo;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -45,6 +54,7 @@ type
     rendef_flags: TFTRenderMode;
     procedure AddLog(S: string);
     procedure Set_FT_Font;
+    function Render(char_idx: smallint): TSymb;
     function CheckLoadFlags: TFTLoadFlags;
     function FontStyletoString(style: TFontStyles): string;
   public
@@ -65,44 +75,27 @@ end;
 
 procedure TForm1.Button1Click(Sender: TObject);
 var
-  x, i, j, k: integer;
-  c: byte;
+  i, j, k: integer;
+  x, y: integer;
+  S: TSymb;
   glyph_index: integer;
 begin
-  glyph_index := face.GetCharIndex(ord(Edit1.Text[1]));
-  face.LoadGlyph(glyph_index, CheckLoadFlags);
-  if ftffGlyphNames in face.FaceFlags then
-    StatusBar1.Panels[2].Text := face.GetGlyphName(glyph_index)
-  else
-    StatusBar1.Panels[2].Text := 'Face hasn'' t glyph names ';
-
   for i := 0 to StringGrid1.ColCount do
     for j := 0 to StringGrid1.RowCount do
       StringGrid1.Cells[i, j] := '';
-
-  // StringGrid1.RowCount := face.Glyph.Metrics.Height div 64;
-  StringGrid1.RowCount := face.Size.Metrics.Height div 64 + 1;
-  StringGrid1.ColCount := face.glyph.Metrics.Width div 64;
-  // StringGrid1.ColCount := face.Size.Metrics.MaxAdvance div 64;
-
-  {
-    Glyph.Bitmap.Pitch в монохромном режиме выдает количество байт на строку, четное число
-    при этом используется 1 бит на пиксель
-  }
+  S := Render(ord(Edit1.Text[1]));
+  StringGrid1.RowCount := S.Heigth;
+  StringGrid1.ColCount := S.Width;
   k := 0;
-  for i := 0 to (face.glyph.Bitmap.Rows * face.glyph.Bitmap.Pitch) - 1 do
+  for i := 0 to S.BufferSize do
   begin
     for j := 0 to 7 do
-    begin
-      if face.glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
-        StringGrid1.Cells[k * 8 + j,
-          (face.Size.Metrics.Ascender - face.glyph.Metrics.HorzBearingY) div 64
-          + i div face.glyph.Bitmap.Pitch + 1] := 'X';
-    end;
-    inc(k);
-    if k = face.glyph.Bitmap.Pitch then
-      k := 0;
-
+      if (S.Buffer[i] shl j) and 128 > 0 then
+      begin
+        x := i div S.BytesPerColumn;
+        y := 8*(i mod S.BytesPerColumn) + j;
+        StringGrid1.Cells[x, y] := 'X';
+      end;
   end;
 end;
 
@@ -177,6 +170,56 @@ begin
     Result := Result + ' Bold';
 end;
 
+function TForm1.Render(char_idx: smallint): TSymb;
+var
+  P_x, P_y, i, j, k: integer;
+  c: byte;
+  byte_idx: integer;
+  glyph_index: integer;
+begin
+  glyph_index := face.GetCharIndex(char_idx);
+  face.LoadGlyph(glyph_index, CheckLoadFlags);
+  if ftffGlyphNames in face.FaceFlags then
+    StatusBar1.Panels[2].Text := face.GetGlyphName(glyph_index)
+  else
+    StatusBar1.Panels[2].Text := 'Face hasn'' t glyph names ';
+  Result.Heigth := face.Size.Metrics.Height div 64 + 1;
+  Result.Width := face.glyph.Metrics.Width div 64;
+  Result.BytesPerColumn := Result.Heigth div 8;
+  if Result.BytesPerColumn * 8 < Result.Heigth then
+    inc(Result.BytesPerColumn);
+  Result.BufferSize := Result.BytesPerColumn * Result.Width;
+  Result.Buffer := GetMemory(Result.BufferSize);
+  // FillChar(Result.Buffer, Result.BufferSize, 0);
+  // StringGrid1.RowCount := face.Size.Metrics.Height div 64 + 1;
+  // StringGrid1.ColCount := face.glyph.Metrics.Width div 64;
+
+  for i := 0 to Result.BufferSize do
+    Result.Buffer[i] := 0;
+  k := 0;
+  for i := 0 to (face.glyph.Bitmap.Rows * face.glyph.Bitmap.Pitch) - 1 do
+  begin
+    for j := 0 to 7 do
+    begin
+      if face.glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
+      begin
+        P_x := k * 8 + j;
+        P_y := (face.Size.Metrics.Ascender - face.glyph.Metrics.HorzBearingY)
+          div 64 + i div face.glyph.Bitmap.Pitch + 1;
+        byte_idx := (P_y div 8) + Result.BytesPerColumn * P_x;
+        Result.Buffer[byte_idx] := Result.Buffer[byte_idx] +
+          1 shl (7 - P_y mod 8);
+
+        // StringGrid1.Cells[P_x, P_y] := 'X';
+      end;
+
+    end;
+    inc(k);
+    if k = face.glyph.Bitmap.Pitch then
+      k := 0;
+  end;
+end;
+
 procedure TForm1.Set_FT_Font;
 var
   dc: HDC;
@@ -200,10 +243,9 @@ begin
     FontStyletoString(FontDialog1.Font.style) + ' ' +
     IntToStr(FontDialog1.Font.Size);
   face.LoadGlyph(face.GetCharIndex(ord('Щ')), CheckLoadFlags);
-  StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64 +
-    1) + 'x' +
-   IntToStr(face.Size.Metrics.MaxAdvance div 64);
-//    IntToStr(face.glyph.Metrics.Width div 64);
+  StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64 + 1) +
+    'x' + IntToStr(face.Size.Metrics.MaxAdvance div 64);
+  // IntToStr(face.glyph.Metrics.Width div 64);
 
 end;
 
