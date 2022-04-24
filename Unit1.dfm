@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 821
+  ClientHeight = 801
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -20,7 +20,7 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 697
+    Top = 677
     Width = 1424
     Height = 105
     Align = alBottom
@@ -30,7 +30,7 @@ object Form1: TForm1
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 694
+    Top = 674
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -42,7 +42,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 145
     Top = 0
-    Height = 694
+    Height = 674
     ExplicitLeft = 168
     ExplicitTop = 280
     ExplicitHeight = 100
@@ -51,7 +51,7 @@ object Form1: TForm1
     Left = 148
     Top = 0
     Width = 1049
-    Height = 694
+    Height = 674
     Align = alClient
     DefaultColWidth = 32
     TabOrder = 0
@@ -72,7 +72,7 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 694
+    Height = 674
     Align = alRight
     TabOrder = 1
     object Button1: TButton
@@ -91,6 +91,7 @@ object Form1: TForm1
       Height = 25
       Caption = 'Font'
       TabOrder = 1
+      OnClick = Button2Click
     end
     object Button3: TButton
       Left = 110
@@ -99,6 +100,7 @@ object Form1: TForm1
       Height = 25
       Caption = 'Free'
       TabOrder = 2
+      OnClick = Button3Click
     end
     object Button4: TButton
       Left = 110
@@ -149,14 +151,14 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 145
-    Height = 694
+    Height = 674
     Align = alLeft
     Indent = 19
     TabOrder = 2
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 802
+    Top = 782
     Width = 1424
     Height = 19
     Panels = <
@@ -168,7 +170,7 @@ object Form1: TForm1
     Ctl3D = False
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -11
+    Font.Height = -19
     Font.Name = 'Tahoma'
     Font.Style = []
     Left = 792

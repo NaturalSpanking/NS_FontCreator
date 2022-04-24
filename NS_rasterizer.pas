@@ -7,6 +7,7 @@ uses
 
 type
   ERenderFlags = (rfNoHinting, rfForceAutohint, rfTargetMono);
+  TRenderFlags = set of rfNoHinting .. ERenderFlags(7);
 
   TLibVersion = record
     major: integer;
@@ -14,20 +15,31 @@ type
     patch: integer;
   end;
 
+  TGlyph = record
+    Data: PByte;
+    Width: integer;
+    Height: integer;
+    Pitch: integer;
+    Ascender: integer;
+    Descender: integer;
+    HorzBearingX: integer;
+    HorzBearingY: integer;
+  end;
+
+  PGlyph = ^TGlyph;
+
   TRasterizer = class
   private
     ft_lib: TFTLibrary;
     ft_face: TFTFace;
-    load_flags: TFTLoadFlags;
-    rendef_flags: TFTRenderMode;
     ver: TLibVersion;
     pFont: PByte;
     font_mem_size: integer;
-    glyph_index: integer;
     procedure set_font(font: TFont);
-    procedure do_render;
+
   public
-    property Font:TFont write set_font;
+    property font: TFont write set_font;
+    function Render(char_idx: integer; flags: TRenderFlags): PGlyph;
     procedure Free;
     constructor Create;
     destructor Destroy;
@@ -46,25 +58,35 @@ begin
   font_mem_size := 0;
 end;
 
-procedure TRasterizer.do_render;
+function TRasterizer.Render(char_idx: integer; flags: TRenderFlags): PGlyph;
+var
+  rendef_flags: TFTRenderMode;
+  load_flags: TFTLoadFlags;
+  glyph_index: integer;
 begin
-  {
-    glyph_index := FT_Get_Char_Index(face, ord(Edit1.Text[1]));
-    exception.Create();
-    load_flags := [ftlfMonochrome, ftlfRender];
-    if CheckBox1.Checked then
-    load_flags := load_flags + [ftlfNoHinting];
-    if CheckBox2.Checked then
-    load_flags := load_flags + [ftlfForceAutohint];
-    if CheckBox3.Checked then
-    load_flags := load_flags + [ftlfTargetMono];
-    x := FT_Load_Glyph(face, glyph_index, load_flags);
-    if x <> 0 then
-    begin
-    AddLog('Failed to load glyph');
-    end;
-  }
 
+  glyph_index := FT_Get_Char_Index(ft_face, char_idx);
+  // Exception.Create();
+  load_flags := [ftlfMonochrome, ftlfRender];
+  if rfNoHinting in flags then
+    load_flags := load_flags + [ftlfNoHinting];
+  if rfForceAutohint in flags then
+    load_flags := load_flags + [ftlfForceAutohint];
+  if rfTargetMono in flags then
+    load_flags := load_flags + [ftlfTargetMono];
+  if FT_Load_Glyph(ft_face, glyph_index, load_flags) > 0 then
+    raise Exception.Create('Failed to load glyph');
+  new(Result);
+  // Result.Width := ft_face.Glyph.Bitmap.Width;
+  Result.Width := ft_face.Glyph.Metrics.Width div 64;
+  // Result.Height := ft_face.Glyph.Bitmap.Rows;
+  Result.Height := ft_face.Size.Metrics.Height div 64 + 1;
+  Result.Pitch := ft_face.Glyph.Bitmap.Pitch;
+  Result.Ascender := ft_face.Size.Metrics.Ascender div 64;
+  Result.Descender := ft_face.Size.Metrics.Descender div 64;
+  Result.HorzBearingX := ft_face.Glyph.Metrics.HorzBearingX div 64;
+  Result.HorzBearingY := ft_face.Glyph.Metrics.HorzBearingY div 64;
+  Result.Data := ft_face.Glyph.Bitmap.Buffer;
   {
     for i := 0 to (face.Glyph.Bitmap.Rows * face.Glyph.Bitmap.Pitch) - 1 do
     begin

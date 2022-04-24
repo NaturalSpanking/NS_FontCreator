@@ -30,6 +30,8 @@ type
     StatusBar1: TStatusBar;
     procedure Button1Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
     raster: TRasterizer;
     procedure AddLog(S: string);
@@ -51,14 +53,31 @@ end;
 
 procedure TForm1.Button1Click(Sender: TObject);
 var
-  i, j: integer;
+  i, j, k: integer;
+  G: PGlyph;
 begin
   for i := 0 to StringGrid1.ColCount do
     for j := 0 to StringGrid1.RowCount do
       StringGrid1.Cells[i, j] := '';
 
+   G:=raster.Render(ord('g'),[]);
   // StringGrid1.RowCount := face.Size.Metrics.Height div 64 + 1;
+  StringGrid1.RowCount := G.Height;
   // StringGrid1.ColCount := face.Glyph.Metrics.Width div 64;
+  StringGrid1.ColCount := G.Width;
+
+  for i := 0 to (G.Height * G.Pitch) - 1 do
+    begin
+    for j := 0 to 7 do
+    begin
+    if G.Data[i] shl j and 128 > 0 then
+    StringGrid1.Cells[k * 8 + j,
+    (G.Ascender - G.HorzBearingY)+ i div G.Pitch + 1] := 'X';
+    end;
+    inc(k);
+    if k = G.Pitch then
+    k := 0;
+    end;
 
   {
     Glyph.Bitmap.Pitch в монохромном режиме выдает количество байт на строку, четное число
@@ -66,11 +85,21 @@ begin
   }
 end;
 
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+  if FontDialog1.Execute then
+    raster.Font := FontDialog1.Font;
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+begin
+  raster.Free;
+end;
+
 procedure TForm1.Button4Click(Sender: TObject);
 begin
   raster := TRasterizer.Create;
   raster.Font := FontDialog1.Font;
-  raster.Free;
 end;
 
 end.
