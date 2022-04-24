@@ -10,6 +10,7 @@ uses
 
 type
   TSymb = record
+    Code: integer;
     Width: integer;
     Heigth: integer;
     BytesPerColumn: integer;
@@ -54,6 +55,7 @@ type
     rendef_flags: TFTRenderMode;
     procedure AddLog(S: string);
     procedure Set_FT_Font;
+    procedure ShowSymb(var symbol: TSymb);
     function Render(char_idx: smallint): TSymb;
     function CheckLoadFlags: TFTLoadFlags;
     function FontStyletoString(style: TFontStyles): string;
@@ -75,28 +77,11 @@ end;
 
 procedure TForm1.Button1Click(Sender: TObject);
 var
-  i, j, k: integer;
-  x, y: integer;
   S: TSymb;
-  glyph_index: integer;
 begin
-  for i := 0 to StringGrid1.ColCount do
-    for j := 0 to StringGrid1.RowCount do
-      StringGrid1.Cells[i, j] := '';
   S := Render(ord(Edit1.Text[1]));
-  StringGrid1.RowCount := S.Heigth;
-  StringGrid1.ColCount := S.Width;
-  k := 0;
-  for i := 0 to S.BufferSize do
-  begin
-    for j := 0 to 7 do
-      if (S.Buffer[i] shl j) and 128 > 0 then
-      begin
-        x := i div S.BytesPerColumn;
-        y := 8*(i mod S.BytesPerColumn) + j;
-        StringGrid1.Cells[x, y] := 'X';
-      end;
-  end;
+  ShowSymb(S);
+  FreeMemory(S.Buffer);
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
@@ -128,8 +113,9 @@ procedure TForm1.Button5Click(Sender: TObject);
 var
   i: integer;
 begin
-  for i := 1 to 1000 do
-    Set_FT_Font;
+  for i := 1 to 10000 do
+    // Set_FT_Font;
+    Button1.Click;
 end;
 
 procedure TForm1.Button6Click(Sender: TObject);
@@ -183,6 +169,7 @@ begin
     StatusBar1.Panels[2].Text := face.GetGlyphName(glyph_index)
   else
     StatusBar1.Panels[2].Text := 'Face hasn'' t glyph names ';
+  Result.Code := char_idx;
   Result.Heigth := face.Size.Metrics.Height div 64 + 1;
   Result.Width := face.glyph.Metrics.Width div 64;
   Result.BytesPerColumn := Result.Heigth div 8;
@@ -190,17 +177,12 @@ begin
     inc(Result.BytesPerColumn);
   Result.BufferSize := Result.BytesPerColumn * Result.Width;
   Result.Buffer := GetMemory(Result.BufferSize);
-  // FillChar(Result.Buffer, Result.BufferSize, 0);
-  // StringGrid1.RowCount := face.Size.Metrics.Height div 64 + 1;
-  // StringGrid1.ColCount := face.glyph.Metrics.Width div 64;
-
   for i := 0 to Result.BufferSize do
     Result.Buffer[i] := 0;
   k := 0;
   for i := 0 to (face.glyph.Bitmap.Rows * face.glyph.Bitmap.Pitch) - 1 do
   begin
     for j := 0 to 7 do
-    begin
       if face.glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
       begin
         P_x := k * 8 + j;
@@ -209,15 +191,12 @@ begin
         byte_idx := (P_y div 8) + Result.BytesPerColumn * P_x;
         Result.Buffer[byte_idx] := Result.Buffer[byte_idx] +
           1 shl (7 - P_y mod 8);
-
-        // StringGrid1.Cells[P_x, P_y] := 'X';
       end;
-
-    end;
     inc(k);
     if k = face.glyph.Bitmap.Pitch then
       k := 0;
   end;
+  face.glyph.Bitmap.Done;
 end;
 
 procedure TForm1.Set_FT_Font;
@@ -242,11 +221,33 @@ begin
   StatusBar1.Panels[0].Text := FontDialog1.Font.Name +
     FontStyletoString(FontDialog1.Font.style) + ' ' +
     IntToStr(FontDialog1.Font.Size);
-  face.LoadGlyph(face.GetCharIndex(ord('Ù')), CheckLoadFlags);
+  // face.LoadGlyph(face.GetCharIndex(ord('Ù')), CheckLoadFlags);
   StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64 + 1) +
     'x' + IntToStr(face.Size.Metrics.MaxAdvance div 64);
   // IntToStr(face.glyph.Metrics.Width div 64);
 
+end;
+
+procedure TForm1.ShowSymb(var symbol: TSymb);
+var
+  i, j: integer;
+  x, y: integer;
+begin
+  for i := 0 to StringGrid1.ColCount do
+    for j := 0 to StringGrid1.RowCount do
+      StringGrid1.Cells[i, j] := '';
+  StringGrid1.RowCount := symbol.Heigth;
+  StringGrid1.ColCount := symbol.Width;
+  for i := 0 to symbol.BufferSize do
+  begin
+    for j := 0 to 7 do
+      if (symbol.Buffer[i] shl j) and 128 > 0 then
+      begin
+        x := i div symbol.BytesPerColumn;
+        y := 8 * (i mod symbol.BytesPerColumn) + j;
+        StringGrid1.Cells[x, y] := 'X';
+      end;
+  end;
 end;
 
 end.
