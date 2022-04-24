@@ -146,6 +146,15 @@ object Form1: TForm1
       TabOrder = 7
       Text = 'g'
     end
+    object Button5: TButton
+      Left = 96
+      Top = 320
+      Width = 75
+      Height = 25
+      Caption = 'Button5'
+      TabOrder = 8
+      OnClick = Button5Click
+    end
   end
   object TreeView1: TTreeView
     Left = 0
@@ -161,7 +170,10 @@ object Form1: TForm1
     Top = 802
     Width = 1424
     Height = 19
-    Panels = <>
+    Panels = <
+      item
+        Width = 50
+      end>
   end
   object FontDialog1: TFontDialog
     Ctl3D = False

@@ -28,12 +28,13 @@ type
     MainMenu1: TMainMenu;
     File1: TMenuItem;
     StatusBar1: TStatusBar;
+    Button5: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
   private
-    ft_lib: TFTLibrary;
     face: TFTFace;
     pFont: PByte;
     font_mem_size: integer;
@@ -41,6 +42,7 @@ type
     load_flags: TFTLoadFlags;
     rendef_flags: TFTRenderMode;
     procedure AddLog(S: string);
+    procedure Set_FT_Font;
   public
     { Public declarations }
   end;
@@ -54,7 +56,7 @@ implementation
 
 procedure TForm1.AddLog(S: string);
 begin
-  //Memo1.Lines.Add(S);
+  // Memo1.Lines.Add(S);
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
@@ -70,35 +72,15 @@ begin
   if CheckBox2.Checked then
     load_flags := load_flags + [ftlfForceAutohint];
   if CheckBox3.Checked then
-    load_flags := load_flags + [ftlfTargetMono];
-//  if CheckBox4.Checked then // фигня какая-то
-//    load_flags := load_flags + [ftlfAdvanceOnly];
-//  if CheckBox5.Checked then
-//    load_flags := load_flags + [ftlfComputeMetrics];
-//  if CheckBox6.Checked then
-//    load_flags := load_flags +[ftlfNoScale];
+    load_flags := load_flags + [ftlfTargetMono]; // другие флаги фигня
 
-  x := FT_Load_Glyph(face, glyph_index, load_flags);
-  if x <> 0 then
-  begin
-    AddLog('Failed to load glyph');
-  end;
-
-  // рендер уже сделан выше
-  // разыменовывание указателя происходит тут
-  // к этому моменту в буфере что-то есть уже
-  // x := FT_Render_Glyph(face.Glyph^, ftrmMono);
-  // if x <> 0 then
-  // begin
-  // AddLog('Failed to render the glyph');
-  // end;
+  face.LoadGlyph(glyph_index, load_flags);
 
   for i := 0 to StringGrid1.ColCount do
     for j := 0 to StringGrid1.RowCount do
       StringGrid1.Cells[i, j] := '';
 
-
-//  StringGrid1.RowCount := face.Glyph.Metrics.Height div 64;
+  // StringGrid1.RowCount := face.Glyph.Metrics.Height div 64;
   StringGrid1.RowCount := face.Size.Metrics.Height div 64 + 1;
   StringGrid1.ColCount := face.Glyph.Metrics.Width div 64;
 
@@ -112,87 +94,69 @@ begin
     for j := 0 to 7 do
     begin
       if face.Glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
-        StringGrid1.Cells[k * 8 + j,(face.Size.Metrics.Ascender - face.Glyph.Metrics.HorzBearingY) div 64 + i div face.Glyph.Bitmap.Pitch + 1] := 'X';
+        StringGrid1.Cells[k * 8 + j,
+          (face.Size.Metrics.Ascender - face.Glyph.Metrics.HorzBearingY) div 64
+          + i div face.Glyph.Bitmap.Pitch + 1] := 'X';
     end;
     inc(k);
     if k = face.Glyph.Bitmap.Pitch then
       k := 0;
 
   end;
-
-  { не правильно работает
-    for i := 0 to (face.Glyph.Bitmap.Rows) - 1 do
-    begin
-    for k := 0 to face.Glyph.Bitmap.Pitch - 1 do
-    begin
-    c := face.Glyph.Bitmap.Buffer[i * face.Glyph.Bitmap.Pitch + k];
-    // c := c + (face.Glyph.Bitmap.Buffer[i * face.Glyph.Bitmap.Pitch +1] shl 8);
-    for j := 0 to face.Glyph.Bitmap.Width do
-    begin
-    if (c shr (j)) and 1 > 0 then // +face.Glyph.BitmapLeft
-    StringGrid1.Cells[8*k + face.Glyph.Bitmap.Width - j, i] := 'X';
-    end;
-    end;
-    end;
-  }
-
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
-  FontDialog1.Font := Form1.Font;
   if FontDialog1.Execute(Application.Handle) then
-  begin
-    Form1.Font := FontDialog1.Font;
-  end;
+    Set_FT_Font;
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
 begin
   face.Glyph.Bitmap.Done;
   FT_Done_Face(face);
-  FT_Done_FreeType(ft_lib);
   FreeMem(pFont);
+  font_mem_size := 0;
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
 var
-  x, major, minor, patch: integer;
+  x: integer;
 begin
-  x := FT_Init_FreeType(ft_lib);
-  if x <> 0 then
-  begin
-    AddLog('init fail');
-    exit;
-  end;
+  StatusBar1.Panels[0].Text :=
+    ('FreeType''s version is ' + IntToStr(TFTManager.MajorVersion) + '.' +
+    IntToStr(TFTManager.MinorVersion) + '.' +
+    IntToStr(TFTManager.PatchVersion));
+  Set_FT_Font;
+end;
 
-  FT_Library_Version(ft_lib, major, minor, patch);
-  AddLog('FreeType''s version is ' + IntToStr(major) + '.' +
-    IntToStr(minor) + '.' + IntToStr(patch));
+procedure TForm1.Button5Click(Sender: TObject);
+var
+  i: integer;
+begin
+  for i := 1 to 1000 do
+    Set_FT_Font;
+end;
 
-  font_mem_size := GetFontData(Form1.Canvas.Handle, 0, 0, nil, font_mem_size);
-  GetMem(pFont, font_mem_size);
-  if GetFontData(Form1.Canvas.Handle, 0, 0, pFont, font_mem_size) = GDI_ERROR
-  then
+procedure TForm1.Set_FT_Font;
+var
+  dc: HDC;
+begin
+  dc := CreateDC('DISPLAY', nil, nil, nil);
+  SelectObject(dc, FontDialog1.Font.Handle);
+  if font_mem_size > 0 then
   begin
+    face.Destroy;
     FreeMem(pFont);
-    FT_Done_FreeType(ft_lib);
-    exit;
   end;
-
-  // x := FT_New_Face(ft_lib, PAnsiChar(FontDialog1.Font.GetNamePath), 0, face);
-  x := FT_New_Memory_Face(ft_lib, pFont, font_mem_size, 0, face);
-  if x <> 0 then
-  begin
-    AddLog('Failed to load face');
-  end;
-
-  x := FT_Set_Pixel_Sizes(face, 0, Form1.Font.Size);
-//  x := FT_Set_Char_Size(face,0,Form1.Font.Size,96,96);
-  if x <> 0 then
-  begin
-    AddLog('Failed to set pixel size');
-  end;
+  font_mem_size := GetFontData(dc, 0, 0, nil, font_mem_size);
+  GetMem(pFont, font_mem_size);
+  if GetFontData(dc, 0, 0, pFont, font_mem_size) = GDI_ERROR then
+    raise Exception.Create('Failed to get font data.');
+  face := TFTFace.Create(pFont, font_mem_size, 0);
+  face.SetPixelSize(0, FontDialog1.Font.Size);
+  CancelDC(dc);
+  DeleteDC(dc);
 end;
 
 end.
