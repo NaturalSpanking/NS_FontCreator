@@ -204,7 +204,18 @@ object Form1: TForm1
     Height = 19
     Panels = <
       item
+        Width = 300
+      end
+      item
+        Text = '50x78'
         Width = 50
+      end
+      item
+        Width = 150
+      end
+      item
+        Alignment = taRightJustify
+        Width = 150
       end>
   end
   object FontDialog1: TFontDialog

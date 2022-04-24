@@ -42,11 +42,11 @@ type
     face: TFTFace;
     pFont: PByte;
     font_mem_size: integer;
-    glyph_index: integer;
-    load_flags: TFTLoadFlags;
     rendef_flags: TFTRenderMode;
     procedure AddLog(S: string);
     procedure Set_FT_Font;
+    function CheckLoadFlags: TFTLoadFlags;
+    function FontStyletoString(style: TFontStyles): string;
   public
     { Public declarations }
   end;
@@ -67,29 +67,23 @@ procedure TForm1.Button1Click(Sender: TObject);
 var
   x, i, j, k: integer;
   c: byte;
+  glyph_index: integer;
 begin
   glyph_index := face.GetCharIndex(ord(Edit1.Text[1]));
-
-  load_flags := [ftlfMonochrome, ftlfRender];
-  if CheckBox1.Checked then
-    load_flags := load_flags + [ftlfNoHinting];
-  if CheckBox2.Checked then
-    load_flags := load_flags + [ftlfForceAutohint];
-  if CheckBox3.Checked then
-    load_flags := load_flags + [ftlfTargetMono]; // другие флаги фигня
-
-  face.LoadGlyph(glyph_index, load_flags);
+  face.LoadGlyph(glyph_index, CheckLoadFlags);
   if ftffGlyphNames in face.FaceFlags then
-    StatusBar1.Panels[0].Text := face.GetGlyphName(glyph_index)
+    StatusBar1.Panels[2].Text := face.GetGlyphName(glyph_index)
   else
-    StatusBar1.Panels[0].Text := 'Face hasn'' t glyph names ';
+    StatusBar1.Panels[2].Text := 'Face hasn'' t glyph names ';
 
-      for i := 0 to StringGrid1.ColCount do for j :=
-      0 to StringGrid1.RowCount do StringGrid1.Cells[i, j] := '';
+  for i := 0 to StringGrid1.ColCount do
+    for j := 0 to StringGrid1.RowCount do
+      StringGrid1.Cells[i, j] := '';
 
   // StringGrid1.RowCount := face.Glyph.Metrics.Height div 64;
   StringGrid1.RowCount := face.Size.Metrics.Height div 64 + 1;
   StringGrid1.ColCount := face.glyph.Metrics.Width div 64;
+  // StringGrid1.ColCount := face.Size.Metrics.MaxAdvance div 64;
 
   {
     Glyph.Bitmap.Pitch в монохромном режиме выдает количество байт на строку, четное число
@@ -121,7 +115,7 @@ end;
 procedure TForm1.Button3Click(Sender: TObject);
 begin
   face.glyph.Bitmap.Done;
-  FT_Done_Face(face);
+  face.Destroy;
   FreeMem(pFont);
   font_mem_size := 0;
 end;
@@ -130,10 +124,10 @@ procedure TForm1.Button4Click(Sender: TObject);
 var
   x: integer;
 begin
-  StatusBar1.Panels[0].Text :=
+  StatusBar1.Panels[3].Text :=
     ('FreeType''s version is ' + IntToStr(TFTManager.MajorVersion) + '.' +
-    IntToStr(TFTManager.MinorVersion) + '.' +
-    IntToStr(TFTManager.PatchVersion));
+    IntToStr(TFTManager.MinorVersion) + '.' + IntToStr(TFTManager.PatchVersion))
+    + '       ';
   Set_FT_Font;
 end;
 
@@ -159,6 +153,30 @@ begin
   Button1.Click;
 end;
 
+function TForm1.CheckLoadFlags: TFTLoadFlags;
+begin
+  Result := [ftlfMonochrome, ftlfRender];
+  if CheckBox1.Checked then
+    Result := Result + [ftlfNoHinting];
+  if CheckBox2.Checked then
+    Result := Result + [ftlfForceAutohint];
+  if CheckBox3.Checked then
+    Result := Result + [ftlfTargetMono]; // другие флаги фигня
+end;
+
+function TForm1.FontStyletoString(style: TFontStyles): string;
+begin
+  Result := '';
+  if fsStrikeOut in style then
+    Result := Result + ' StrikeOut';
+  if fsUnderline in style then
+    Result := Result + ' Underline';
+  if fsItalic in style then
+    Result := Result + ' Italic';
+  if fsBold in style then
+    Result := Result + ' Bold';
+end;
+
 procedure TForm1.Set_FT_Font;
 var
   dc: HDC;
@@ -178,6 +196,15 @@ begin
   face.SetPixelSize(0, FontDialog1.Font.Size);
   CancelDC(dc);
   DeleteDC(dc);
+  StatusBar1.Panels[0].Text := FontDialog1.Font.Name +
+    FontStyletoString(FontDialog1.Font.style) + ' ' +
+    IntToStr(FontDialog1.Font.Size);
+  face.LoadGlyph(face.GetCharIndex(ord('Щ')), CheckLoadFlags);
+  StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64 +
+    1) + 'x' +
+   IntToStr(face.Size.Metrics.MaxAdvance div 64);
+//    IntToStr(face.glyph.Metrics.Width div 64);
+
 end;
 
 end.
