@@ -54,13 +54,14 @@ end;
 procedure TForm1.Button1Click(Sender: TObject);
 var
   i, j, k: integer;
-  G: PGlyph;
+  G,H: PGlyph;
 begin
   for i := 0 to StringGrid1.ColCount do
     for j := 0 to StringGrid1.RowCount do
       StringGrid1.Cells[i, j] := '';
 
    G:=raster.Render(ord('g'),[]);
+   H:=raster.Render(ord('h'),[]);
   // StringGrid1.RowCount := face.Size.Metrics.Height div 64 + 1;
   StringGrid1.RowCount := G.Height;
   // StringGrid1.ColCount := face.Glyph.Metrics.Width div 64;

@@ -60,6 +60,7 @@ end;
 
 function TRasterizer.Render(char_idx: integer; flags: TRenderFlags): PGlyph;
 var
+  i: integer;
   rendef_flags: TFTRenderMode;
   load_flags: TFTLoadFlags;
   glyph_index: integer;
@@ -86,7 +87,11 @@ begin
   Result.Descender := ft_face.Size.Metrics.Descender div 64;
   Result.HorzBearingX := ft_face.Glyph.Metrics.HorzBearingX div 64;
   Result.HorzBearingY := ft_face.Glyph.Metrics.HorzBearingY div 64;
-  Result.Data := ft_face.Glyph.Bitmap.Buffer;
+  Result.Data := SysGetMem(ft_face.Glyph.Bitmap.Rows *
+    ft_face.Glyph.Bitmap.Pitch);
+  for i := 0 to ft_face.Glyph.Bitmap.Rows * ft_face.Glyph.Bitmap.Pitch do
+    Result.Data[i] := ft_face.Glyph.Bitmap.Buffer[i];
+
   {
     for i := 0 to (face.Glyph.Bitmap.Rows * face.Glyph.Bitmap.Pitch) - 1 do
     begin
