@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 821
+  ClientHeight = 801
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -20,7 +20,7 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 697
+    Top = 677
     Width = 1424
     Height = 105
     Align = alBottom
@@ -30,7 +30,7 @@ object Form1: TForm1
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 694
+    Top = 674
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -42,7 +42,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 145
     Top = 0
-    Height = 694
+    Height = 674
     ExplicitLeft = 168
     ExplicitTop = 280
     ExplicitHeight = 100
@@ -51,7 +51,7 @@ object Form1: TForm1
     Left = 148
     Top = 0
     Width = 1049
-    Height = 694
+    Height = 674
     Align = alClient
     DefaultColWidth = 32
     TabOrder = 0
@@ -72,11 +72,9 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 694
+    Height = 674
     Align = alRight
     TabOrder = 1
-    ExplicitLeft = 1203
-    ExplicitTop = -3
     object Button1: TButton
       Left = 70
       Top = 39
@@ -189,7 +187,7 @@ object Form1: TForm1
     end
     object Memo1: TMemo
       Left = 1
-      Top = 376
+      Top = 356
       Width = 225
       Height = 317
       Align = alBottom
@@ -202,14 +200,14 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 145
-    Height = 694
+    Height = 674
     Align = alLeft
     Indent = 19
     TabOrder = 2
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 802
+    Top = 782
     Width = 1424
     Height = 19
     Panels = <

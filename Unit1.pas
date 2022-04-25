@@ -176,9 +176,7 @@ begin
   if Result.BytesPerColumn * 8 < Result.Heigth then
     inc(Result.BytesPerColumn);
   Result.BufferSize := Result.BytesPerColumn * Result.Width;
-  Result.Buffer := GetMemory(Result.BufferSize);
-  for i := 0 to Result.BufferSize do
-    Result.Buffer[i] := 0;
+  Result.Buffer := AllocMem(Result.BufferSize); // не надо очищать
   k := 0;
   for i := 0 to (face.glyph.Bitmap.Rows * face.glyph.Bitmap.Pitch) - 1 do
   begin
