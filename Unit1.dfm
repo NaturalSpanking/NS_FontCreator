@@ -47,26 +47,16 @@ object Form1: TForm1
     ExplicitTop = 280
     ExplicitHeight = 100
   end
-  object StringGrid1: TStringGrid
+  object Image2: TImage
     Left = 148
     Top = 0
     Width = 1049
     Height = 674
     Align = alClient
-    DefaultColWidth = 32
-    TabOrder = 0
-    ColWidths = (
-      32
-      32
-      32
-      32
-      32)
-    RowHeights = (
-      24
-      24
-      24
-      24
-      24)
+    ExplicitLeft = 304
+    ExplicitTop = 112
+    ExplicitWidth = 105
+    ExplicitHeight = 105
   end
   object Panel1: TPanel
     Left = 1197
@@ -74,7 +64,7 @@ object Form1: TForm1
     Width = 227
     Height = 674
     Align = alRight
-    TabOrder = 1
+    TabOrder = 0
     object Button1: TButton
       Left = 70
       Top = 39
@@ -203,7 +193,7 @@ object Form1: TForm1
     Height = 674
     Align = alLeft
     Indent = 19
-    TabOrder = 2
+    TabOrder = 1
   end
   object StatusBar1: TStatusBar
     Left = 0

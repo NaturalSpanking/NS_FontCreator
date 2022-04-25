@@ -13,6 +13,8 @@ type
     Code: integer;
     Width: integer;
     Heigth: integer;
+    Ascender: integer;
+    Descender: integer;
     BytesPerColumn: integer;
     BufferSize: integer;
     Buffer: PByte;
@@ -23,7 +25,6 @@ type
     Button2: TButton;
     FontDialog1: TFontDialog;
     Button3: TButton;
-    StringGrid1: TStringGrid;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
@@ -41,6 +42,7 @@ type
     Button6: TButton;
     Button7: TButton;
     Memo1: TMemo;
+    Image2: TImage;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -172,6 +174,8 @@ begin
   Result.Code := char_idx;
   Result.Heigth := face.Size.Metrics.Height div 64 + 1;
   Result.Width := face.glyph.Metrics.Width div 64;
+  Result.Ascender := face.Size.Metrics.Ascender div 64;
+  Result.Descender := face.Size.Metrics.Descender div 64;
   Result.BytesPerColumn := Result.Heigth div 8;
   if Result.BytesPerColumn * 8 < Result.Heigth then
     inc(Result.BytesPerColumn);
@@ -228,23 +232,92 @@ end;
 
 procedure TForm1.ShowSymb(var symbol: TSymb);
 var
+  a, b: integer;
   i, j: integer;
   x, y: integer;
+  grid_size: integer;
+  R: TRect;
 begin
-  for i := 0 to StringGrid1.ColCount do
-    for j := 0 to StringGrid1.RowCount do
-      StringGrid1.Cells[i, j] := '';
-  StringGrid1.RowCount := symbol.Heigth;
-  StringGrid1.ColCount := symbol.Width;
-  for i := 0 to symbol.BufferSize do
-  begin
+  Image2.Picture.Bitmap.Width := Image2.Width;
+  Image2.Picture.Bitmap.Height := Image2.Height;
+  grid_size := round(Image2.Height * 8 / 10 / symbol.Heigth);
+  i := round(Image2.Width * 5 / 10 / symbol.Width);
+  if i < grid_size then
+    grid_size := i;
+
+  Image2.Canvas.Brush.Color := clGray;
+  Image2.Canvas.FillRect(Rect(0, 0, Image2.Width, Image2.Height));
+
+  a := round(Image2.Height * 2 / 3) - symbol.Ascender * grid_size;
+  b := round(Image2.Width / 8);
+  Image2.Canvas.Brush.Color := clWhite;
+  for x := 0 to symbol.Width - 1 do
+    for y := 0 to symbol.Heigth - 1 do
+    begin
+      R := Rect(b + x * grid_size, a + y * grid_size - grid_size,
+        b + x * grid_size + grid_size, a + y * grid_size);
+      Image2.Canvas.FillRect(R);
+    end;
+
+  Image2.Canvas.pen.Color := clWhite;
+  Image2.Canvas.Brush.Color := clBlack;
+  for i := 0 to symbol.BufferSize - 1 do
     for j := 0 to 7 do
+    begin
+      x := i div symbol.BytesPerColumn;
+      y := 8 * (i mod symbol.BytesPerColumn) + j;
+      R := Rect(b + x * grid_size, a + y * grid_size - grid_size,
+        b + x * grid_size + grid_size, a + y * grid_size);
       if (symbol.Buffer[i] shl j) and 128 > 0 then
-      begin
-        x := i div symbol.BytesPerColumn;
-        y := 8 * (i mod symbol.BytesPerColumn) + j;
-        StringGrid1.Cells[x, y] := 'X';
-      end;
+        Image2.Canvas.FillRect(R);
+    end;
+
+  with Image2.Canvas do
+  begin
+    i := round(Image2.Height * 2 / 3);
+    pen.Color := clBlack;
+    j := i;
+    while j > 0 do
+    begin
+      MoveTo(0, j);
+      LineTo(Image2.Width, j);
+      dec(j, grid_size);
+    end;
+    while j < Image2.Height do
+    begin
+      MoveTo(0, j);
+      LineTo(Image2.Width, j);
+      inc(j, grid_size);
+    end;
+    pen.Color := clRed;
+    MoveTo(0, i);
+    LineTo(Image2.Width, i); // базовая линия горизонтальная
+    j := i - symbol.Ascender * grid_size;
+    MoveTo(0, j);
+    LineTo(Image2.Width, j); // Ascender
+    j := i - symbol.Descender * grid_size;
+    MoveTo(0, j);
+    LineTo(Image2.Width, j); // Descender
+
+    i := round(Image2.Width / 8);
+    pen.Color := clBlack;
+    j := i;
+    while j > 0 do
+    begin
+      MoveTo(j, 0);
+      LineTo(j, Image2.Height);
+      dec(j, grid_size);
+    end;
+    j := i;
+    while j < Image2.Width do
+    begin
+      MoveTo(j, 0);
+      LineTo(j, Image2.Height);
+      inc(j, grid_size);
+    end;
+    pen.Color := clRed;
+    MoveTo(i, 0);
+    LineTo(i, Image2.Height); // базовая линия вертикальная
   end;
 end;
 
