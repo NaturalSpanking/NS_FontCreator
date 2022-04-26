@@ -521,7 +521,7 @@ Type
       ftffHinter, ftffCIDKeyed, ftffTricky, ftffColor, ftffVariation);
    TFTFaceFlags = Set Of ftffScalable .. TFTFaceFlag(8 * SizeOf(LongInt) - 1);
 
-   TFTStyleFlag  = (ftsfItalic, ftsfBold);
+   TFTStyleFlag  = (ftsfRegular, ftsfItalic, ftsfBold, ftsFlag3, ftsFlag4, ftsFlag5, ftsFlag6);
    TFTStyleFlags = ftsfItalic .. TFTStyleFlag(8 * SizeOf(LongInt) - 1);
 
    TFTStyleFlagsHelper = Record Helper For TFTStyleFlags

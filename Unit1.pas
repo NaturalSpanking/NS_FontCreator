@@ -149,13 +149,9 @@ function TForm1.FontStyletoString(style: TFontStyles): string;
 begin
   Result := '';
   if fsStrikeOut in style then
-    Result := Result + ' StrikeOut';
+    Result := Result + 'StrikeOut ';
   if fsUnderline in style then
-    Result := Result + ' Underline';
-  if fsItalic in style then
-    Result := Result + ' Italic';
-  if fsBold in style then
-    Result := Result + ' Bold';
+    Result := Result + 'Underline ';
 end;
 
 function TForm1.Render(char_idx: smallint): TSymb;
@@ -220,10 +216,12 @@ begin
   face.SetPixelSize(0, FontDialog1.Font.Size);
   CancelDC(dc);
   DeleteDC(dc);
-  StatusBar1.Panels[0].Text := FontDialog1.Font.Name +
-    FontStyletoString(FontDialog1.Font.style) + ' ' +
-    IntToStr(FontDialog1.Font.Size);
-  // face.LoadGlyph(face.GetCharIndex(ord('Ù')), CheckLoadFlags);
+//  StatusBar1.Panels[0].Text := FontDialog1.Font.Name +
+//    FontStyletoString(FontDialog1.Font.style) + ' ' +
+//    IntToStr(FontDialog1.Font.Size);
+  StatusBar1.Panels[0].Text := face.FamilyName + ' ' + face.StyleName + ' ' +
+  FontStyletoString(FontDialog1.Font.style) + IntToStr(FontDialog1.Font.Size);
+
   StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64 + 1) +
     'x' + IntToStr(face.Size.Metrics.MaxAdvance div 64);
   // IntToStr(face.glyph.Metrics.Width div 64);
