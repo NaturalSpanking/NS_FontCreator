@@ -168,7 +168,7 @@ begin
   else
     StatusBar1.Panels[2].Text := 'Face hasn'' t glyph names ';
   Result.Code := char_idx;
-  Result.Heigth := face.Size.Metrics.Height div 64 + 1;
+  Result.Heigth := face.Size.Metrics.Height div 64;
   Result.Width := face.glyph.Metrics.Width div 64;
   Result.Ascender := face.Size.Metrics.Ascender div 64;
   Result.Descender := face.Size.Metrics.Descender div 64;
@@ -185,7 +185,7 @@ begin
       begin
         P_x := k * 8 + j;
         P_y := (face.Size.Metrics.Ascender - face.glyph.Metrics.HorzBearingY)
-          div 64 + i div face.glyph.Bitmap.Pitch + 1;
+          div 64 + i div face.glyph.Bitmap.Pitch;
         byte_idx := (P_y div 8) + Result.BytesPerColumn * P_x;
         Result.Buffer[byte_idx] := Result.Buffer[byte_idx] +
           1 shl (7 - P_y mod 8);
@@ -216,13 +216,13 @@ begin
   face.SetPixelSize(0, FontDialog1.Font.Size);
   CancelDC(dc);
   DeleteDC(dc);
-//  StatusBar1.Panels[0].Text := FontDialog1.Font.Name +
-//    FontStyletoString(FontDialog1.Font.style) + ' ' +
-//    IntToStr(FontDialog1.Font.Size);
+  // StatusBar1.Panels[0].Text := FontDialog1.Font.Name +
+  // FontStyletoString(FontDialog1.Font.style) + ' ' +
+  // IntToStr(FontDialog1.Font.Size);
   StatusBar1.Panels[0].Text := face.FamilyName + ' ' + face.StyleName + ' ' +
-  FontStyletoString(FontDialog1.Font.style) + IntToStr(FontDialog1.Font.Size);
+    FontStyletoString(FontDialog1.Font.style) + IntToStr(FontDialog1.Font.Size);
 
-  StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64 + 1) +
+  StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) +
     'x' + IntToStr(face.Size.Metrics.MaxAdvance div 64);
   // IntToStr(face.glyph.Metrics.Width div 64);
 
@@ -230,92 +230,99 @@ end;
 
 procedure TForm1.ShowSymb(var symbol: TSymb);
 var
-  a, b: integer;
   i, j: integer;
   x, y: integer;
   grid_size: integer;
+  origin: TPoint;
+  bbox: TRect;
   R: TRect;
 begin
+  // очистка канвы
   Image2.Picture.Bitmap.Width := Image2.Width;
   Image2.Picture.Bitmap.Height := Image2.Height;
-  grid_size := round(Image2.Height * 8 / 10 / symbol.Heigth);
+  Image2.Canvas.Brush.Color := clGray;
+  Image2.Canvas.FillRect(Rect(0, 0, Image2.Width, Image2.Height));
+  // вычисление размера сетки
+  grid_size := round(Image2.Height * 7 / 10 / symbol.Heigth);
   i := round(Image2.Width * 5 / 10 / symbol.Width);
   if i < grid_size then
     grid_size := i;
-
-  Image2.Canvas.Brush.Color := clGray;
-  Image2.Canvas.FillRect(Rect(0, 0, Image2.Width, Image2.Height));
-
-  a := round(Image2.Height * 2 / 3) - symbol.Ascender * grid_size;
-  b := round(Image2.Width / 8);
+  // вычисление координат
+  origin.x := round(Image2.Width / 8);
+  origin.y := round(Image2.Height * 9 / 12);
+  bbox.Left := origin.x;
+  bbox.Top := origin.y - symbol.Ascender * grid_size;
+  bbox.Bottom := origin.y - symbol.Descender * grid_size;
+  // заливка коробки белым
   Image2.Canvas.Brush.Color := clWhite;
   for x := 0 to symbol.Width - 1 do
     for y := 0 to symbol.Heigth - 1 do
     begin
-      R := Rect(b + x * grid_size, a + y * grid_size - grid_size,
-        b + x * grid_size + grid_size, a + y * grid_size);
+      R := Rect(bbox.Left + x * grid_size, bbox.Top + y * grid_size,
+        bbox.Left + x * grid_size + grid_size, bbox.Top + y * grid_size +
+        grid_size);
       Image2.Canvas.FillRect(R);
     end;
-
-  Image2.Canvas.pen.Color := clWhite;
+  // отрисовка символа
   Image2.Canvas.Brush.Color := clBlack;
   for i := 0 to symbol.BufferSize - 1 do
     for j := 0 to 7 do
     begin
       x := i div symbol.BytesPerColumn;
       y := 8 * (i mod symbol.BytesPerColumn) + j;
-      R := Rect(b + x * grid_size, a + y * grid_size - grid_size,
-        b + x * grid_size + grid_size, a + y * grid_size);
+      R := Rect(bbox.Left + x * grid_size, bbox.Top + y * grid_size,
+        bbox.Left + x * grid_size + grid_size, bbox.Top + y * grid_size +
+        grid_size);
       if (symbol.Buffer[i] shl j) and 128 > 0 then
         Image2.Canvas.FillRect(R);
     end;
-
+  // отрисовка сетки
   with Image2.Canvas do
   begin
-    i := round(Image2.Height * 2 / 3);
+    // горизонтальные черные линии
     pen.Color := clBlack;
-    j := i;
-    while j > 0 do
+    j := origin.y;
+    while j > 0 do // выше базовой
     begin
       MoveTo(0, j);
       LineTo(Image2.Width, j);
       dec(j, grid_size);
     end;
-    while j < Image2.Height do
+    j := origin.y;
+    while j < Image2.Height do // ниже базовой
     begin
       MoveTo(0, j);
       LineTo(Image2.Width, j);
       inc(j, grid_size);
     end;
+    // горизонтальные красные линии
     pen.Color := clRed;
-    MoveTo(0, i);
-    LineTo(Image2.Width, i); // базовая линия горизонтальная
-    j := i - symbol.Ascender * grid_size;
-    MoveTo(0, j);
-    LineTo(Image2.Width, j); // Ascender
-    j := i - symbol.Descender * grid_size;
-    MoveTo(0, j);
-    LineTo(Image2.Width, j); // Descender
-
-    i := round(Image2.Width / 8);
+    MoveTo(0, origin.y);
+    LineTo(Image2.Width, origin.y); // базовая линия горизонтальная
+    MoveTo(0, bbox.Top);
+    LineTo(Image2.Width, bbox.Top); // Ascender
+    MoveTo(0, bbox.Bottom);
+    LineTo(Image2.Width, bbox.Bottom); // Descender
+    // вертикальные черные линии
     pen.Color := clBlack;
-    j := i;
-    while j > 0 do
+    j := origin.X;
+    while j > 0 do // левее базовой
     begin
       MoveTo(j, 0);
       LineTo(j, Image2.Height);
       dec(j, grid_size);
     end;
-    j := i;
-    while j < Image2.Width do
+    j := origin.X;
+    while j < Image2.Width do // правее базовой
     begin
       MoveTo(j, 0);
       LineTo(j, Image2.Height);
       inc(j, grid_size);
     end;
+    // вертикальные красные линии
     pen.Color := clRed;
-    MoveTo(i, 0);
-    LineTo(i, Image2.Height); // базовая линия вертикальная
+    MoveTo(origin.X, 0);
+    LineTo(origin.X, Image2.Height); // базовая линия вертикальная
   end;
 end;
 
