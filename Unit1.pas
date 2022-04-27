@@ -46,6 +46,8 @@ type
     Button7: TButton;
     Memo1: TMemo;
     Image2: TImage;
+    Button8: TButton;
+    Button9: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -53,6 +55,8 @@ type
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
+    procedure Button8Click(Sender: TObject);
+    procedure Button9Click(Sender: TObject);
   private
     face: TFTFace;
     pFont: PByte;
@@ -137,6 +141,18 @@ begin
   Button1.Click;
 end;
 
+procedure TForm1.Button8Click(Sender: TObject);
+begin
+  Edit1.Text := chr(ord(Edit1.Text[1]) + 1);
+  Button1.Click;
+end;
+
+procedure TForm1.Button9Click(Sender: TObject);
+begin
+  Edit1.Text := chr(ord(Edit1.Text[1]) - 1);
+  Button1.Click;
+end;
+
 function TForm1.CheckLoadFlags: TFTLoadFlags;
 begin
   Result := [ftlfMonochrome, ftlfRender];
@@ -174,7 +190,8 @@ begin
   Result.BearingX := face.glyph.Metrics.HorzBearingX div 64;
   Result.BearingY := face.glyph.Metrics.HorzBearingY div 64;
   Result.Heigth := face.Size.Metrics.Height div 64;
-  Result.Width := face.glyph.Metrics.Width div 64 + Result.BearingX;
+  // Result.Width := face.glyph.Metrics.Width div 64 + abs(Result.BearingX);
+  Result.Width := face.glyph.Bitmap.Width; // это правильнее
   Result.Ascender := face.Size.Metrics.Ascender div 64;
   Result.Descender := face.Size.Metrics.Descender div 64;
   Result.Advance := face.glyph.Metrics.HorzAdvance div 64;
@@ -189,7 +206,8 @@ begin
     for j := 0 to 7 do
       if face.glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
       begin
-        P_x := Result.BearingX + k * 8 + j;
+        // P_x := abs(Result.BearingX) + k * 8 + j;
+        P_x := k * 8 + j; // это правильнее
         P_y := (face.Size.Metrics.Ascender - face.glyph.Metrics.HorzBearingY)
           div 64 + i div face.glyph.Bitmap.Pitch;
         byte_idx := (P_y div 8) + Result.BytesPerColumn * P_x;
@@ -222,16 +240,10 @@ begin
   face.SetPixelSize(0, FontDialog1.Font.Size);
   CancelDC(dc);
   DeleteDC(dc);
-  // StatusBar1.Panels[0].Text := FontDialog1.Font.Name +
-  // FontStyletoString(FontDialog1.Font.style) + ' ' +
-  // IntToStr(FontDialog1.Font.Size);
   StatusBar1.Panels[0].Text := face.FamilyName + ' ' + face.StyleName + ' ' +
     FontStyletoString(FontDialog1.Font.style) + IntToStr(FontDialog1.Font.Size);
-
   StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x' +
     IntToStr(face.Size.Metrics.MaxAdvance div 64);
-  // IntToStr(face.glyph.Metrics.Width div 64);
-
 end;
 
 procedure TForm1.ShowSymb(var symbol: TSymb);
@@ -262,7 +274,7 @@ begin
   bbox.Bottom := origin.y - symbol.Descender * grid_size;
   // заливка коробки белым
   Image2.Canvas.Brush.Color := clWhite;
-  for x := 0 to symbol.Width - 1 do
+  for x := symbol.BearingX to symbol.Width - 1 + symbol.BearingX do
     for y := 0 to symbol.Heigth - 1 do
     begin
       R := Rect(bbox.Left + x * grid_size, bbox.Top + y * grid_size,
@@ -272,10 +284,10 @@ begin
     end;
   // отрисовка символа
   Image2.Canvas.Brush.Color := clBlack;
-  for i := 0 to symbol.BufferSize - 1 do
+  for i := 0 to symbol.BufferSize - 1do
     for j := 0 to 7 do
     begin
-      x := i div symbol.BytesPerColumn;
+      x := i div symbol.BytesPerColumn + symbol.BearingX;
       y := 8 * (i mod symbol.BytesPerColumn) + j;
       R := Rect(bbox.Left + x * grid_size, bbox.Top + y * grid_size,
         bbox.Left + x * grid_size + grid_size, bbox.Top + y * grid_size +
@@ -331,7 +343,7 @@ begin
     MoveTo(origin.x, 0);
     LineTo(origin.x, Image2.Height); // базовая линия вертикальная
     MoveTo(bbox.Right, 0);
-    LineTo(bbox.Right, Image2.Height);  // Advance
+    LineTo(bbox.Right, Image2.Height); // Advance
   end;
 end;
 

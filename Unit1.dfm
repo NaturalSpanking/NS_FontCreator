@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 801
+  ClientHeight = 741
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -20,7 +20,7 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 677
+    Top = 617
     Width = 1424
     Height = 105
     Align = alBottom
@@ -30,7 +30,7 @@ object Form1: TForm1
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 674
+    Top = 614
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -42,7 +42,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 145
     Top = 0
-    Height = 674
+    Height = 614
     ExplicitLeft = 168
     ExplicitTop = 280
     ExplicitHeight = 100
@@ -51,7 +51,7 @@ object Form1: TForm1
     Left = 148
     Top = 0
     Width = 1049
-    Height = 674
+    Height = 614
     Align = alClient
     ExplicitLeft = 304
     ExplicitTop = 112
@@ -62,7 +62,7 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 674
+    Height = 614
     Align = alRight
     TabOrder = 0
     object Button1: TButton
@@ -125,16 +125,18 @@ object Form1: TForm1
       Width = 130
       Height = 17
       Caption = 'Target mono'
+      Checked = True
+      State = cbChecked
       TabOrder = 6
       OnClick = Button1Click
     end
     object Edit1: TEdit
-      Left = 6
-      Top = 126
+      Left = 70
+      Top = 132
       Width = 27
       Height = 29
       TabOrder = 7
-      Text = 'g'
+      Text = 'j'
     end
     object Button5: TButton
       Left = 96
@@ -177,7 +179,7 @@ object Form1: TForm1
     end
     object Memo1: TMemo
       Left = 1
-      Top = 356
+      Top = 296
       Width = 225
       Height = 317
       Align = alBottom
@@ -185,19 +187,37 @@ object Form1: TForm1
         'Memo1')
       TabOrder = 11
     end
+    object Button8: TButton
+      Left = 103
+      Top = 134
+      Width = 26
+      Height = 27
+      Caption = 'Button8'
+      TabOrder = 12
+      OnClick = Button8Click
+    end
+    object Button9: TButton
+      Left = 37
+      Top = 129
+      Width = 27
+      Height = 35
+      Caption = 'Button9'
+      TabOrder = 13
+      OnClick = Button9Click
+    end
   end
   object TreeView1: TTreeView
     Left = 0
     Top = 0
     Width = 145
-    Height = 674
+    Height = 614
     Align = alLeft
     Indent = 19
     TabOrder = 1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 782
+    Top = 722
     Width = 1424
     Height = 19
     Panels = <
