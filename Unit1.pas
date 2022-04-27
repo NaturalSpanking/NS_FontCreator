@@ -15,6 +15,9 @@ type
     Heigth: integer;
     Ascender: integer;
     Descender: integer;
+    BearingX: integer;
+    BearingY: integer;
+    Advance: integer;
     BytesPerColumn: integer;
     BufferSize: integer;
     Buffer: PByte;
@@ -168,10 +171,13 @@ begin
   else
     StatusBar1.Panels[2].Text := 'Face hasn'' t glyph names ';
   Result.Code := char_idx;
+  Result.BearingX := face.glyph.Metrics.HorzBearingX div 64;
+  Result.BearingY := face.glyph.Metrics.HorzBearingY div 64;
   Result.Heigth := face.Size.Metrics.Height div 64;
-  Result.Width := face.glyph.Metrics.Width div 64;
+  Result.Width := face.glyph.Metrics.Width div 64 + Result.BearingX;
   Result.Ascender := face.Size.Metrics.Ascender div 64;
   Result.Descender := face.Size.Metrics.Descender div 64;
+  Result.Advance := face.glyph.Metrics.HorzAdvance div 64;
   Result.BytesPerColumn := Result.Heigth div 8;
   if Result.BytesPerColumn * 8 < Result.Heigth then
     inc(Result.BytesPerColumn);
@@ -183,7 +189,7 @@ begin
     for j := 0 to 7 do
       if face.glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
       begin
-        P_x := k * 8 + j;
+        P_x := Result.BearingX + k * 8 + j;
         P_y := (face.Size.Metrics.Ascender - face.glyph.Metrics.HorzBearingY)
           div 64 + i div face.glyph.Bitmap.Pitch;
         byte_idx := (P_y div 8) + Result.BytesPerColumn * P_x;
@@ -222,8 +228,8 @@ begin
   StatusBar1.Panels[0].Text := face.FamilyName + ' ' + face.StyleName + ' ' +
     FontStyletoString(FontDialog1.Font.style) + IntToStr(FontDialog1.Font.Size);
 
-  StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) +
-    'x' + IntToStr(face.Size.Metrics.MaxAdvance div 64);
+  StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x' +
+    IntToStr(face.Size.Metrics.MaxAdvance div 64);
   // IntToStr(face.glyph.Metrics.Width div 64);
 
 end;
@@ -251,6 +257,7 @@ begin
   origin.x := round(Image2.Width / 8);
   origin.y := round(Image2.Height * 9 / 12);
   bbox.Left := origin.x;
+  bbox.Right := origin.x + symbol.Advance * grid_size;
   bbox.Top := origin.y - symbol.Ascender * grid_size;
   bbox.Bottom := origin.y - symbol.Descender * grid_size;
   // заливка коробки белым
@@ -305,14 +312,14 @@ begin
     LineTo(Image2.Width, bbox.Bottom); // Descender
     // вертикальные черные линии
     pen.Color := clBlack;
-    j := origin.X;
+    j := origin.x;
     while j > 0 do // левее базовой
     begin
       MoveTo(j, 0);
       LineTo(j, Image2.Height);
       dec(j, grid_size);
     end;
-    j := origin.X;
+    j := origin.x;
     while j < Image2.Width do // правее базовой
     begin
       MoveTo(j, 0);
@@ -321,8 +328,10 @@ begin
     end;
     // вертикальные красные линии
     pen.Color := clRed;
-    MoveTo(origin.X, 0);
-    LineTo(origin.X, Image2.Height); // базовая линия вертикальная
+    MoveTo(origin.x, 0);
+    LineTo(origin.x, Image2.Height); // базовая линия вертикальная
+    MoveTo(bbox.Right, 0);
+    LineTo(bbox.Right, Image2.Height);  // Advance
   end;
 end;
 
