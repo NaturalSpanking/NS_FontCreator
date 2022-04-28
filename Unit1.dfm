@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 741
+  ClientHeight = 721
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -16,11 +16,13 @@ object Form1: TForm1
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = False
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 617
+    Top = 597
     Width = 1424
     Height = 105
     Align = alBottom
@@ -30,7 +32,7 @@ object Form1: TForm1
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 614
+    Top = 594
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -42,7 +44,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 145
     Top = 0
-    Height = 614
+    Height = 594
     ExplicitLeft = 168
     ExplicitTop = 280
     ExplicitHeight = 100
@@ -51,7 +53,7 @@ object Form1: TForm1
     Left = 148
     Top = 0
     Width = 1049
-    Height = 614
+    Height = 594
     Align = alClient
     ExplicitLeft = 304
     ExplicitTop = 112
@@ -62,7 +64,7 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 614
+    Height = 594
     Align = alRight
     TabOrder = 0
     object Button1: TButton
@@ -179,7 +181,7 @@ object Form1: TForm1
     end
     object Memo1: TMemo
       Left = 1
-      Top = 296
+      Top = 276
       Width = 225
       Height = 317
       Align = alBottom
@@ -210,14 +212,14 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 145
-    Height = 614
+    Height = 594
     Align = alLeft
     Indent = 19
     TabOrder = 1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 722
+    Top = 702
     Width = 1424
     Height = 19
     Panels = <
@@ -229,7 +231,7 @@ object Form1: TForm1
         Width = 50
       end
       item
-        Width = 150
+        Width = 550
       end
       item
         Alignment = taRightJustify

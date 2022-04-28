@@ -57,14 +57,18 @@ type
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     face: TFTFace;
     pFont: PByte;
     font_mem_size: integer;
     rendef_flags: TFTRenderMode;
+    glyph_names: TStringList;
     procedure AddLog(S: string);
     procedure Set_FT_Font;
     procedure ShowSymb(var symbol: TSymb);
+    procedure LoadGlyphNames;
     function Render(char_idx: smallint): TSymb;
     function CheckLoadFlags: TFTLoadFlags;
     function FontStyletoString(style: TFontStyles): string;
@@ -90,6 +94,7 @@ var
 begin
   S := Render(ord(Edit1.Text[1]));
   ShowSymb(S);
+  StatusBar1.Panels[2].Text := glyph_names[S.Code];
   FreeMemory(S.Buffer);
 end;
 
@@ -116,6 +121,7 @@ begin
     IntToStr(TFTManager.MinorVersion) + '.' + IntToStr(TFTManager.PatchVersion))
     + '       ';
   Set_FT_Font;
+  LoadGlyphNames;
 end;
 
 procedure TForm1.Button5Click(Sender: TObject);
@@ -173,6 +179,39 @@ begin
     Result := Result + 'Underline ';
 end;
 
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  glyph_names := TStringList.Create;
+end;
+
+procedure TForm1.FormDestroy(Sender: TObject);
+begin
+  glyph_names.Free;
+end;
+
+procedure TForm1.LoadGlyphNames;
+var
+  f: TextFile;
+  sl: TStringList;
+  S: string;
+  i: integer;
+begin
+  sl := TStringList.Create;
+  sl.Clear;
+  sl.Delimiter := ';';
+  sl.StrictDelimiter := true;
+  AssignFile(f, 'UnicodeData.txt');
+  reset(f);
+  repeat
+    readln(f, S);
+    sl.DelimitedText := S;
+    // glyph_names.Add('U+' + sl[0] + ' - ' + sl[1][1] + AnsiLowerCase(copy(sl[1],
+    // 2, length(sl[1]))));
+    glyph_names.Add('U+' + sl[0] + ' - ' + sl[1]);
+  until EOF(f);
+  sl.Free;
+end;
+
 function TForm1.Render(char_idx: smallint): TSymb;
 var
   P_x, P_y, i, j, k: integer;
@@ -182,10 +221,10 @@ var
 begin
   glyph_index := face.GetCharIndex(char_idx);
   face.LoadGlyph(glyph_index, CheckLoadFlags);
-  if ftffGlyphNames in face.FaceFlags then
-    StatusBar1.Panels[2].Text := face.GetGlyphName(glyph_index)
-  else
-    StatusBar1.Panels[2].Text := 'Face hasn'' t glyph names ';
+  // if ftffGlyphNames in face.FaceFlags then
+  // StatusBar1.Panels[2].Text := face.GetGlyphName(glyph_index)
+  // else
+  // StatusBar1.Panels[2].Text := 'Face hasn'' t glyph names ';
   Result.Code := char_idx;
   Result.BearingX := face.glyph.Metrics.HorzBearingX div 64;
   Result.BearingY := face.glyph.Metrics.HorzBearingY div 64;
@@ -284,7 +323,7 @@ begin
     end;
   // отрисовка символа
   Image2.Canvas.Brush.Color := clBlack;
-  for i := 0 to symbol.BufferSize - 1do
+  for i := 0 to symbol.BufferSize - 1 do
     for j := 0 to 7 do
     begin
       x := i div symbol.BytesPerColumn + symbol.BearingX;
