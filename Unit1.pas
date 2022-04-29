@@ -8,6 +8,9 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uFreeType, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.Imaging.jpeg, Vcl.Grids, Vcl.ComCtrls, Vcl.Menus;
 
+const
+  UnicodeArrSize = 34627;
+
 type
   TSymb = record
     Code: integer;
@@ -21,6 +24,12 @@ type
     BytesPerColumn: integer;
     BufferSize: integer;
     Buffer: PByte;
+  end;
+
+  TUnicodeData = record
+    Code: integer;
+    U_plus: string;
+    Name: string; // [60]
   end;
 
   TForm1 = class(TForm)
@@ -44,7 +53,6 @@ type
     Button5: TButton;
     Button6: TButton;
     Button7: TButton;
-    Memo1: TMemo;
     Image2: TImage;
     Button8: TButton;
     Button9: TButton;
@@ -57,14 +65,12 @@ type
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
   private
     face: TFTFace;
     pFont: PByte;
     font_mem_size: integer;
     rendef_flags: TFTRenderMode;
-    glyph_names: TStringList;
+    glyph_names_arr: array [0 .. UnicodeArrSize] of TUnicodeData;
     procedure AddLog(S: string);
     procedure Set_FT_Font;
     procedure ShowSymb(var symbol: TSymb);
@@ -72,6 +78,7 @@ type
     function Render(char_idx: smallint): TSymb;
     function CheckLoadFlags: TFTLoadFlags;
     function FontStyletoString(style: TFontStyles): string;
+    function SearchUnicodeName(Code: integer): string;
   public
     { Public declarations }
   end;
@@ -94,7 +101,7 @@ var
 begin
   S := Render(ord(Edit1.Text[1]));
   ShowSymb(S);
-  StatusBar1.Panels[2].Text := glyph_names[S.Code];
+  StatusBar1.Panels[2].Text := SearchUnicodeName(S.Code);
   FreeMemory(S.Buffer);
 end;
 
@@ -179,14 +186,20 @@ begin
     Result := Result + 'Underline ';
 end;
 
-procedure TForm1.FormCreate(Sender: TObject);
+function TForm1.SearchUnicodeName(Code: integer): string;
+var
+  a, b, i: integer;
 begin
-  glyph_names := TStringList.Create;
-end;
-
-procedure TForm1.FormDestroy(Sender: TObject);
-begin
-  glyph_names.Free;
+  b := UnicodeArrSize;
+  a := 0;
+  repeat
+    i := ((b - a) div 2) + a;
+    if glyph_names_arr[i].Code < Code then
+      a := i
+    else
+      b := i;
+  until glyph_names_arr[i].Code = Code;
+  Result := glyph_names_arr[i].U_plus + ' - ' + glyph_names_arr[i].Name;
 end;
 
 procedure TForm1.LoadGlyphNames;
@@ -205,9 +218,10 @@ begin
   repeat
     readln(f, S);
     sl.DelimitedText := S;
-    // glyph_names.Add('U+' + sl[0] + ' - ' + sl[1][1] + AnsiLowerCase(copy(sl[1],
-    // 2, length(sl[1]))));
-    glyph_names.Add('U+' + sl[0] + ' - ' + sl[1]);
+    glyph_names_arr[i].Code := StrToInt('$' + sl[0]);
+    glyph_names_arr[i].Name := sl[1];
+    glyph_names_arr[i].U_plus := 'U+' + sl[0];
+    inc(i);
   until EOF(f);
   sl.Free;
 end;
@@ -221,10 +235,6 @@ var
 begin
   glyph_index := face.GetCharIndex(char_idx);
   face.LoadGlyph(glyph_index, CheckLoadFlags);
-  // if ftffGlyphNames in face.FaceFlags then
-  // StatusBar1.Panels[2].Text := face.GetGlyphName(glyph_index)
-  // else
-  // StatusBar1.Panels[2].Text := 'Face hasn'' t glyph names ';
   Result.Code := char_idx;
   Result.BearingX := face.glyph.Metrics.HorzBearingX div 64;
   Result.BearingY := face.glyph.Metrics.HorzBearingY div 64;
