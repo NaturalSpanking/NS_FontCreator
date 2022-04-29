@@ -26,6 +26,8 @@ type
     Buffer: PByte;
   end;
 
+  PSymb = ^TSymb;
+
   TUnicodeData = record
     Code: integer;
     U_plus: string;
@@ -56,6 +58,8 @@ type
     Image2: TImage;
     Button8: TButton;
     Button9: TButton;
+    Button10: TButton;
+    Button11: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -65,7 +69,13 @@ type
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
+    procedure Button10Click(Sender: TObject);
+    procedure TreeView1Change(Sender: TObject; Node: TTreeNode);
+    procedure Button11Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
+    curNode: TTreeNode;
     face: TFTFace;
     pFont: PByte;
     font_mem_size: integer;
@@ -73,9 +83,9 @@ type
     glyph_names_arr: array [0 .. UnicodeArrSize] of TUnicodeData;
     procedure AddLog(S: string);
     procedure Set_FT_Font;
-    procedure ShowSymb(var symbol: TSymb);
+    procedure ShowSymb(var symbol: PSymb);
     procedure LoadGlyphNames;
-    function Render(char_idx: smallint): TSymb;
+    function Render(char_idx: smallint): PSymb;
     function CheckLoadFlags: TFTLoadFlags;
     function FontStyletoString(style: TFontStyles): string;
     function SearchUnicodeName(Code: integer): string;
@@ -97,14 +107,40 @@ begin
   // Memo1.Lines.Add(S);
 end;
 
+procedure TForm1.Button10Click(Sender: TObject);
+var
+  S: string;
+begin
+  S := 'table1';
+  if InputQuery('Table name', 'Enter new table name', S) then
+    TreeView1.Items.Add(nil, S);
+end;
+
+procedure TForm1.Button11Click(Sender: TObject);
+var
+  psy: PSymb;
+begin
+  if curNode <> nil then
+  begin
+    psy := Render(ord(Edit1.Text[1]));
+    if curNode.Parent = nil then
+      TreeView1.Items.AddChildObject(curNode, chr(psy.Code) + ' - ' +
+        IntToStr(psy.Code), psy)
+    else
+      TreeView1.Items.AddObject(curNode, chr(psy.Code) + ' - ' +
+        IntToStr(psy.Code), psy);
+  end;
+end;
+
 procedure TForm1.Button1Click(Sender: TObject);
 var
-  S: TSymb;
+  S: PSymb;
 begin
   S := Render(ord(Edit1.Text[1]));
   ShowSymb(S);
   StatusBar1.Panels[2].Text := SearchUnicodeName(S.Code);
   FreeMemory(S.Buffer);
+  Dispose(S);
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
@@ -122,8 +158,6 @@ begin
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
-var
-  x: integer;
 begin
   StatusBar1.Panels[3].Text :=
     ('FreeType''s version is ' + IntToStr(TFTManager.MajorVersion) + '.' +
@@ -189,6 +223,24 @@ begin
     Result := Result + 'Underline ';
 end;
 
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  StatusBar1.Panels[3].Text :=
+    ('FreeType''s version is ' + IntToStr(TFTManager.MajorVersion) + '.' +
+    IntToStr(TFTManager.MinorVersion) + '.' + IntToStr(TFTManager.PatchVersion))
+    + '       ';
+  Set_FT_Font;
+  LoadGlyphNames;
+end;
+
+procedure TForm1.FormDestroy(Sender: TObject);
+begin
+  face.glyph.Bitmap.Done;
+  face.Destroy;
+  FreeMem(pFont);
+  font_mem_size := 0;
+end;
+
 function TForm1.SearchUnicodeName(Code: integer): string;
 var
   a, b, i: integer;
@@ -229,13 +281,14 @@ begin
   sl.Free;
 end;
 
-function TForm1.Render(char_idx: smallint): TSymb;
+function TForm1.Render(char_idx: smallint): PSymb;
 var
   P_x, P_y, i, j, k: integer;
   c: byte;
   byte_idx: integer;
   glyph_index: integer;
 begin
+  Result := new(PSymb);
   glyph_index := face.GetCharIndex(char_idx);
   face.LoadGlyph(glyph_index, CheckLoadFlags);
   Result.Code := char_idx;
@@ -298,7 +351,7 @@ begin
     IntToStr(face.Size.Metrics.MaxAdvance div 64);
 end;
 
-procedure TForm1.ShowSymb(var symbol: TSymb);
+procedure TForm1.ShowSymb(var symbol: PSymb);
 var
   i, j: integer;
   x, y: integer;
@@ -397,6 +450,11 @@ begin
     MoveTo(bbox.Right, 0);
     LineTo(bbox.Right, Image2.Height); // Advance
   end;
+end;
+
+procedure TForm1.TreeView1Change(Sender: TObject; Node: TTreeNode);
+begin
+  curNode := Node;
 end;
 
 end.
