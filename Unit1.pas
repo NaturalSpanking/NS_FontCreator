@@ -90,6 +90,8 @@ implementation
 
 {$R *.dfm}
 
+uses add_table;
+
 procedure TForm1.AddLog(S: string);
 begin
   // Memo1.Lines.Add(S);
@@ -135,9 +137,10 @@ procedure TForm1.Button5Click(Sender: TObject);
 var
   i: integer;
 begin
-  for i := 1 to 10000 do
-    // Set_FT_Font;
-    Button1.Click;
+  if Form2.Execute then
+    ShowMessage('ok')
+  else
+    ShowMessage('cancel');
 end;
 
 procedure TForm1.Button6Click(Sender: TObject);
