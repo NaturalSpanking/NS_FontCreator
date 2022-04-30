@@ -54,6 +54,11 @@ type
     Label1: TLabel;
     Button3: TButton;
     Button4: TButton;
+    PopupMenu1: TPopupMenu;
+    Addtable1: TMenuItem;
+    Addsymbols1: TMenuItem;
+    Delete1: TMenuItem;
+    Renametable1: TMenuItem;
     procedure FR_FullRepaint(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -65,8 +70,12 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure Delete1Click(Sender: TObject);
+    procedure TreeView1Deletion(Sender: TObject; Node: TTreeNode);
+    procedure FormResize(Sender: TObject);
+    procedure Renametable1Click(Sender: TObject);
   private
-    curNode: TTreeNode;
+    // curNode: TTreeNode;
     face: TFTFace;
     pFont: PByte;
     font_mem_size: integer;
@@ -77,6 +86,7 @@ type
     procedure FR_ShowSymbol(var symbol: PSymb);
     procedure FR_LoadUnicodeNames;
     procedure FR_Render(symb: PSymb);
+    procedure FR_FreeSymb(var symb: PSymb);
     function FR_FontStyleToString(style: TFontStyles): string;
     function FR_SearchUnicodeName(Code: integer): string;
   public
@@ -182,7 +192,7 @@ var
   f: file;
   i: integer;
   b: byte;
-  s:string;
+  S: string;
   psy: PSymb;
 begin
   stream := TMemoryStream.Create;
@@ -217,11 +227,11 @@ begin
   FontDialog1.Font.Size := i;
   BlockRead(f, i, sizeof(integer));
   FontDialog1.Font.style := TFontStyles(byte(i));
-  
+
   BlockRead(f, i, sizeof(integer));
-  SetLength(s, i);  
-  BlockRead(f, s[1], (i) * sizeof(char));
-  FontDialog1.Font.Name :=s;
+  SetLength(S, i);
+  BlockRead(f, S[1], (i) * sizeof(char));
+  FontDialog1.Font.Name := S;
   FR_SetFont;
   TreeView1.Select(TreeView1.Items[0]);
   CloseFile(f);
@@ -232,18 +242,18 @@ var
   i: integer;
   psy: PSymb;
 begin
-  if Form2.Execute and (curNode <> nil) then
+  if Form2.Execute and (TreeView1.Selected <> nil) then
     for i := Form2.RangeBegin to Form2.RangeEnd do
     begin
       psy := new(PSymb);
       psy.Code := i;
       psy.Buffer := nil;
-      if curNode.Parent = nil then
-        TreeView1.Items.AddChildObject(curNode, '''' + chr(psy.Code) + '''' +
-          ' - ' + IntToStr(psy.Code), psy)
+      if TreeView1.Selected.Parent = nil then
+        TreeView1.Items.AddChildObject(TreeView1.Selected,
+          '''' + chr(psy.Code) + '''' + ' - ' + IntToStr(psy.Code), psy)
       else
-        TreeView1.Items.AddObject(curNode, '''' + chr(psy.Code) + '''' + ' - ' +
-          IntToStr(psy.Code), psy);
+        TreeView1.Items.AddObject(TreeView1.Selected, '''' + chr(psy.Code) +
+          '''' + ' - ' + IntToStr(psy.Code), psy);
     end;
 end;
 
@@ -261,6 +271,13 @@ begin
   Button1.Click;
 end;
 
+procedure TForm1.Delete1Click(Sender: TObject);
+var
+  temp_node: TTreeNode;
+begin
+  TreeView1.Selected.Delete;
+end;
+
 function TForm1.FR_FontStyleToString(style: TFontStyles): string;
 begin
   Result := '';
@@ -268,6 +285,17 @@ begin
     Result := Result + 'StrikeOut ';
   if fsUnderline in style then
     Result := Result + 'Underline ';
+end;
+
+procedure TForm1.FR_FreeSymb(var symb: PSymb);
+begin
+  if symb <> nil then
+  begin
+    if symb.Buffer <> nil then
+      FreeMemory(symb.Buffer);
+    Dispose(symb);
+  end;
+  symb := nil;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -281,24 +309,26 @@ begin
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
-var
-  i: integer;
-  psy: PSymb;
 begin
-  for i := 0 to TreeView1.Items.Count - 1 do
-  begin
-    psy := TreeView1.Items[i].Data;
-    if psy <> nil then
-    begin
-      if psy.Buffer <> nil then
-        FreeMemory(psy.Buffer);
-      Dispose(psy);
-    end;
-  end;
   face.glyph.Bitmap.Done;
   face.Destroy;
   FreeMemory(pFont);
   font_mem_size := 0;
+end;
+
+procedure TForm1.FormResize(Sender: TObject);
+var
+  psy: PSymb;
+begin
+  if TreeView1.Selected = nil then
+    exit;
+  if (TreeView1.Selected.getFirstChild = nil) and
+    (TreeView1.Selected.Parent <> nil) and (TreeView1.Selected.Data <> nil) then
+  begin
+    psy := TreeView1.Selected.Data;
+    if psy.BufferSize > 0 then
+      FR_ShowSymbol(psy);
+  end;
 end;
 
 function TForm1.FR_SearchUnicodeName(Code: integer): string;
@@ -356,7 +386,6 @@ begin
   symb.BearingX := face.glyph.Metrics.HorzBearingX div 64;
   symb.BearingY := face.glyph.Metrics.HorzBearingY div 64;
   symb.Heigth := face.Size.Metrics.Height div 64;
-  // Result.Width := face.glyph.Metrics.Width div 64 + abs(Result.BearingX);
   symb.Width := face.glyph.Bitmap.Width; // это правильнее
   symb.Ascender := face.Size.Metrics.Ascender div 64;
   symb.Descender := face.Size.Metrics.Descender div 64;
@@ -372,7 +401,6 @@ begin
     for j := 0 to 7 do
       if face.glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
       begin
-        // P_x := abs(Result.BearingX) + k * 8 + j;
         P_x := k * 8 + j; // это правильнее
         P_y := (face.Size.Metrics.Ascender - face.glyph.Metrics.HorzBearingY)
           div 64 + i div face.glyph.Bitmap.Pitch;
@@ -514,18 +542,36 @@ begin
   StatusBar1.Panels[2].Text := FR_SearchUnicodeName(symbol.Code);
 end;
 
+procedure TForm1.Renametable1Click(Sender: TObject);
+var
+  S: string;
+begin
+  if TreeView1.Selected.Parent <> nil then
+    TreeView1.Selected := TreeView1.Selected.Parent;
+  S := TreeView1.Selected.Text;
+  if InputQuery('Rename table', 'Enter new name:', S) then
+    TreeView1.Selected.Text := S;
+end;
+
 procedure TForm1.TreeView1Change(Sender: TObject; Node: TTreeNode);
 var
   psy: PSymb;
 begin
-  curNode := Node;
-  if (curNode.getFirstChild = nil) and (curNode.Parent <> nil) and
-    (curNode.Data <> nil) then
+  if (Node.getFirstChild = nil) and (Node.Parent <> nil) and (Node.Data <> nil)
+  then
   begin
-    psy := curNode.Data;
+    psy := Node.Data;
     if psy.BufferSize > 0 then
       FR_ShowSymbol(psy);
   end;
+end;
+
+procedure TForm1.TreeView1Deletion(Sender: TObject; Node: TTreeNode);
+var
+  psy: PSymb;
+begin
+  psy := Node.Data;
+  FR_FreeSymb(psy);
 end;
 
 end.

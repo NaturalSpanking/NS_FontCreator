@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 0
   Top = 0
-  Caption = 'Form1'
+  Caption = 'NS Font Creator'
   ClientHeight = 841
   ClientWidth = 1424
   Color = clBtnFace
@@ -18,6 +18,7 @@ object Form1: TForm1
   OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 21
   object Image1: TImage
@@ -42,7 +43,7 @@ object Form1: TForm1
     ExplicitWidth = 1091
   end
   object Splitter2: TSplitter
-    Left = 145
+    Left = 185
     Top = 0
     Height = 714
     ExplicitLeft = 168
@@ -50,9 +51,9 @@ object Form1: TForm1
     ExplicitHeight = 100
   end
   object Image2: TImage
-    Left = 148
+    Left = 188
     Top = 0
-    Width = 1049
+    Width = 1009
     Height = 714
     Align = alClient
     ExplicitLeft = 304
@@ -163,15 +164,16 @@ object Form1: TForm1
   object TreeView1: TTreeView
     Left = 0
     Top = 0
-    Width = 145
+    Width = 185
     Height = 714
     Align = alLeft
     DragMode = dmAutomatic
     HideSelection = False
     Indent = 19
+    PopupMenu = PopupMenu1
     TabOrder = 1
     OnChange = TreeView1Change
-    ExplicitHeight = 534
+    OnDeletion = TreeView1Deletion
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -201,14 +203,34 @@ object Form1: TForm1
     Font.Height = -19
     Font.Name = 'Times New Roman'
     Font.Style = []
-    Left = 792
+    Left = 232
     Top = 8
   end
   object MainMenu1: TMainMenu
-    Left = 744
+    Left = 312
     Top = 8
     object File1: TMenuItem
       Caption = 'File'
+    end
+  end
+  object PopupMenu1: TPopupMenu
+    Left = 160
+    Top = 8
+    object Addtable1: TMenuItem
+      Caption = 'Add table'
+      OnClick = FR_AddTable
+    end
+    object Renametable1: TMenuItem
+      Caption = 'Rename table'
+      OnClick = Renametable1Click
+    end
+    object Addsymbols1: TMenuItem
+      Caption = 'Add symbols'
+      OnClick = FR_AddRange
+    end
+    object Delete1: TMenuItem
+      Caption = 'Delete'
+      OnClick = Delete1Click
     end
   end
 end
