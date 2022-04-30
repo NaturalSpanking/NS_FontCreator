@@ -174,6 +174,8 @@ object Form1: TForm1
     TabOrder = 1
     OnChange = TreeView1Change
     OnDeletion = TreeView1Deletion
+    OnDragDrop = TreeView1DragDrop
+    OnDragOver = TreeView1DragOver
   end
   object StatusBar1: TStatusBar
     Left = 0

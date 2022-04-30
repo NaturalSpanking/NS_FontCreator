@@ -74,6 +74,9 @@ type
     procedure TreeView1Deletion(Sender: TObject; Node: TTreeNode);
     procedure FormResize(Sender: TObject);
     procedure Renametable1Click(Sender: TObject);
+    procedure TreeView1DragDrop(Sender, Source: TObject; X, Y: integer);
+    procedure TreeView1DragOver(Sender, Source: TObject; X, Y: integer;
+      State: TDragState; var Accept: Boolean);
   private
     // curNode: TTreeNode;
     face: TFTFace;
@@ -82,6 +85,8 @@ type
     rendef_flags: TFTRenderMode;
     glyph_names_arr: array [0 .. UnicodeArrSize] of TUnicodeData;
     procedure AddLog(S: string);
+    procedure FR_Save(FName: string);
+    procedure FR_Load(FName: string);
     procedure FR_SetFont;
     procedure FR_ShowSymbol(var symbol: PSymb);
     procedure FR_LoadUnicodeNames;
@@ -140,101 +145,13 @@ begin
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
-var
-  stream: TMemoryStream;
-  f: file;
-  i: integer;
-  b: byte;
-  psy: PSymb;
 begin
-  stream := TMemoryStream.Create;
-  AssignFile(f, 'saving.dat');
-  rewrite(f, 1);
-  TreeView1.SaveToStream(stream);
-  i := stream.Size;
-  BlockWrite(f, i, sizeof(integer));
-  BlockWrite(f, stream.Memory^, i);
-  stream.Free;
-  for i := 0 to TreeView1.Items.Count - 1 do
-  begin
-    psy := TreeView1.Items[i].Data;
-    if psy <> nil then
-    begin
-      b := 1;
-      BlockWrite(f, b, 1);
-      BlockWrite(f, psy^, sizeof(TSymb));
-      BlockWrite(f, psy.Buffer^, psy.BufferSize);
-    end
-    else
-    begin
-      b := 0;
-      BlockWrite(f, b, 1);
-    end;
-  end;
-  i := FontDialog1.Font.Charset;
-  BlockWrite(f, i, sizeof(integer));
-  i := FontDialog1.Font.Color;
-  BlockWrite(f, i, sizeof(integer));
-  i := FontDialog1.Font.Size;
-  BlockWrite(f, i, sizeof(integer));
-  i := byte(FontDialog1.Font.style);
-  BlockWrite(f, i, sizeof(integer));
-  i := length(FontDialog1.Font.Name);
-  BlockWrite(f, i, sizeof(integer));
-  BlockWrite(f, FontDialog1.Font.Name[1], i * sizeof(char));
-  CloseFile(f);
-
+  FR_Save('saving.dat');
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
-var
-  stream: TMemoryStream;
-  f: file;
-  i: integer;
-  b: byte;
-  S: string;
-  psy: PSymb;
 begin
-  stream := TMemoryStream.Create;
-  AssignFile(f, 'saving.dat');
-  reset(f, 1);
-  BlockRead(f, i, sizeof(integer));
-  stream.SetSize(i);
-  BlockRead(f, stream.Memory^, i);
-  TreeView1.LoadFromStream(stream);
-  stream.Free;
-  for i := 0 to TreeView1.Items.Count - 1 do
-  begin
-    BlockRead(f, b, 1);
-    if b = 1 then
-    begin
-      psy := new(PSymb);
-      BlockRead(f, psy^, sizeof(TSymb));
-      if psy.BufferSize > 0 then
-      begin
-        psy.Buffer := GetMemory(psy.BufferSize);
-        BlockRead(f, psy.Buffer^, psy.BufferSize);
-      end;
-      TreeView1.Items[i].Data := psy;
-    end;
-  end;
-
-  BlockRead(f, i, sizeof(integer));
-  FontDialog1.Font.Charset := TFontCharset(i);
-  BlockRead(f, i, sizeof(integer));
-  FontDialog1.Font.Color := TColor(i);
-  BlockRead(f, i, sizeof(integer));
-  FontDialog1.Font.Size := i;
-  BlockRead(f, i, sizeof(integer));
-  FontDialog1.Font.style := TFontStyles(byte(i));
-
-  BlockRead(f, i, sizeof(integer));
-  SetLength(S, i);
-  BlockRead(f, S[1], (i) * sizeof(char));
-  FontDialog1.Font.Name := S;
-  FR_SetFont;
-  TreeView1.Select(TreeView1.Items[0]);
-  CloseFile(f);
+  FR_Load('saving.dat');
 end;
 
 procedure TForm1.FR_AddRange(Sender: TObject);
@@ -254,6 +171,7 @@ begin
       else
         TreeView1.Items.AddObject(TreeView1.Selected, '''' + chr(psy.Code) +
           '''' + ' - ' + IntToStr(psy.Code), psy);
+
     end;
 end;
 
@@ -331,6 +249,52 @@ begin
   end;
 end;
 
+procedure TForm1.FR_Save(FName: string);
+var
+  stream: TMemoryStream;
+  f: file;
+  i: integer;
+  b: byte;
+  psy: PSymb;
+begin
+  stream := TMemoryStream.Create;
+  AssignFile(f, FName);
+  rewrite(f, 1);
+  TreeView1.SaveToStream(stream);
+  i := stream.Size;
+  BlockWrite(f, i, sizeof(integer));
+  BlockWrite(f, stream.Memory^, i);
+  stream.Free;
+  for i := 0 to TreeView1.Items.Count - 1 do
+  begin
+    psy := TreeView1.Items[i].Data;
+    if psy <> nil then
+    begin
+      b := 1;
+      BlockWrite(f, b, 1);
+      BlockWrite(f, psy^, sizeof(TSymb));
+      BlockWrite(f, psy.Buffer^, psy.BufferSize);
+    end
+    else
+    begin
+      b := 0;
+      BlockWrite(f, b, 1);
+    end;
+  end;
+  i := FontDialog1.Font.Charset;
+  BlockWrite(f, i, sizeof(integer));
+  i := FontDialog1.Font.Color;
+  BlockWrite(f, i, sizeof(integer));
+  i := FontDialog1.Font.Size;
+  BlockWrite(f, i, sizeof(integer));
+  i := byte(FontDialog1.Font.style);
+  BlockWrite(f, i, sizeof(integer));
+  i := length(FontDialog1.Font.Name);
+  BlockWrite(f, i, sizeof(integer));
+  BlockWrite(f, FontDialog1.Font.Name[1], i * sizeof(char));
+  CloseFile(f);
+end;
+
 function TForm1.FR_SearchUnicodeName(Code: integer): string;
 var
   a, b, i: integer;
@@ -345,6 +309,57 @@ begin
       b := i;
   until glyph_names_arr[i].Code = Code;
   Result := glyph_names_arr[i].U_plus + ' - ' + glyph_names_arr[i].Name;
+end;
+
+procedure TForm1.FR_Load(FName: string);
+var
+  stream: TMemoryStream;
+  f: file;
+  i: integer;
+  b: byte;
+  S: string;
+  psy: PSymb;
+begin
+  stream := TMemoryStream.Create;
+  AssignFile(f, FName);
+  reset(f, 1);
+  BlockRead(f, i, sizeof(integer));
+  stream.SetSize(i);
+  BlockRead(f, stream.Memory^, i);
+  TreeView1.LoadFromStream(stream);
+  stream.Free;
+  for i := 0 to TreeView1.Items.Count - 1 do
+  begin
+    BlockRead(f, b, 1);
+    if b = 1 then
+    begin
+      psy := new(PSymb);
+      BlockRead(f, psy^, sizeof(TSymb));
+      if psy.BufferSize > 0 then
+      begin
+        psy.Buffer := GetMemory(psy.BufferSize);
+        BlockRead(f, psy.Buffer^, psy.BufferSize);
+      end;
+      TreeView1.Items[i].Data := psy;
+    end;
+  end;
+
+  BlockRead(f, i, sizeof(integer));
+  FontDialog1.Font.Charset := TFontCharset(i);
+  BlockRead(f, i, sizeof(integer));
+  FontDialog1.Font.Color := TColor(i);
+  BlockRead(f, i, sizeof(integer));
+  FontDialog1.Font.Size := i;
+  BlockRead(f, i, sizeof(integer));
+  FontDialog1.Font.style := TFontStyles(byte(i));
+
+  BlockRead(f, i, sizeof(integer));
+  SetLength(S, i);
+  BlockRead(f, S[1], (i) * sizeof(char));
+  FontDialog1.Font.Name := S;
+  FR_SetFont;
+  TreeView1.Select(TreeView1.Items[0]);
+  CloseFile(f);
 end;
 
 procedure TForm1.FR_LoadUnicodeNames;
@@ -443,7 +458,7 @@ end;
 procedure TForm1.FR_ShowSymbol(var symbol: PSymb);
 var
   i, j: integer;
-  x, y: integer;
+  X, Y: integer;
   grid_size: integer;
   origin: TPoint;
   bbox: TRect;
@@ -460,19 +475,19 @@ begin
   if i < grid_size then
     grid_size := i;
   // вычисление координат
-  origin.x := round(Image2.Width / 8);
-  origin.y := round(Image2.Height * 9 / 12);
-  bbox.Left := origin.x;
-  bbox.Right := origin.x + symbol.Advance * grid_size;
-  bbox.Top := origin.y - symbol.Ascender * grid_size;
-  bbox.Bottom := origin.y - symbol.Descender * grid_size;
+  origin.X := round(Image2.Width / 8);
+  origin.Y := round(Image2.Height * 9 / 12);
+  bbox.Left := origin.X;
+  bbox.Right := origin.X + symbol.Advance * grid_size;
+  bbox.Top := origin.Y - symbol.Ascender * grid_size;
+  bbox.Bottom := origin.Y - symbol.Descender * grid_size;
   // заливка коробки белым
   Image2.Canvas.Brush.Color := clWhite;
-  for x := symbol.BearingX to symbol.Width - 1 + symbol.BearingX do
-    for y := 0 to symbol.Heigth - 1 do
+  for X := symbol.BearingX to symbol.Width - 1 + symbol.BearingX do
+    for Y := 0 to symbol.Heigth - 1 do
     begin
-      R := Rect(bbox.Left + x * grid_size, bbox.Top + y * grid_size,
-        bbox.Left + x * grid_size + grid_size, bbox.Top + y * grid_size +
+      R := Rect(bbox.Left + X * grid_size, bbox.Top + Y * grid_size,
+        bbox.Left + X * grid_size + grid_size, bbox.Top + Y * grid_size +
         grid_size);
       Image2.Canvas.FillRect(R);
     end;
@@ -481,10 +496,10 @@ begin
   for i := 0 to symbol.BufferSize - 1 do
     for j := 0 to 7 do
     begin
-      x := i div symbol.BytesPerColumn + symbol.BearingX;
-      y := 8 * (i mod symbol.BytesPerColumn) + j;
-      R := Rect(bbox.Left + x * grid_size, bbox.Top + y * grid_size,
-        bbox.Left + x * grid_size + grid_size, bbox.Top + y * grid_size +
+      X := i div symbol.BytesPerColumn + symbol.BearingX;
+      Y := 8 * (i mod symbol.BytesPerColumn) + j;
+      R := Rect(bbox.Left + X * grid_size, bbox.Top + Y * grid_size,
+        bbox.Left + X * grid_size + grid_size, bbox.Top + Y * grid_size +
         grid_size);
       if (symbol.Buffer[i] shl j) and 128 > 0 then
         Image2.Canvas.FillRect(R);
@@ -494,14 +509,14 @@ begin
   begin
     // горизонтальные черные линии
     pen.Color := clBlack;
-    j := origin.y;
+    j := origin.Y;
     while j > 0 do // выше базовой
     begin
       MoveTo(0, j);
       LineTo(Image2.Width, j);
       dec(j, grid_size);
     end;
-    j := origin.y;
+    j := origin.Y;
     while j < Image2.Height do // ниже базовой
     begin
       MoveTo(0, j);
@@ -510,22 +525,22 @@ begin
     end;
     // горизонтальные красные линии
     pen.Color := clRed;
-    MoveTo(0, origin.y);
-    LineTo(Image2.Width, origin.y); // базовая линия горизонтальная
+    MoveTo(0, origin.Y);
+    LineTo(Image2.Width, origin.Y); // базовая линия горизонтальная
     MoveTo(0, bbox.Top);
     LineTo(Image2.Width, bbox.Top); // Ascender
     MoveTo(0, bbox.Bottom);
     LineTo(Image2.Width, bbox.Bottom); // Descender
     // вертикальные черные линии
     pen.Color := clBlack;
-    j := origin.x;
+    j := origin.X;
     while j > 0 do // левее базовой
     begin
       MoveTo(j, 0);
       LineTo(j, Image2.Height);
       dec(j, grid_size);
     end;
-    j := origin.x;
+    j := origin.X;
     while j < Image2.Width do // правее базовой
     begin
       MoveTo(j, 0);
@@ -534,8 +549,8 @@ begin
     end;
     // вертикальные красные линии
     pen.Color := clRed;
-    MoveTo(origin.x, 0);
-    LineTo(origin.x, Image2.Height); // базовая линия вертикальная
+    MoveTo(origin.X, 0);
+    LineTo(origin.X, Image2.Height); // базовая линия вертикальная
     MoveTo(bbox.Right, 0);
     LineTo(bbox.Right, Image2.Height); // Advance
   end;
@@ -572,6 +587,43 @@ var
 begin
   psy := Node.Data;
   FR_FreeSymb(psy);
+end;
+
+procedure TForm1.TreeView1DragDrop(Sender, Source: TObject; X, Y: integer);
+var
+  AnItem: TTreeNode;
+  AttachMode: TNodeAttachMode;
+  HT: THitTests;
+begin
+  AttachMode := naInsert;
+  if TreeView1.Selected = nil then
+    exit;
+  HT := TreeView1.GetHitTestInfoAt(X, Y);
+  AnItem := TreeView1.GetNodeAt(X, Y);
+  if (HT - [htOnItem, htOnIcon, htNowhere, htOnIndent, htOnRight] <> HT) then
+  begin
+    if (htOnItem in HT) or (htOnIcon in HT) then
+    begin
+      if (AnItem.Parent = nil) and (TreeView1.Selected.Parent <> nil) then
+        AttachMode := naAddChild
+      else
+        AttachMode := naInsert;
+    end
+    else if htNowhere in HT then
+      AttachMode := naAdd
+    else if (htOnIndent in HT) or (htOnRight in HT) then
+      AttachMode := naInsert;
+    TreeView1.Selected.MoveTo(AnItem, AttachMode);
+    // if AttachMode = naAddChild then
+    // PM_Unit(AnItem.Data).is_param := false;
+    // has_global_changes := true;
+  end;
+end;
+
+procedure TForm1.TreeView1DragOver(Sender, Source: TObject; X, Y: integer;
+  State: TDragState; var Accept: Boolean);
+begin
+  Accept := Sender = Source;
 end;
 
 end.
