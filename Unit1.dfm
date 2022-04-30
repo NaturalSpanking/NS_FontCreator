@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 681
+  ClientHeight = 661
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -22,7 +22,7 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 557
+    Top = 537
     Width = 1424
     Height = 105
     Align = alBottom
@@ -32,7 +32,7 @@ object Form1: TForm1
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 554
+    Top = 534
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -44,7 +44,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 145
     Top = 0
-    Height = 554
+    Height = 534
     ExplicitLeft = 168
     ExplicitTop = 280
     ExplicitHeight = 100
@@ -53,7 +53,7 @@ object Form1: TForm1
     Left = 148
     Top = 0
     Width = 1049
-    Height = 554
+    Height = 534
     Align = alClient
     ExplicitLeft = 304
     ExplicitTop = 112
@@ -64,7 +64,7 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 554
+    Height = 534
     Align = alRight
     TabOrder = 0
     object Button1: TButton
@@ -85,31 +85,13 @@ object Form1: TForm1
       TabOrder = 1
       OnClick = Button2Click
     end
-    object Button3: TButton
-      Left = 70
-      Top = 101
-      Width = 75
-      Height = 25
-      Caption = 'Free'
-      TabOrder = 2
-      OnClick = Button3Click
-    end
-    object Button4: TButton
-      Left = 70
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = 'Init'
-      TabOrder = 3
-      OnClick = Button4Click
-    end
     object CheckBox1: TCheckBox
       Left = 15
       Top = 193
       Width = 130
       Height = 17
       Caption = 'NoHinting'
-      TabOrder = 4
+      TabOrder = 2
       OnClick = Button1Click
     end
     object CheckBox2: TCheckBox
@@ -118,7 +100,7 @@ object Form1: TForm1
       Width = 130
       Height = 17
       Caption = 'Force auto-hit'
-      TabOrder = 5
+      TabOrder = 3
       OnClick = Button1Click
     end
     object CheckBox3: TCheckBox
@@ -129,7 +111,7 @@ object Form1: TForm1
       Caption = 'Target mono'
       Checked = True
       State = cbChecked
-      TabOrder = 6
+      TabOrder = 4
       OnClick = Button1Click
     end
     object Edit1: TEdit
@@ -137,7 +119,7 @@ object Form1: TForm1
       Top = 132
       Width = 27
       Height = 29
-      TabOrder = 7
+      TabOrder = 5
       Text = 'j'
     end
     object Button5: TButton
@@ -146,7 +128,7 @@ object Form1: TForm1
       Width = 75
       Height = 25
       Caption = 'Button5'
-      TabOrder = 8
+      TabOrder = 6
       OnClick = Button5Click
     end
     object Button6: TButton
@@ -161,7 +143,7 @@ object Form1: TForm1
       Font.Name = 'Times New Roman'
       Font.Style = []
       ParentFont = False
-      TabOrder = 9
+      TabOrder = 7
       OnClick = Button6Click
     end
     object Button7: TButton
@@ -176,7 +158,7 @@ object Form1: TForm1
       Font.Name = 'Times New Roman'
       Font.Style = []
       ParentFont = False
-      TabOrder = 10
+      TabOrder = 8
       OnClick = Button7Click
     end
     object Button8: TButton
@@ -185,7 +167,7 @@ object Form1: TForm1
       Width = 26
       Height = 27
       Caption = 'Button8'
-      TabOrder = 11
+      TabOrder = 9
       OnClick = Button8Click
     end
     object Button9: TButton
@@ -194,7 +176,7 @@ object Form1: TForm1
       Width = 27
       Height = 35
       Caption = 'Button9'
-      TabOrder = 12
+      TabOrder = 10
       OnClick = Button9Click
     end
     object Button10: TButton
@@ -203,7 +185,7 @@ object Form1: TForm1
       Width = 75
       Height = 25
       Caption = 'add root'
-      TabOrder = 13
+      TabOrder = 11
       OnClick = Button10Click
     end
     object Button11: TButton
@@ -212,7 +194,7 @@ object Form1: TForm1
       Width = 75
       Height = 25
       Caption = 'add child'
-      TabOrder = 14
+      TabOrder = 12
       OnClick = Button11Click
     end
   end
@@ -220,7 +202,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 145
-    Height = 554
+    Height = 534
     Align = alLeft
     DragMode = dmAutomatic
     HideSelection = False
@@ -230,7 +212,7 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 662
+    Top = 642
     Width = 1424
     Height = 19
     Panels = <

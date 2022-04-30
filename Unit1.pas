@@ -38,11 +38,9 @@ type
     Button1: TButton;
     Button2: TButton;
     FontDialog1: TFontDialog;
-    Button3: TButton;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
-    Button4: TButton;
     Edit1: TEdit;
     Panel1: TPanel;
     TreeView1: TTreeView;
@@ -62,8 +60,6 @@ type
     Button11: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
@@ -85,7 +81,7 @@ type
     procedure Set_FT_Font;
     procedure ShowSymb(var symbol: PSymb);
     procedure LoadGlyphNames;
-    function Render(char_idx: smallint): PSymb;
+    procedure Render(symb: PSymb);
     function CheckLoadFlags: TFTLoadFlags;
     function FontStyletoString(style: TFontStyles): string;
     function SearchUnicodeName(Code: integer): string;
@@ -122,7 +118,9 @@ var
 begin
   if curNode <> nil then
   begin
-    psy := Render(ord(Edit1.Text[1]));
+    psy := new(PSymb);
+    psy.Code := ord(Edit1.Text[1]);
+    Render(psy);
     if curNode.Parent = nil then
       TreeView1.Items.AddChildObject(curNode, chr(psy.Code) + ' - ' +
         IntToStr(psy.Code), psy)
@@ -136,7 +134,9 @@ procedure TForm1.Button1Click(Sender: TObject);
 var
   S: PSymb;
 begin
-  S := Render(ord(Edit1.Text[1]));
+  S := new(PSymb);
+  S.Code := ord(Edit1.Text[1]);
+  Render(S);
   ShowSymb(S);
   StatusBar1.Panels[2].Text := SearchUnicodeName(S.Code);
   FreeMemory(S.Buffer);
@@ -147,24 +147,6 @@ procedure TForm1.Button2Click(Sender: TObject);
 begin
   if FontDialog1.Execute(Application.Handle) then
     Set_FT_Font;
-end;
-
-procedure TForm1.Button3Click(Sender: TObject);
-begin
-  face.glyph.Bitmap.Done;
-  face.Destroy;
-  FreeMem(pFont);
-  font_mem_size := 0;
-end;
-
-procedure TForm1.Button4Click(Sender: TObject);
-begin
-  StatusBar1.Panels[3].Text :=
-    ('FreeType''s version is ' + IntToStr(TFTManager.MajorVersion) + '.' +
-    IntToStr(TFTManager.MinorVersion) + '.' + IntToStr(TFTManager.PatchVersion))
-    + '       ';
-  Set_FT_Font;
-  LoadGlyphNames;
 end;
 
 procedure TForm1.Button5Click(Sender: TObject);
@@ -281,30 +263,28 @@ begin
   sl.Free;
 end;
 
-function TForm1.Render(char_idx: smallint): PSymb;
+procedure TForm1.Render(symb: PSymb);
 var
   P_x, P_y, i, j, k: integer;
   c: byte;
   byte_idx: integer;
   glyph_index: integer;
 begin
-  Result := new(PSymb);
-  glyph_index := face.GetCharIndex(char_idx);
+  glyph_index := face.GetCharIndex(symb.Code);
   face.LoadGlyph(glyph_index, CheckLoadFlags);
-  Result.Code := char_idx;
-  Result.BearingX := face.glyph.Metrics.HorzBearingX div 64;
-  Result.BearingY := face.glyph.Metrics.HorzBearingY div 64;
-  Result.Heigth := face.Size.Metrics.Height div 64;
+  symb.BearingX := face.glyph.Metrics.HorzBearingX div 64;
+  symb.BearingY := face.glyph.Metrics.HorzBearingY div 64;
+  symb.Heigth := face.Size.Metrics.Height div 64;
   // Result.Width := face.glyph.Metrics.Width div 64 + abs(Result.BearingX);
-  Result.Width := face.glyph.Bitmap.Width; // это правильнее
-  Result.Ascender := face.Size.Metrics.Ascender div 64;
-  Result.Descender := face.Size.Metrics.Descender div 64;
-  Result.Advance := face.glyph.Metrics.HorzAdvance div 64;
-  Result.BytesPerColumn := Result.Heigth div 8;
-  if Result.BytesPerColumn * 8 < Result.Heigth then
-    inc(Result.BytesPerColumn);
-  Result.BufferSize := Result.BytesPerColumn * Result.Width;
-  Result.Buffer := AllocMem(Result.BufferSize); // не надо очищать
+  symb.Width := face.glyph.Bitmap.Width; // это правильнее
+  symb.Ascender := face.Size.Metrics.Ascender div 64;
+  symb.Descender := face.Size.Metrics.Descender div 64;
+  symb.Advance := face.glyph.Metrics.HorzAdvance div 64;
+  symb.BytesPerColumn := symb.Heigth div 8;
+  if symb.BytesPerColumn * 8 < symb.Heigth then
+    inc(symb.BytesPerColumn);
+  symb.BufferSize := symb.BytesPerColumn * symb.Width;
+  symb.Buffer := AllocMem(symb.BufferSize); // не надо очищать
   k := 0;
   for i := 0 to (face.glyph.Bitmap.Rows * face.glyph.Bitmap.Pitch) - 1 do
   begin
@@ -315,8 +295,8 @@ begin
         P_x := k * 8 + j; // это правильнее
         P_y := (face.Size.Metrics.Ascender - face.glyph.Metrics.HorzBearingY)
           div 64 + i div face.glyph.Bitmap.Pitch;
-        byte_idx := (P_y div 8) + Result.BytesPerColumn * P_x;
-        Result.Buffer[byte_idx] := Result.Buffer[byte_idx] +
+        byte_idx := (P_y div 8) + symb.BytesPerColumn * P_x;
+        symb.Buffer[byte_idx] := symb.Buffer[byte_idx] +
           1 shl (7 - P_y mod 8);
       end;
     inc(k);
