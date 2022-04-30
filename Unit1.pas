@@ -142,7 +142,7 @@ begin
   AssignFile(f, 'saving.dat');
   rewrite(f, 1);
   i := stream.Size;
-  BlockWrite(f, i, sizeof(i));
+  BlockWrite(f, i, sizeof(integer));
   BlockWrite(f, stream.Memory^, i);
 
   for i := 0 to TreeView1.Items.Count - 1 do
@@ -176,7 +176,7 @@ begin
   stream := TMemoryStream.Create;
   AssignFile(f, 'saving.dat');
   reset(f, 1);
-  BlockRead(f, i, sizeof(i));
+  BlockRead(f, i, sizeof(integer));
   stream.SetSize(i);
   BlockRead(f, stream.Memory^, i);
   TreeView1.LoadFromStream(stream);
@@ -269,7 +269,7 @@ begin
   end;
   face.glyph.Bitmap.Done;
   face.Destroy;
-  FreeMem(pFont);
+  FreeMemory(pFont);
   font_mem_size := 0;
 end;
 
@@ -367,10 +367,10 @@ begin
   if font_mem_size > 0 then
   begin
     face.Destroy;
-    FreeMem(pFont);
+    FreeMemory(pFont);
   end;
   font_mem_size := GetFontData(dc, 0, 0, nil, font_mem_size);
-  GetMem(pFont, font_mem_size);
+  pFont := GetMemory(font_mem_size);
   if GetFontData(dc, 0, 0, pFont, font_mem_size) = GDI_ERROR then
     raise Exception.Create('Failed to get font data.');
   face := TFTFace.Create(pFont, font_mem_size, 0);
