@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 661
+  ClientHeight = 841
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -22,7 +22,7 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 537
+    Top = 717
     Width = 1424
     Height = 105
     Align = alBottom
@@ -32,7 +32,7 @@ object Form1: TForm1
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 534
+    Top = 714
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -44,7 +44,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 145
     Top = 0
-    Height = 534
+    Height = 714
     ExplicitLeft = 168
     ExplicitTop = 280
     ExplicitHeight = 100
@@ -53,7 +53,7 @@ object Form1: TForm1
     Left = 148
     Top = 0
     Width = 1049
-    Height = 534
+    Height = 714
     Align = alClient
     ExplicitLeft = 304
     ExplicitTop = 112
@@ -64,9 +64,17 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 534
+    Height = 714
     Align = alRight
     TabOrder = 0
+    ExplicitHeight = 534
+    object Label1: TLabel
+      Left = 6
+      Top = 690
+      Width = 72
+      Height = 21
+      Caption = '1440x900'
+    end
     object Button1: TButton
       Left = 70
       Top = 39
@@ -123,11 +131,11 @@ object Form1: TForm1
       Text = 'j'
     end
     object Button5: TButton
-      Left = 112
-      Top = 320
+      Left = 16
+      Top = 351
       Width = 75
       Height = 25
-      Caption = 'Button5'
+      Caption = 'add range'
       TabOrder = 6
       OnClick = Button5Click
     end
@@ -188,31 +196,23 @@ object Form1: TForm1
       TabOrder = 11
       OnClick = Button10Click
     end
-    object Button11: TButton
-      Left = 16
-      Top = 351
-      Width = 75
-      Height = 25
-      Caption = 'add child'
-      TabOrder = 12
-      OnClick = Button11Click
-    end
   end
   object TreeView1: TTreeView
     Left = 0
     Top = 0
     Width = 145
-    Height = 534
+    Height = 714
     Align = alLeft
     DragMode = dmAutomatic
     HideSelection = False
     Indent = 19
     TabOrder = 1
     OnChange = TreeView1Change
+    ExplicitHeight = 534
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 642
+    Top = 822
     Width = 1424
     Height = 19
     Panels = <
@@ -229,6 +229,7 @@ object Form1: TForm1
         Alignment = taRightJustify
         Width = 150
       end>
+    ExplicitTop = 642
   end
   object FontDialog1: TFontDialog
     Ctl3D = False

@@ -57,7 +57,7 @@ type
     Button8: TButton;
     Button9: TButton;
     Button10: TButton;
-    Button11: TButton;
+    Label1: TLabel;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
@@ -67,7 +67,6 @@ type
     procedure Button9Click(Sender: TObject);
     procedure Button10Click(Sender: TObject);
     procedure TreeView1Change(Sender: TObject; Node: TTreeNode);
-    procedure Button11Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
@@ -112,35 +111,21 @@ begin
     TreeView1.Items.Add(nil, S);
 end;
 
-procedure TForm1.Button11Click(Sender: TObject);
-var
-  psy: PSymb;
-begin
-  if curNode <> nil then
-  begin
-    psy := new(PSymb);
-    psy.Code := ord(Edit1.Text[1]);
-    Render(psy);
-    if curNode.Parent = nil then
-      TreeView1.Items.AddChildObject(curNode, chr(psy.Code) + ' - ' +
-        IntToStr(psy.Code), psy)
-    else
-      TreeView1.Items.AddObject(curNode, chr(psy.Code) + ' - ' +
-        IntToStr(psy.Code), psy);
-  end;
-end;
-
 procedure TForm1.Button1Click(Sender: TObject);
 var
-  S: PSymb;
+  psy: PSymb;
+  i:integer;
 begin
-  S := new(PSymb);
-  S.Code := ord(Edit1.Text[1]);
-  Render(S);
-  ShowSymb(S);
-  StatusBar1.Panels[2].Text := SearchUnicodeName(S.Code);
-  FreeMemory(S.Buffer);
-  Dispose(S);
+  for i := 0 to TreeView1.Items.Count - 1 do
+  begin
+    psy:= TreeView1.Items[i].Data;
+    if psy <> nil then
+    begin
+    Render(psy);    
+    if i = TreeView1.Selected.AbsoluteIndex then
+      ShowSymb(psy);
+    end;    
+  end;  
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
@@ -152,11 +137,22 @@ end;
 procedure TForm1.Button5Click(Sender: TObject);
 var
   i: integer;
+  psy: PSymb;
 begin
-  if Form2.Execute then
-    ShowMessage('ok')
-  else
-    ShowMessage('cancel');
+  if Form2.Execute and (curNode <> nil) then
+    for i := Form2.RangeBegin to Form2.RangeEnd do
+    begin
+      psy := new(PSymb);
+      psy.Code := i;
+      psy.Buffer := nil;
+      // Render(psy);
+      if curNode.Parent = nil then
+        TreeView1.Items.AddChildObject(curNode, chr(psy.Code) + ' - ' +
+          IntToStr(psy.Code), psy)
+      else
+        TreeView1.Items.AddObject(curNode, chr(psy.Code) + ' - ' +
+          IntToStr(psy.Code), psy);
+    end;
 end;
 
 procedure TForm1.Button6Click(Sender: TObject);
@@ -216,7 +212,20 @@ begin
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
+var 
+i:integer;
+psy:PSymb;
 begin
+  for i := 0 to TreeView1.Items.Count - 1 do
+  begin
+   psy:= TreeView1.Items[i].Data;
+    if psy <> nil then
+    begin
+    if psy.Buffer <> nil then
+      FreeMemory(psy.Buffer);
+    Dispose(psy);
+    end;    
+  end;
   face.glyph.Bitmap.Done;
   face.Destroy;
   FreeMem(pFont);
@@ -270,6 +279,9 @@ var
   byte_idx: integer;
   glyph_index: integer;
 begin
+  if symb.Buffer <> nil then
+    FreeMemory(symb.Buffer);
+  
   glyph_index := face.GetCharIndex(symb.Code);
   face.LoadGlyph(glyph_index, CheckLoadFlags);
   symb.BearingX := face.glyph.Metrics.HorzBearingX div 64;
@@ -296,8 +308,7 @@ begin
         P_y := (face.Size.Metrics.Ascender - face.glyph.Metrics.HorzBearingY)
           div 64 + i div face.glyph.Bitmap.Pitch;
         byte_idx := (P_y div 8) + symb.BytesPerColumn * P_x;
-        symb.Buffer[byte_idx] := symb.Buffer[byte_idx] +
-          1 shl (7 - P_y mod 8);
+        symb.Buffer[byte_idx] := symb.Buffer[byte_idx] + 1 shl (7 - P_y mod 8);
       end;
     inc(k);
     if k = face.glyph.Bitmap.Pitch then
@@ -430,11 +441,20 @@ begin
     MoveTo(bbox.Right, 0);
     LineTo(bbox.Right, Image2.Height); // Advance
   end;
+  StatusBar1.Panels[2].Text := SearchUnicodeName(symbol.Code);
 end;
 
 procedure TForm1.TreeView1Change(Sender: TObject; Node: TTreeNode);
+var
+  psy: PSymb;
 begin
   curNode := Node;
+  if (curNode.getFirstChild = nil) and (curNode.Parent <> nil) then
+  begin
+    psy := curNode.Data;
+    if psy.BufferSize > 0 then
+      ShowSymb(psy);
+  end;
 end;
 
 end.
