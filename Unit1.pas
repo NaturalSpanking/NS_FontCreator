@@ -41,7 +41,6 @@ type
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
-    Edit1: TEdit;
     Panel1: TPanel;
     TreeView1: TTreeView;
     Image1: TImage;
@@ -54,21 +53,21 @@ type
     Button6: TButton;
     Button7: TButton;
     Image2: TImage;
-    Button8: TButton;
-    Button9: TButton;
     Button10: TButton;
     Label1: TLabel;
+    Button3: TButton;
+    Button4: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
-    procedure Button8Click(Sender: TObject);
-    procedure Button9Click(Sender: TObject);
     procedure Button10Click(Sender: TObject);
     procedure TreeView1Change(Sender: TObject; Node: TTreeNode);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
     curNode: TTreeNode;
     face: TFTFace;
@@ -114,24 +113,91 @@ end;
 procedure TForm1.Button1Click(Sender: TObject);
 var
   psy: PSymb;
-  i:integer;
+  i: integer;
 begin
   for i := 0 to TreeView1.Items.Count - 1 do
   begin
-    psy:= TreeView1.Items[i].Data;
+    psy := TreeView1.Items[i].Data;
     if psy <> nil then
     begin
-    Render(psy);    
-    if i = TreeView1.Selected.AbsoluteIndex then
-      ShowSymb(psy);
-    end;    
-  end;  
+      Render(psy);
+      if i = TreeView1.Selected.AbsoluteIndex then
+        ShowSymb(psy);
+    end;
+  end;
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
   if FontDialog1.Execute(Application.Handle) then
     Set_FT_Font;
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+var
+  stream: TMemoryStream;
+  f: file;
+  i: integer;
+  b: byte;
+  psy: PSymb;
+begin
+  stream := TMemoryStream.Create;
+  TreeView1.SaveToStream(stream);
+  AssignFile(f, 'saving.dat');
+  rewrite(f, 1);
+  i := stream.Size;
+  BlockWrite(f, i, sizeof(i));
+  BlockWrite(f, stream.Memory^, i);
+
+  for i := 0 to TreeView1.Items.Count - 1 do
+  begin
+    psy := TreeView1.Items[i].Data;
+    if psy <> nil then
+    begin
+      b := 1;
+      BlockWrite(f, b, 1);
+      BlockWrite(f, psy^, sizeof(TSymb));
+      BlockWrite(f, psy.Buffer^, psy.BufferSize);
+    end
+    else
+    begin
+      b := 0;
+      BlockWrite(f, b, 1);
+    end;
+  end;
+  CloseFile(f);
+  stream.Free;
+end;
+
+procedure TForm1.Button4Click(Sender: TObject);
+var
+  stream: TMemoryStream;
+  f: file;
+  i: integer;
+  b: byte;
+  psy: PSymb;
+begin
+  stream := TMemoryStream.Create;
+  AssignFile(f, 'saving.dat');
+  reset(f, 1);
+  BlockRead(f, i, sizeof(i));
+  stream.SetSize(i);
+  BlockRead(f, stream.Memory^, i);
+  TreeView1.LoadFromStream(stream);
+
+  for i := 0 to TreeView1.Items.Count - 1 do
+  begin
+    BlockRead(f, b, 1);
+    if b = 1 then
+    begin
+      psy := new(PSymb);
+      BlockRead(f, psy^, sizeof(TSymb));
+      if psy.BufferSize > 0 then
+        BlockRead(f, psy.Buffer^, psy.BufferSize);
+      TreeView1.Items[i].Data := psy;
+    end;
+  end;
+  stream.Free;
 end;
 
 procedure TForm1.Button5Click(Sender: TObject);
@@ -145,12 +211,11 @@ begin
       psy := new(PSymb);
       psy.Code := i;
       psy.Buffer := nil;
-      // Render(psy);
       if curNode.Parent = nil then
-        TreeView1.Items.AddChildObject(curNode, chr(psy.Code) + ' - ' +
-          IntToStr(psy.Code), psy)
+        TreeView1.Items.AddChildObject(curNode, '"' + chr(psy.Code) + '"' +
+          ' - ' + IntToStr(psy.Code), psy)
       else
-        TreeView1.Items.AddObject(curNode, chr(psy.Code) + ' - ' +
+        TreeView1.Items.AddObject(curNode, '"' + chr(psy.Code) + '"' + ' - ' +
           IntToStr(psy.Code), psy);
     end;
 end;
@@ -166,18 +231,6 @@ procedure TForm1.Button7Click(Sender: TObject);
 begin
   FontDialog1.Font.Size := FontDialog1.Font.Size + 1;
   Set_FT_Font;
-  Button1.Click;
-end;
-
-procedure TForm1.Button8Click(Sender: TObject);
-begin
-  Edit1.Text := chr(ord(Edit1.Text[1]) + 1);
-  Button1.Click;
-end;
-
-procedure TForm1.Button9Click(Sender: TObject);
-begin
-  Edit1.Text := chr(ord(Edit1.Text[1]) - 1);
   Button1.Click;
 end;
 
@@ -212,19 +265,19 @@ begin
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
-var 
-i:integer;
-psy:PSymb;
+var
+  i: integer;
+  psy: PSymb;
 begin
   for i := 0 to TreeView1.Items.Count - 1 do
   begin
-   psy:= TreeView1.Items[i].Data;
+    psy := TreeView1.Items[i].Data;
     if psy <> nil then
     begin
-    if psy.Buffer <> nil then
-      FreeMemory(psy.Buffer);
-    Dispose(psy);
-    end;    
+      if psy.Buffer <> nil then
+        FreeMemory(psy.Buffer);
+      Dispose(psy);
+    end;
   end;
   face.glyph.Bitmap.Done;
   face.Destroy;
@@ -281,7 +334,7 @@ var
 begin
   if symb.Buffer <> nil then
     FreeMemory(symb.Buffer);
-  
+
   glyph_index := face.GetCharIndex(symb.Code);
   face.LoadGlyph(glyph_index, CheckLoadFlags);
   symb.BearingX := face.glyph.Metrics.HorzBearingX div 64;
@@ -449,7 +502,8 @@ var
   psy: PSymb;
 begin
   curNode := Node;
-  if (curNode.getFirstChild = nil) and (curNode.Parent <> nil) then
+  if (curNode.getFirstChild = nil) and (curNode.Parent <> nil) and
+    (curNode.Data <> nil) then
   begin
     psy := curNode.Data;
     if psy.BufferSize > 0 then

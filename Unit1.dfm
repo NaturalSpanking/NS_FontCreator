@@ -122,21 +122,13 @@ object Form1: TForm1
       TabOrder = 4
       OnClick = Button1Click
     end
-    object Edit1: TEdit
-      Left = 70
-      Top = 132
-      Width = 27
-      Height = 29
-      TabOrder = 5
-      Text = 'j'
-    end
     object Button5: TButton
       Left = 16
       Top = 351
       Width = 75
       Height = 25
       Caption = 'add range'
-      TabOrder = 6
+      TabOrder = 5
       OnClick = Button5Click
     end
     object Button6: TButton
@@ -151,7 +143,7 @@ object Form1: TForm1
       Font.Name = 'Times New Roman'
       Font.Style = []
       ParentFont = False
-      TabOrder = 7
+      TabOrder = 6
       OnClick = Button6Click
     end
     object Button7: TButton
@@ -166,26 +158,8 @@ object Form1: TForm1
       Font.Name = 'Times New Roman'
       Font.Style = []
       ParentFont = False
-      TabOrder = 8
+      TabOrder = 7
       OnClick = Button7Click
-    end
-    object Button8: TButton
-      Left = 103
-      Top = 134
-      Width = 26
-      Height = 27
-      Caption = 'Button8'
-      TabOrder = 9
-      OnClick = Button8Click
-    end
-    object Button9: TButton
-      Left = 37
-      Top = 129
-      Width = 27
-      Height = 35
-      Caption = 'Button9'
-      TabOrder = 10
-      OnClick = Button9Click
     end
     object Button10: TButton
       Left = 15
@@ -193,8 +167,26 @@ object Form1: TForm1
       Width = 75
       Height = 25
       Caption = 'add root'
-      TabOrder = 11
+      TabOrder = 8
       OnClick = Button10Click
+    end
+    object Button3: TButton
+      Left = 24
+      Top = 408
+      Width = 75
+      Height = 25
+      Caption = 'save'
+      TabOrder = 9
+      OnClick = Button3Click
+    end
+    object Button4: TButton
+      Left = 24
+      Top = 439
+      Width = 75
+      Height = 25
+      Caption = 'load'
+      TabOrder = 10
+      OnClick = Button4Click
     end
   end
   object TreeView1: TTreeView
