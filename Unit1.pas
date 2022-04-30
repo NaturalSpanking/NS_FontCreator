@@ -12,6 +12,8 @@ const
   UnicodeArrSize = 34627;
 
 type
+  PSymb = ^TSymb;
+
   TSymb = record
     Code: integer;
     Width: integer;
@@ -26,8 +28,6 @@ type
     Buffer: PByte;
   end;
 
-  PSymb = ^TSymb;
-
   TUnicodeData = record
     Code: integer;
     U_plus: string;
@@ -38,9 +38,6 @@ type
     Button1: TButton;
     Button2: TButton;
     FontDialog1: TFontDialog;
-    CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
-    CheckBox3: TCheckBox;
     Panel1: TPanel;
     TreeView1: TTreeView;
     Image1: TImage;
@@ -80,7 +77,6 @@ type
     procedure ShowSymb(var symbol: PSymb);
     procedure LoadGlyphNames;
     procedure Render(symb: PSymb);
-    function CheckLoadFlags: TFTLoadFlags;
     function FontStyletoString(style: TFontStyles): string;
     function SearchUnicodeName(Code: integer): string;
   public
@@ -193,7 +189,10 @@ begin
       psy := new(PSymb);
       BlockRead(f, psy^, sizeof(TSymb));
       if psy.BufferSize > 0 then
+      begin
+        psy.Buffer := GetMemory(psy.BufferSize);
         BlockRead(f, psy.Buffer^, psy.BufferSize);
+      end;
       TreeView1.Items[i].Data := psy;
     end;
   end;
@@ -232,17 +231,6 @@ begin
   FontDialog1.Font.Size := FontDialog1.Font.Size + 1;
   Set_FT_Font;
   Button1.Click;
-end;
-
-function TForm1.CheckLoadFlags: TFTLoadFlags;
-begin
-  Result := [ftlfMonochrome, ftlfRender];
-  if CheckBox1.Checked then
-    Result := Result + [ftlfNoHinting];
-  if CheckBox2.Checked then
-    Result := Result + [ftlfForceAutohint];
-  if CheckBox3.Checked then
-    Result := Result + [ftlfTargetMono]; // другие флаги фигня
 end;
 
 function TForm1.FontStyletoString(style: TFontStyles): string;
@@ -336,7 +324,7 @@ begin
     FreeMemory(symb.Buffer);
 
   glyph_index := face.GetCharIndex(symb.Code);
-  face.LoadGlyph(glyph_index, CheckLoadFlags);
+  face.LoadGlyph(glyph_index, [ftlfMonochrome, ftlfTargetMono, ftlfRender]);
   symb.BearingX := face.glyph.Metrics.HorzBearingX div 64;
   symb.BearingY := face.glyph.Metrics.HorzBearingY div 64;
   symb.Heigth := face.Size.Metrics.Height div 64;
