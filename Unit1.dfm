@@ -82,7 +82,7 @@ object Form1: TForm1
       Height = 25
       Caption = 'Draw'
       TabOrder = 0
-      OnClick = Button1Click
+      OnClick = FR_FullRepaint
     end
     object Button2: TButton
       Left = 70
@@ -100,7 +100,7 @@ object Form1: TForm1
       Height = 25
       Caption = 'add range'
       TabOrder = 2
-      OnClick = Button5Click
+      OnClick = FR_AddRange
     end
     object Button6: TButton
       Left = 31
@@ -139,7 +139,7 @@ object Form1: TForm1
       Height = 25
       Caption = 'add root'
       TabOrder = 5
-      OnClick = Button10Click
+      OnClick = FR_AddTable
     end
     object Button3: TButton
       Left = 24

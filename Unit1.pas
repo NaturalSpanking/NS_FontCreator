@@ -54,12 +54,12 @@ type
     Label1: TLabel;
     Button3: TButton;
     Button4: TButton;
-    procedure Button1Click(Sender: TObject);
+    procedure FR_FullRepaint(Sender: TObject);
     procedure Button2Click(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
+    procedure FR_AddRange(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
-    procedure Button10Click(Sender: TObject);
+    procedure FR_AddTable(Sender: TObject);
     procedure TreeView1Change(Sender: TObject; Node: TTreeNode);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -73,12 +73,12 @@ type
     rendef_flags: TFTRenderMode;
     glyph_names_arr: array [0 .. UnicodeArrSize] of TUnicodeData;
     procedure AddLog(S: string);
-    procedure Set_FT_Font;
-    procedure ShowSymb(var symbol: PSymb);
-    procedure LoadGlyphNames;
-    procedure Render(symb: PSymb);
-    function FontStyletoString(style: TFontStyles): string;
-    function SearchUnicodeName(Code: integer): string;
+    procedure FR_SetFont;
+    procedure FR_ShowSymbol(var symbol: PSymb);
+    procedure FR_LoadUnicodeNames;
+    procedure FR_Render(symb: PSymb);
+    function FR_FontStyleToString(style: TFontStyles): string;
+    function FR_SearchUnicodeName(Code: integer): string;
   public
     { Public declarations }
   end;
@@ -97,7 +97,7 @@ begin
   // Memo1.Lines.Add(S);
 end;
 
-procedure TForm1.Button10Click(Sender: TObject);
+procedure TForm1.FR_AddTable(Sender: TObject);
 var
   S: string;
 begin
@@ -106,7 +106,7 @@ begin
     TreeView1.Items.Add(nil, S);
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.FR_FullRepaint(Sender: TObject);
 var
   psy: PSymb;
   i: integer;
@@ -116,9 +116,9 @@ begin
     psy := TreeView1.Items[i].Data;
     if psy <> nil then
     begin
-      Render(psy);
+      FR_Render(psy);
       if i = TreeView1.Selected.AbsoluteIndex then
-        ShowSymb(psy);
+        FR_ShowSymbol(psy);
     end;
   end;
 end;
@@ -126,7 +126,7 @@ end;
 procedure TForm1.Button2Click(Sender: TObject);
 begin
   if FontDialog1.Execute(Application.Handle) then
-    Set_FT_Font;
+    FR_SetFont;
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
@@ -138,13 +138,13 @@ var
   psy: PSymb;
 begin
   stream := TMemoryStream.Create;
-  TreeView1.SaveToStream(stream);
   AssignFile(f, 'saving.dat');
   rewrite(f, 1);
+  TreeView1.SaveToStream(stream);
   i := stream.Size;
   BlockWrite(f, i, sizeof(integer));
   BlockWrite(f, stream.Memory^, i);
-
+  stream.Free;
   for i := 0 to TreeView1.Items.Count - 1 do
   begin
     psy := TreeView1.Items[i].Data;
@@ -161,8 +161,19 @@ begin
       BlockWrite(f, b, 1);
     end;
   end;
+  i := FontDialog1.Font.Charset;
+  BlockWrite(f, i, sizeof(integer));
+  i := FontDialog1.Font.Color;
+  BlockWrite(f, i, sizeof(integer));
+  i := FontDialog1.Font.Size;
+  BlockWrite(f, i, sizeof(integer));
+  i := byte(FontDialog1.Font.style);
+  BlockWrite(f, i, sizeof(integer));
+  i := length(FontDialog1.Font.Name);
+  BlockWrite(f, i, sizeof(integer));
+  BlockWrite(f, FontDialog1.Font.Name[1], i * sizeof(char));
   CloseFile(f);
-  stream.Free;
+
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
@@ -171,6 +182,7 @@ var
   f: file;
   i: integer;
   b: byte;
+  s:string;
   psy: PSymb;
 begin
   stream := TMemoryStream.Create;
@@ -180,7 +192,7 @@ begin
   stream.SetSize(i);
   BlockRead(f, stream.Memory^, i);
   TreeView1.LoadFromStream(stream);
-
+  stream.Free;
   for i := 0 to TreeView1.Items.Count - 1 do
   begin
     BlockRead(f, b, 1);
@@ -196,10 +208,26 @@ begin
       TreeView1.Items[i].Data := psy;
     end;
   end;
-  stream.Free;
+
+  BlockRead(f, i, sizeof(integer));
+  FontDialog1.Font.Charset := TFontCharset(i);
+  BlockRead(f, i, sizeof(integer));
+  FontDialog1.Font.Color := TColor(i);
+  BlockRead(f, i, sizeof(integer));
+  FontDialog1.Font.Size := i;
+  BlockRead(f, i, sizeof(integer));
+  FontDialog1.Font.style := TFontStyles(byte(i));
+  
+  BlockRead(f, i, sizeof(integer));
+  SetLength(s, i);  
+  BlockRead(f, s[1], (i) * sizeof(char));
+  FontDialog1.Font.Name :=s;
+  FR_SetFont;
+  TreeView1.Select(TreeView1.Items[0]);
+  CloseFile(f);
 end;
 
-procedure TForm1.Button5Click(Sender: TObject);
+procedure TForm1.FR_AddRange(Sender: TObject);
 var
   i: integer;
   psy: PSymb;
@@ -211,10 +239,10 @@ begin
       psy.Code := i;
       psy.Buffer := nil;
       if curNode.Parent = nil then
-        TreeView1.Items.AddChildObject(curNode, '"' + chr(psy.Code) + '"' +
+        TreeView1.Items.AddChildObject(curNode, '''' + chr(psy.Code) + '''' +
           ' - ' + IntToStr(psy.Code), psy)
       else
-        TreeView1.Items.AddObject(curNode, '"' + chr(psy.Code) + '"' + ' - ' +
+        TreeView1.Items.AddObject(curNode, '''' + chr(psy.Code) + '''' + ' - ' +
           IntToStr(psy.Code), psy);
     end;
 end;
@@ -222,18 +250,18 @@ end;
 procedure TForm1.Button6Click(Sender: TObject);
 begin
   FontDialog1.Font.Size := FontDialog1.Font.Size - 1;
-  Set_FT_Font;
+  FR_SetFont;
   Button1.Click;
 end;
 
 procedure TForm1.Button7Click(Sender: TObject);
 begin
   FontDialog1.Font.Size := FontDialog1.Font.Size + 1;
-  Set_FT_Font;
+  FR_SetFont;
   Button1.Click;
 end;
 
-function TForm1.FontStyletoString(style: TFontStyles): string;
+function TForm1.FR_FontStyleToString(style: TFontStyles): string;
 begin
   Result := '';
   if fsStrikeOut in style then
@@ -248,8 +276,8 @@ begin
     ('FreeType''s version is ' + IntToStr(TFTManager.MajorVersion) + '.' +
     IntToStr(TFTManager.MinorVersion) + '.' + IntToStr(TFTManager.PatchVersion))
     + '       ';
-  Set_FT_Font;
-  LoadGlyphNames;
+  FR_SetFont;
+  FR_LoadUnicodeNames;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -273,7 +301,7 @@ begin
   font_mem_size := 0;
 end;
 
-function TForm1.SearchUnicodeName(Code: integer): string;
+function TForm1.FR_SearchUnicodeName(Code: integer): string;
 var
   a, b, i: integer;
 begin
@@ -289,7 +317,7 @@ begin
   Result := glyph_names_arr[i].U_plus + ' - ' + glyph_names_arr[i].Name;
 end;
 
-procedure TForm1.LoadGlyphNames;
+procedure TForm1.FR_LoadUnicodeNames;
 var
   f: TextFile;
   sl: TStringList;
@@ -313,7 +341,7 @@ begin
   sl.Free;
 end;
 
-procedure TForm1.Render(symb: PSymb);
+procedure TForm1.FR_Render(symb: PSymb);
 var
   P_x, P_y, i, j, k: integer;
   c: byte;
@@ -358,7 +386,7 @@ begin
   face.glyph.Bitmap.Done;
 end;
 
-procedure TForm1.Set_FT_Font;
+procedure TForm1.FR_SetFont;
 var
   dc: HDC;
 begin
@@ -378,12 +406,13 @@ begin
   CancelDC(dc);
   DeleteDC(dc);
   StatusBar1.Panels[0].Text := face.FamilyName + ' ' + face.StyleName + ' ' +
-    FontStyletoString(FontDialog1.Font.style) + IntToStr(FontDialog1.Font.Size);
+    FR_FontStyleToString(FontDialog1.Font.style) +
+    IntToStr(FontDialog1.Font.Size);
   StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x' +
     IntToStr(face.Size.Metrics.MaxAdvance div 64);
 end;
 
-procedure TForm1.ShowSymb(var symbol: PSymb);
+procedure TForm1.FR_ShowSymbol(var symbol: PSymb);
 var
   i, j: integer;
   x, y: integer;
@@ -482,7 +511,7 @@ begin
     MoveTo(bbox.Right, 0);
     LineTo(bbox.Right, Image2.Height); // Advance
   end;
-  StatusBar1.Panels[2].Text := SearchUnicodeName(symbol.Code);
+  StatusBar1.Panels[2].Text := FR_SearchUnicodeName(symbol.Code);
 end;
 
 procedure TForm1.TreeView1Change(Sender: TObject; Node: TTreeNode);
@@ -495,7 +524,7 @@ begin
   begin
     psy := curNode.Data;
     if psy.BufferSize > 0 then
-      ShowSymb(psy);
+      FR_ShowSymbol(psy);
   end;
 end;
 
