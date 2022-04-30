@@ -41,6 +41,8 @@ begin
   from_code := StrToInt(Edit1.Text);
   to_code := StrToInt(Edit2.Text);
   res := True;
+  if RadioGroup1.ItemIndex = 2 then
+    to_code := from_code;
   Close;
 end;
 

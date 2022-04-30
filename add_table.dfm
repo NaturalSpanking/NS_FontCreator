@@ -36,6 +36,7 @@ object Form2: TForm2
     Width = 113
     Height = 113
     Caption = 'Presets'
+    ItemIndex = 0
     Items.Strings = (
       'ASCII'
       'Cyrillic'
@@ -63,8 +64,8 @@ object Form2: TForm2
     Text = '127'
   end
   object Button1: TButton
-    Left = 233
-    Top = 96
+    Left = 136
+    Top = 95
     Width = 75
     Height = 25
     Caption = 'OK'
@@ -72,8 +73,8 @@ object Form2: TForm2
     OnClick = Button1Click
   end
   object Button2: TButton
-    Left = 136
-    Top = 96
+    Left = 231
+    Top = 95
     Width = 75
     Height = 25
     Caption = 'Cancel'
