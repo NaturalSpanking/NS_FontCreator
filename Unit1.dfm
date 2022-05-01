@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 821
+  ClientHeight = 841
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -23,52 +23,52 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 697
+    Top = 717
     Width = 1424
     Height = 105
     Align = alBottom
-    ExplicitLeft = 216
-    ExplicitTop = 574
-    ExplicitWidth = 105
+    Constraints.MaxHeight = 300
+    Constraints.MinHeight = 46
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 694
+    Top = 714
     Width = 1424
     Height = 3
     Cursor = crVSplit
     Align = alBottom
+    AutoSnap = False
     Beveled = True
     OnMoved = FormResize
     ExplicitTop = 573
     ExplicitWidth = 1091
   end
   object Splitter2: TSplitter
-    Left = 185
+    Left = 151
     Top = 0
-    Height = 694
+    Height = 714
+    AutoSnap = False
     ExplicitLeft = 168
     ExplicitTop = 280
     ExplicitHeight = 100
   end
   object Image2: TImage
-    Left = 188
+    Left = 154
     Top = 0
-    Width = 1009
-    Height = 694
+    Width = 1043
+    Height = 714
     Align = alClient
-    ExplicitLeft = 304
-    ExplicitTop = 112
-    ExplicitWidth = 105
-    ExplicitHeight = 105
+    ExplicitTop = 29
+    ExplicitHeight = 660
   end
   object Panel1: TPanel
     Left = 1197
     Top = 0
     Width = 227
-    Height = 694
+    Height = 714
     Align = alRight
     TabOrder = 0
+    ExplicitHeight = 694
     object Label1: TLabel
       Left = 6
       Top = 690
@@ -92,16 +92,7 @@ object Form1: TForm1
       Height = 25
       Caption = 'Font'
       TabOrder = 1
-      OnClick = Button2Click
-    end
-    object Button5: TButton
-      Left = 16
-      Top = 351
-      Width = 75
-      Height = 25
-      Caption = 'add range'
-      TabOrder = 2
-      OnClick = FR_AddRange
+      OnClick = FR_SelectFont
     end
     object Button6: TButton
       Left = 31
@@ -115,8 +106,8 @@ object Form1: TForm1
       Font.Name = 'Times New Roman'
       Font.Style = []
       ParentFont = False
-      TabOrder = 3
-      OnClick = Button6Click
+      TabOrder = 2
+      OnClick = FR_DecFontSize
     end
     object Button7: TButton
       Left = 151
@@ -130,25 +121,16 @@ object Form1: TForm1
       Font.Name = 'Times New Roman'
       Font.Style = []
       ParentFont = False
-      TabOrder = 4
-      OnClick = Button7Click
-    end
-    object Button10: TButton
-      Left = 15
-      Top = 320
-      Width = 75
-      Height = 25
-      Caption = 'add root'
-      TabOrder = 5
-      OnClick = FR_AddTable
+      TabOrder = 3
+      OnClick = FR_IncFontSize
     end
     object Button3: TButton
       Left = 24
-      Top = 408
+      Top = 200
       Width = 75
       Height = 25
       Caption = 'save'
-      TabOrder = 6
+      TabOrder = 4
       OnClick = Button3Click
     end
     object Button4: TButton
@@ -157,30 +139,36 @@ object Form1: TForm1
       Width = 75
       Height = 25
       Caption = 'load'
-      TabOrder = 7
+      TabOrder = 5
       OnClick = Button4Click
     end
   end
   object TreeView1: TTreeView
     Left = 0
     Top = 0
-    Width = 185
-    Height = 694
+    Width = 151
+    Height = 714
     Align = alLeft
+    Constraints.MaxWidth = 300
+    Constraints.MinWidth = 151
     DragMode = dmAutomatic
     HideSelection = False
-    Indent = 19
+    Indent = 20
     PopupMenu = PopupMenu1
+    ReadOnly = True
+    RightClickSelect = True
     TabOrder = 1
     OnChange = TreeView1Change
     OnDeletion = TreeView1Deletion
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
+    ExplicitTop = 29
+    ExplicitHeight = 685
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 802
+    Top = 822
     Width = 1424
     Height = 19
     Panels = <
@@ -197,6 +185,7 @@ object Form1: TForm1
         Alignment = taRightJustify
         Width = 150
       end>
+    ExplicitTop = 802
   end
   object FontDialog1: TFontDialog
     Ctl3D = False
@@ -244,20 +233,49 @@ object Form1: TForm1
       Caption = 'Tools'
       object Repaintall1: TMenuItem
         Caption = 'Repaint all'
+        ShortCut = 16466
+        OnClick = FR_FullRepaint
+      end
+      object Autorepaint1: TMenuItem
+        Caption = 'Autorepaint'
+        Checked = True
+        OnClick = Autorepaint1Click
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object Font1: TMenuItem
+        Caption = 'Font'
+        object Select1: TMenuItem
+          Caption = 'Select'
+          OnClick = FR_SelectFont
+        end
+        object Increasesize1: TMenuItem
+          Caption = 'Increase size'
+          OnClick = FR_IncFontSize
+        end
+        object Decreasesize1: TMenuItem
+          Caption = 'Decrease size'
+          OnClick = FR_DecFontSize
+        end
       end
       object Charset1: TMenuItem
         Caption = 'Charset'
         object Addtable2: TMenuItem
           Caption = 'Add table'
+          OnClick = FR_AddTable
         end
         object Renametable2: TMenuItem
           Caption = 'Rename table'
+          OnClick = FR_RenameTable
         end
         object Addsymbols2: TMenuItem
           Caption = 'Add symbols'
+          OnClick = FR_AddRange
         end
         object Delete2: TMenuItem
           Caption = 'Delete'
+          OnClick = FR_Delete
         end
       end
       object Symbol1: TMenuItem
@@ -322,7 +340,7 @@ object Form1: TForm1
     end
     object Renametable1: TMenuItem
       Caption = 'Rename table'
-      OnClick = Renametable1Click
+      OnClick = FR_RenameTable
     end
     object Addsymbols1: TMenuItem
       Caption = 'Add symbols'
@@ -330,7 +348,7 @@ object Form1: TForm1
     end
     object Delete1: TMenuItem
       Caption = 'Delete'
-      OnClick = Delete1Click
+      OnClick = FR_Delete
     end
   end
   object OpenDialog1: TOpenDialog
