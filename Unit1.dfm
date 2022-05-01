@@ -213,6 +213,14 @@ object Form1: TForm1
     Top = 8
     object File1: TMenuItem
       Caption = 'File'
+      object Makesources1: TMenuItem
+        Caption = 'Build'
+        ShortCut = 16450
+      end
+      object New1: TMenuItem
+        Caption = 'New'
+        ShortCut = 16462
+      end
       object Open1: TMenuItem
         Caption = 'Open'
         ShortCut = 16463
@@ -227,12 +235,82 @@ object Form1: TForm1
         Caption = 'Save as...'
         OnClick = Saveas1Click
       end
+      object Exit1: TMenuItem
+        Caption = 'Exit'
+        ShortCut = 32883
+      end
     end
     object ools1: TMenuItem
       Caption = 'Tools'
+      object Repaintall1: TMenuItem
+        Caption = 'Repaint all'
+      end
+      object Charset1: TMenuItem
+        Caption = 'Charset'
+        object Addtable2: TMenuItem
+          Caption = 'Add table'
+        end
+        object Renametable2: TMenuItem
+          Caption = 'Rename table'
+        end
+        object Addsymbols2: TMenuItem
+          Caption = 'Add symbols'
+        end
+        object Delete2: TMenuItem
+          Caption = 'Delete'
+        end
+      end
+      object Symbol1: TMenuItem
+        Caption = 'Glyphs'
+        object Moveup1: TMenuItem
+          Caption = 'Move up'
+        end
+        object Movedown1: TMenuItem
+          Caption = 'Move down'
+        end
+        object Moveleft1: TMenuItem
+          Caption = 'Move left'
+        end
+        object Moderight1: TMenuItem
+          Caption = 'Mode right'
+        end
+        object N2: TMenuItem
+          Caption = '-'
+        end
+        object Addrowattop1: TMenuItem
+          Caption = 'Add row at top'
+        end
+        object Addrowatbottom1: TMenuItem
+          Caption = 'Add row at bottom'
+        end
+        object Addcolumnatleft1: TMenuItem
+          Caption = 'Add column at left'
+        end
+        object Addcolumnatright1: TMenuItem
+          Caption = 'Add column at right'
+        end
+        object N1: TMenuItem
+          Caption = '-'
+        end
+        object Removerowattop1: TMenuItem
+          Caption = 'Remove row at top'
+        end
+        object Removerowatbottom1: TMenuItem
+          Caption = 'Remove row at bottom'
+        end
+        object Removecolumnatleft1: TMenuItem
+          Caption = 'Remove column at left'
+        end
+        object Removecolumnatright1: TMenuItem
+          Caption = 'Remove column at right'
+        end
+      end
     end
     object Help1: TMenuItem
       Caption = 'Help'
+    end
+    object Abuot: TMenuItem
+      Caption = 'About'
     end
   end
   object PopupMenu1: TPopupMenu
@@ -242,13 +320,13 @@ object Form1: TForm1
       Caption = 'Add table'
       OnClick = FR_AddTable
     end
-    object Addsymbols1: TMenuItem
-      Caption = 'Add symbols'
-      OnClick = FR_AddRange
-    end
     object Renametable1: TMenuItem
       Caption = 'Rename table'
       OnClick = Renametable1Click
+    end
+    object Addsymbols1: TMenuItem
+      Caption = 'Add symbols'
+      OnClick = FR_AddRange
     end
     object Delete1: TMenuItem
       Caption = 'Delete'
