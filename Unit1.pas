@@ -59,6 +59,13 @@ type
     Addsymbols1: TMenuItem;
     Delete1: TMenuItem;
     Renametable1: TMenuItem;
+    Open1: TMenuItem;
+    Save1: TMenuItem;
+    Saveas1: TMenuItem;
+    OpenDialog1: TOpenDialog;
+    SaveDialog1: TSaveDialog;
+    ools1: TMenuItem;
+    Help1: TMenuItem;
     procedure FR_FullRepaint(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -77,11 +84,17 @@ type
     procedure TreeView1DragDrop(Sender, Source: TObject; X, Y: integer);
     procedure TreeView1DragOver(Sender, Source: TObject; X, Y: integer;
       State: TDragState; var Accept: Boolean);
+    procedure TreeView1KeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure Save1Click(Sender: TObject);
+    procedure Open1Click(Sender: TObject);
+    procedure Saveas1Click(Sender: TObject);
   private
     // curNode: TTreeNode;
     face: TFTFace;
     pFont: PByte;
     font_mem_size: integer;
+    extended_font_name: string;
     rendef_flags: TFTRenderMode;
     glyph_names_arr: array [0 .. UnicodeArrSize] of TUnicodeData;
     procedure AddLog(S: string);
@@ -448,9 +461,11 @@ begin
   face.SetPixelSize(0, FontDialog1.Font.Size);
   CancelDC(dc);
   DeleteDC(dc);
-  StatusBar1.Panels[0].Text := face.FamilyName + ' ' + face.StyleName + ' ' +
+  extended_font_name := face.FamilyName + ' ' + face.StyleName + ' ' +
     FR_FontStyleToString(FontDialog1.Font.style) +
     IntToStr(FontDialog1.Font.Size);
+  StatusBar1.Panels[0].Text := extended_font_name;
+
   StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x' +
     IntToStr(face.Size.Metrics.MaxAdvance div 64);
 end;
@@ -557,6 +572,16 @@ begin
   StatusBar1.Panels[2].Text := FR_SearchUnicodeName(symbol.Code);
 end;
 
+procedure TForm1.Open1Click(Sender: TObject);
+begin
+  if OpenDialog1.Execute then
+  begin
+    FR_Load(OpenDialog1.FileName);
+    Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
+    // SaveDialog1.FileName:=OpenDialog1.FileName;
+  end;
+end;
+
 procedure TForm1.Renametable1Click(Sender: TObject);
 var
   S: string;
@@ -566,6 +591,34 @@ begin
   S := TreeView1.Selected.Text;
   if InputQuery('Rename table', 'Enter new name:', S) then
     TreeView1.Selected.Text := S;
+end;
+
+procedure TForm1.Save1Click(Sender: TObject);
+begin
+  if OpenDialog1.FileName <> '' then
+    FR_Save(OpenDialog1.FileName)
+  else
+  begin
+    SaveDialog1.FileName := extended_font_name;
+    if SaveDialog1.Execute then
+      if not FileExists(SaveDialog1.FileName) then
+        FR_Save(SaveDialog1.FileName)
+      else if MessageDlg('File is exist. Rewrite?', mtConfirmation,
+        [mbYes, mbNo], 0) = mrYes then
+        FR_Save(SaveDialog1.FileName);
+  end;
+end;
+
+procedure TForm1.Saveas1Click(Sender: TObject);
+
+begin
+  SaveDialog1.FileName := extended_font_name;
+  if SaveDialog1.Execute then
+    if not FileExists(SaveDialog1.FileName) then
+      FR_Save(SaveDialog1.FileName)
+    else if MessageDlg('File is exist. Rewrite?', mtConfirmation, [mbYes, mbNo],
+      0) = mrYes then
+      FR_Save(SaveDialog1.FileName);
 end;
 
 procedure TForm1.TreeView1Change(Sender: TObject; Node: TTreeNode);
@@ -614,9 +667,6 @@ begin
     else if (htOnIndent in HT) or (htOnRight in HT) then
       AttachMode := naInsert;
     TreeView1.Selected.MoveTo(AnItem, AttachMode);
-    // if AttachMode = naAddChild then
-    // PM_Unit(AnItem.Data).is_param := false;
-    // has_global_changes := true;
   end;
 end;
 
@@ -624,6 +674,15 @@ procedure TForm1.TreeView1DragOver(Sender, Source: TObject; X, Y: integer;
   State: TDragState; var Accept: Boolean);
 begin
   Accept := Sender = Source;
+end;
+
+procedure TForm1.TreeView1KeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if (Key = VK_DELETE) and (TreeView1.Selected <> nil) then
+    TreeView1.Selected.Delete;
+  // if (Key = VK_UP) and (ssShift in Shift) then
+  // TreeView1.Selected.MoveTo(TreeView1.Items[TreeView1.Selected.Index-1],naInsert);
 end;
 
 end.

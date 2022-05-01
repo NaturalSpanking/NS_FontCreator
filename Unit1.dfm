@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 841
+  ClientHeight = 821
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -23,7 +23,7 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 717
+    Top = 697
     Width = 1424
     Height = 105
     Align = alBottom
@@ -33,19 +33,20 @@ object Form1: TForm1
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 714
+    Top = 694
     Width = 1424
     Height = 3
     Cursor = crVSplit
     Align = alBottom
     Beveled = True
+    OnMoved = FormResize
     ExplicitTop = 573
     ExplicitWidth = 1091
   end
   object Splitter2: TSplitter
     Left = 185
     Top = 0
-    Height = 714
+    Height = 694
     ExplicitLeft = 168
     ExplicitTop = 280
     ExplicitHeight = 100
@@ -54,7 +55,7 @@ object Form1: TForm1
     Left = 188
     Top = 0
     Width = 1009
-    Height = 714
+    Height = 694
     Align = alClient
     ExplicitLeft = 304
     ExplicitTop = 112
@@ -65,10 +66,9 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 714
+    Height = 694
     Align = alRight
     TabOrder = 0
-    ExplicitHeight = 534
     object Label1: TLabel
       Left = 6
       Top = 690
@@ -165,7 +165,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 185
-    Height = 714
+    Height = 694
     Align = alLeft
     DragMode = dmAutomatic
     HideSelection = False
@@ -176,10 +176,11 @@ object Form1: TForm1
     OnDeletion = TreeView1Deletion
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
+    OnKeyDown = TreeView1KeyDown
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 822
+    Top = 802
     Width = 1424
     Height = 19
     Panels = <
@@ -196,7 +197,6 @@ object Form1: TForm1
         Alignment = taRightJustify
         Width = 150
       end>
-    ExplicitTop = 642
   end
   object FontDialog1: TFontDialog
     Ctl3D = False
@@ -213,26 +213,57 @@ object Form1: TForm1
     Top = 8
     object File1: TMenuItem
       Caption = 'File'
+      object Open1: TMenuItem
+        Caption = 'Open'
+        ShortCut = 16463
+        OnClick = Open1Click
+      end
+      object Save1: TMenuItem
+        Caption = 'Save'
+        ShortCut = 16467
+        OnClick = Save1Click
+      end
+      object Saveas1: TMenuItem
+        Caption = 'Save as...'
+        OnClick = Saveas1Click
+      end
+    end
+    object ools1: TMenuItem
+      Caption = 'Tools'
+    end
+    object Help1: TMenuItem
+      Caption = 'Help'
     end
   end
   object PopupMenu1: TPopupMenu
-    Left = 160
-    Top = 8
+    Left = 312
+    Top = 64
     object Addtable1: TMenuItem
       Caption = 'Add table'
       OnClick = FR_AddTable
-    end
-    object Renametable1: TMenuItem
-      Caption = 'Rename table'
-      OnClick = Renametable1Click
     end
     object Addsymbols1: TMenuItem
       Caption = 'Add symbols'
       OnClick = FR_AddRange
     end
+    object Renametable1: TMenuItem
+      Caption = 'Rename table'
+      OnClick = Renametable1Click
+    end
     object Delete1: TMenuItem
       Caption = 'Delete'
       OnClick = Delete1Click
     end
+  end
+  object OpenDialog1: TOpenDialog
+    Filter = 'NS Font file|*.nsfont|Any File|*.*'
+    Left = 232
+    Top = 64
+  end
+  object SaveDialog1: TSaveDialog
+    DefaultExt = '.nsfont'
+    Filter = 'NS Font file|*.nsfont'
+    Left = 232
+    Top = 128
   end
 end
