@@ -4,8 +4,8 @@ object Form2: TForm2
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Add...'
-  ClientHeight = 128
-  ClientWidth = 314
+  ClientHeight = 110
+  ClientWidth = 409
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
@@ -14,71 +14,55 @@ object Form2: TForm2
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 21
   object Label1: TLabel
-    Left = 136
-    Top = 16
-    Width = 45
+    Left = 8
+    Top = 11
+    Width = 50
     Height = 21
-    Caption = 'From:'
+    Caption = 'Preset:'
   end
   object Label2: TLabel
-    Left = 136
-    Top = 51
-    Width = 25
-    Height = 21
-    Caption = 'To:'
-  end
-  object RadioGroup1: TRadioGroup
     Left = 8
-    Top = 8
-    Width = 113
-    Height = 113
-    Caption = 'Presets'
-    ItemIndex = 0
-    Items.Strings = (
-      'ASCII'
-      'Cyrillic'
-      'Single'
-      'Range')
-    TabOrder = 0
-    OnClick = RadioGroup1Click
+    Top = 46
+    Width = 71
+    Height = 21
+    Caption = 'Elements:'
   end
   object Edit1: TEdit
-    Left = 187
-    Top = 13
-    Width = 121
+    Left = 87
+    Top = 43
+    Width = 313
     Height = 29
-    Enabled = False
-    TabOrder = 1
-    Text = '32'
-  end
-  object Edit2: TEdit
-    Left = 187
-    Top = 48
-    Width = 121
-    Height = 29
-    Enabled = False
-    TabOrder = 2
-    Text = '127'
+    TabOrder = 0
   end
   object Button1: TButton
-    Left = 136
-    Top = 95
+    Left = 232
+    Top = 78
     Width = 75
     Height = 25
     Caption = 'OK'
-    TabOrder = 3
+    TabOrder = 1
     OnClick = Button1Click
   end
   object Button2: TButton
-    Left = 231
-    Top = 95
+    Left = 325
+    Top = 78
     Width = 75
     Height = 25
     Caption = 'Cancel'
-    TabOrder = 4
+    TabOrder = 2
     OnClick = Button2Click
+  end
+  object ComboBox1: TComboBox
+    Left = 87
+    Top = 8
+    Width = 313
+    Height = 29
+    TabOrder = 3
+    OnSelect = ComboBox1Select
   end
 end

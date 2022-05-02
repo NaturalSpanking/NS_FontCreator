@@ -9,24 +9,26 @@ uses
 
 type
   TForm2 = class(TForm)
-    RadioGroup1: TRadioGroup;
     Edit1: TEdit;
-    Edit2: TEdit;
-    Label1: TLabel;
-    Label2: TLabel;
     Button1: TButton;
     Button2: TButton;
-    procedure RadioGroup1Click(Sender: TObject);
+    ComboBox1: TComboBox;
+    Label1: TLabel;
+    Label2: TLabel;
     procedure Button2Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure ComboBox1Select(Sender: TObject);
   private
     res: boolean;
-    from_code: integer;
-    to_code: integer;
+    presets: TStringList;
+    int_list: TList;
+    procedure clear_list;
+    procedure parse_preset(str: string);
   public
     function Execute: boolean;
-    property RangeBegin: integer read from_code;
-    property RangeEnd: integer read to_code;
+    property CharList: TList read int_list;
   end;
 
 var
@@ -38,11 +40,8 @@ implementation
 
 procedure TForm2.Button1Click(Sender: TObject);
 begin
-  from_code := StrToInt(Edit1.Text);
-  to_code := StrToInt(Edit2.Text);
+  parse_preset(Edit1.Text);
   res := True;
-  if RadioGroup1.ItemIndex = 2 then
-    to_code := from_code;
   Close;
 end;
 
@@ -52,38 +51,94 @@ begin
   Close;
 end;
 
+procedure TForm2.clear_list;
+var
+  i: integer;
+begin
+  for i := 0 to int_list.Count - 1 do
+    dispose(int_list[i]);
+  int_list.Clear;
+end;
+
+procedure TForm2.ComboBox1Select(Sender: TObject);
+var
+  s: string;
+begin
+  clear_list;
+  s := presets[ComboBox1.ItemIndex];
+  s := copy(s, pos(':', s) + 1, length(s));
+  if s[1] = ' ' then
+    delete(s, 1, 1);
+  Edit1.Text := s;
+end;
+
 function TForm2.Execute: boolean;
 begin
   ShowModal;
   Result := res;
 end;
 
-procedure TForm2.RadioGroup1Click(Sender: TObject);
+procedure TForm2.FormCreate(Sender: TObject);
+var
+  i: integer;
 begin
-  Edit1.Enabled := False;
-  Edit2.Enabled := False;
-  case RadioGroup1.ItemIndex of
-    0:
-      begin
-        Edit1.Text := IntToStr(32);
-        Edit2.Text := IntToStr(127);;
-      end;
+  int_list := TList.Create;
+  presets := TStringList.Create;
+  presets.LoadFromFile('Presets.txt');
+  for i := 0 to presets.Count - 1 do
+    ComboBox1.Items.Add(copy(presets[i], 1, pos(':', presets[i]) - 1));
+  ComboBox1.ItemIndex := 0;
+  ComboBox1Select(Form2);
+end;
 
-    1:
+procedure TForm2.FormDestroy(Sender: TObject);
+begin
+  clear_list;
+  presets.Free;
+  int_list.Free;
+end;
+
+procedure TForm2.parse_preset(str: string);
+var
+  x: string;
+  i: integer;
+  p: ^integer;
+  com_pos, minus_pos: integer;
+  start, stop: integer;
+begin
+  clear_list;
+  str := copy(str, pos(':', str) + 1, length(str)); // удаление названия пресета
+  for i := 1 to length(str) do // удаление пробелов
+    if str[i] = ' ' then
+      delete(str, i, 1);
+  repeat
+    com_pos := pos(',', str);
+    if com_pos = 0 then
+      com_pos := length(str) + 1;
+    // поиск позиции запятой, если нету - конец строки
+    x := copy(str, 1, com_pos - 1); // подстрока до запятой
+    minus_pos := pos('-', x); // проверка - диапазон или число
+    if minus_pos > 0 then // есть минус
+    begin
+      start := StrToInt(copy(x, 1, minus_pos - 1));
+      // вычисление первого индекса
+      stop := StrToInt(copy(x, minus_pos + 1, length(x)));
+      // вычисление последнего
+      for i := start to stop do // заполнение в цикле
       begin
-        Edit1.Text := IntToStr(1040);
-        Edit2.Text := IntToStr(1103);;
+        new(p);
+        p^ := i;
+        int_list.Add(p);
       end;
-    2:
-      begin
-        Edit1.Enabled := True;
-      end;
-    3:
-      begin
-        Edit1.Enabled := True;
-        Edit2.Enabled := True;
-      end;
-  end;
+    end
+    else // нет минуса
+    begin // просто добавление числа
+      new(p);
+      p^ := StrToInt(copy(x, 1, com_pos - 1));
+      int_list.Add(p);
+    end;
+    delete(str, 1, com_pos);
+  until length(str) = 0;
 end;
 
 end.
