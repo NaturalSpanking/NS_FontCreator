@@ -62,7 +62,6 @@ type
     Saveas1: TMenuItem;
     OpenDialog1: TOpenDialog;
     SaveDialog1: TSaveDialog;
-    ools1: TMenuItem;
     Help1: TMenuItem;
     Charset1: TMenuItem;
     Exit1: TMenuItem;
@@ -90,11 +89,12 @@ type
     Abuot: TMenuItem;
     Repaintall1: TMenuItem;
     Autorepaint1: TMenuItem;
-    N3: TMenuItem;
     Font1: TMenuItem;
     Select1: TMenuItem;
     Increasesize1: TMenuItem;
     Decreasesize1: TMenuItem;
+    N3: TMenuItem;
+    Button5: TButton;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -119,9 +119,12 @@ type
     procedure Open1Click(Sender: TObject);
     procedure Saveas1Click(Sender: TObject);
     procedure Autorepaint1Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
   private
     // curNode: TTreeNode;
     face: TFTFace;
+    min_w: integer;
+    max_w: integer;
     pFont: PByte;
     font_mem_size: integer;
     extended_font_name: string;
@@ -133,6 +136,8 @@ type
     procedure FR_LoadUnicodeNames;
     procedure FR_Render(symb: PSymb);
     procedure FR_FreeSymb(var symb: PSymb);
+    procedure FR_GenSymb(var f: TextFile; symb: PSymb; MaxW: integer);
+    procedure FR_GenerageOld;
     function FR_FontStyleToString(style: TFontStyles): string;
     function FR_SearchUnicodeName(Code: integer): string;
   public
@@ -164,7 +169,8 @@ var
 begin
   if font_mem_size = 0 then
   begin
-    MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
+    // MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
+    FR_SelectFont(Sender);
     exit;
   end;
   for i := 0 to TreeView1.Items.Count - 1 do
@@ -173,10 +179,12 @@ begin
     if psy <> nil then
     begin
       FR_Render(psy);
-      if i = TreeView1.Selected.AbsoluteIndex then
+      if (TreeView1.Selected <> nil) and (i = TreeView1.Selected.AbsoluteIndex) then
         FR_ShowSymbol(psy);
     end;
   end;
+  StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x' +
+    IntToStr(min_w) + '..' + IntToStr(max_w);
 end;
 
 procedure TForm1.Autorepaint1Click(Sender: TObject);
@@ -204,17 +212,87 @@ begin
   FR_Load('saving.dat');
 end;
 
+procedure TForm1.FR_GenerageOld;
+var
+  f: TextFile;
+  i: integer;
+  max_w: integer;
+  p: PSymb;
+  bracket: Boolean;
+begin
+  bracket := false;
+  max_w := 0;
+  for i := 0 to TreeView1.Items.Count - 1 do
+  begin
+    if TreeView1.Items[i].Parent <> nil then
+    begin
+      p := TreeView1.Items[i].Data;
+      if p.Buffer <> nil then
+        if p.Width > max_w then
+          max_w := p.Width;
+    end;
+  end;
+
+  AssignFile(f, 'out.c');
+  rewrite(f);
+  for i := 0 to TreeView1.Items.Count - 1 do
+  begin
+    if TreeView1.Items[i].Parent <> nil then
+      FR_GenSymb(f, TreeView1.Items[i].Data, max_w)
+    else
+    begin
+      if bracket then
+        writeln(f, '};');
+      writeln(f, 'static const unsigned char ' + TreeView1.Items[i].Text +
+        '[] = {');
+      bracket := true;
+    end;
+  end;
+  CloseFile(f);
+end;
+
+procedure TForm1.FR_GenSymb(var f: TextFile; symb: PSymb; MaxW: integer);
+var
+  i: integer;
+begin
+  if symb = nil then
+    exit;
+  // writeln(f, '/* ' + FR_SearchUnicodeName(symb.Code) + ' */');
+  if symb.Buffer = nil then
+  begin
+    writeln(f, '/* NO DATA */');
+    exit;
+  end;
+  write(f, '0x', IntToHex(byte(symb.Width)), ', ');
+  // for i := 0 to symb.BufferSize - 1 do
+  for i := 0 to symb.BytesPerColumn * MaxW - 1 do
+  begin
+    if i < symb.BufferSize then
+      write(f, '0x', IntToHex(symb.Buffer[i]), ', ')
+    else
+      write(f, '0x00, ');
+  end;
+  writeln(f);
+end;
+
+procedure TForm1.Button5Click(Sender: TObject);
+begin
+  FR_GenerageOld;
+end;
+
 procedure TForm1.FR_AddRange(Sender: TObject);
 var
   i: integer;
+  p: ^integer;
   psy: PSymb;
 begin
   if Form2.Execute and (TreeView1.Selected <> nil) then
-    for i := Form2.RangeBegin to Form2.RangeEnd do
+    for i := 0 to Form2.CharList.Count - 1 do
     begin
+      p := Form2.CharList[i];
       psy := new(PSymb);
-      psy.Code := i;
-      psy.BufferSize :=0;
+      psy.Code := p^;
+      psy.BufferSize := 0;
       psy.Buffer := nil;
       if TreeView1.Selected.Parent = nil then
         TreeView1.Items.AddChildObject(TreeView1.Selected,
@@ -230,7 +308,8 @@ procedure TForm1.FR_DecFontSize(Sender: TObject);
 begin
   if font_mem_size = 0 then
   begin
-    MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
+    // MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
+    FR_SelectFont(Sender);
     exit;
   end;
   FontDialog1.Font.Size := FontDialog1.Font.Size - 1;
@@ -243,7 +322,8 @@ procedure TForm1.FR_IncFontSize(Sender: TObject);
 begin
   if font_mem_size = 0 then
   begin
-    MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
+    // MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
+    FR_SelectFont(Sender);
     exit;
   end;
   FontDialog1.Font.Size := FontDialog1.Font.Size + 1;
@@ -412,7 +492,8 @@ begin
         BlockRead(f, psy.Buffer^, psy.BufferSize);
       end;
       TreeView1.Items[i].Data := psy;
-      TreeView1.Items[i].Text := '''' + chr(psy.Code) + '''' + ' - ' + IntToStr(psy.Code);
+      TreeView1.Items[i].Text := '''' + chr(psy.Code) + '''' + ' - ' +
+        IntToStr(psy.Code);
     end;
   end;
   BlockRead(f, b, 1);
@@ -481,7 +562,14 @@ begin
   symb.Ascender := face.Size.Metrics.Ascender div 64;
   symb.Descender := face.Size.Metrics.Descender div 64;
   symb.Advance := face.glyph.Metrics.HorzAdvance div 64;
+  if symb.Code = 32 then
+    symb.Width := symb.Advance;
   symb.BytesPerColumn := symb.Heigth div 8;
+  if symb.Width > max_w then
+    max_w := symb.Width;
+  if symb.Width < min_w then
+    min_w := symb.Width;
+
   if symb.BytesPerColumn * 8 < symb.Heigth then
     inc(symb.BytesPerColumn);
   symb.BufferSize := symb.BytesPerColumn * symb.Width;
@@ -496,7 +584,9 @@ begin
         P_y := (face.Size.Metrics.Ascender - face.glyph.Metrics.HorzBearingY)
           div 64 + i div face.glyph.Bitmap.Pitch;
         byte_idx := (P_y div 8) + symb.BytesPerColumn * P_x;
-        symb.Buffer[byte_idx] := symb.Buffer[byte_idx] + 1 shl (7 - P_y mod 8);
+        // symb.Buffer[byte_idx] := symb.Buffer[byte_idx] + 1 shl (7 - P_y mod 8); так было изначально, символы перевернуты получаются
+        symb.Buffer[byte_idx] := symb.Buffer[byte_idx] +
+          128 shr (7 - P_y mod 8); // так есть совместимость с GLCD font creator
       end;
     inc(k);
     if k = face.glyph.Bitmap.Pitch then
@@ -528,9 +618,13 @@ begin
     ' ' + FR_FontStyleToString(FontDialog1.Font.style) +
     string(IntToStr(FontDialog1.Font.Size));
   StatusBar1.Panels[0].Text := extended_font_name;
-
-  StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x' +
-    IntToStr(face.Size.Metrics.MaxAdvance div 64);
+  max_w := 0;
+  min_w := face.Size.Metrics.MaxAdvance div 64;
+    StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x'
+      + IntToStr(min_w) + '..' + IntToStr(max_w)
+//  else
+//    StatusBar1.Panels[1].Text :=
+//      IntToStr(face.Size.Metrics.Height div 64) + 'x??';
 end;
 
 procedure TForm1.FR_ShowSymbol(var symbol: PSymb);
@@ -586,7 +680,8 @@ begin
       R := Rect(bbox.Left + X * grid_size, bbox.Top + Y * grid_size,
         bbox.Left + X * grid_size + grid_size, bbox.Top + Y * grid_size +
         grid_size);
-      if (symbol.Buffer[i] shl j) and 128 > 0 then
+      // if (symbol.Buffer[i] shl j) and 128 > 0 then
+      if (symbol.Buffer[i] shr j) and 1 > 0 then // совместимость с GLCD
         Image2.Canvas.FillRect(R);
     end;
   // отрисовка сетки
@@ -646,8 +741,8 @@ procedure TForm1.Open1Click(Sender: TObject);
 begin
   if OpenDialog1.Execute then
   begin
-    FR_Load(OpenDialog1.FileName);    
-    // SaveDialog1.FileName:=OpenDialog1.FileName;
+    FR_Load(OpenDialog1.FileName);
+    SaveDialog1.FileName := OpenDialog1.FileName;
   end;
 end;
 

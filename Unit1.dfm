@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 841
+  ClientHeight = 843
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -23,16 +23,17 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 717
+    Top = 719
     Width = 1424
     Height = 105
     Align = alBottom
     Constraints.MaxHeight = 300
     Constraints.MinHeight = 46
+    ExplicitTop = 717
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 714
+    Top = 716
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -46,7 +47,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 151
     Top = 0
-    Height = 714
+    Height = 716
     AutoSnap = False
     ExplicitLeft = 168
     ExplicitTop = 280
@@ -56,7 +57,7 @@ object Form1: TForm1
     Left = 154
     Top = 0
     Width = 1043
-    Height = 714
+    Height = 716
     Align = alClient
     ExplicitTop = 29
     ExplicitHeight = 660
@@ -65,7 +66,7 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 714
+    Height = 716
     Align = alRight
     TabOrder = 0
     ExplicitHeight = 694
@@ -142,12 +143,21 @@ object Form1: TForm1
       TabOrder = 5
       OnClick = Button4Click
     end
+    object Button5: TButton
+      Left = 24
+      Top = 328
+      Width = 75
+      Height = 25
+      Caption = 'Gen'
+      TabOrder = 6
+      OnClick = Button5Click
+    end
   end
   object TreeView1: TTreeView
     Left = 0
     Top = 0
     Width = 151
-    Height = 714
+    Height = 716
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
@@ -163,12 +173,11 @@ object Form1: TForm1
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
-    ExplicitTop = 29
-    ExplicitHeight = 685
+    ExplicitHeight = 694
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 822
+    Top = 824
     Width = 1424
     Height = 19
     Panels = <
@@ -229,8 +238,8 @@ object Form1: TForm1
         ShortCut = 32883
       end
     end
-    object ools1: TMenuItem
-      Caption = 'Tools'
+    object Font1: TMenuItem
+      Caption = 'Font'
       object Repaintall1: TMenuItem
         Caption = 'Repaint all'
         ShortCut = 16466
@@ -244,84 +253,81 @@ object Form1: TForm1
       object N3: TMenuItem
         Caption = '-'
       end
-      object Font1: TMenuItem
-        Caption = 'Font'
-        object Select1: TMenuItem
-          Caption = 'Select'
-          OnClick = FR_SelectFont
-        end
-        object Increasesize1: TMenuItem
-          Caption = 'Increase size'
-          OnClick = FR_IncFontSize
-        end
-        object Decreasesize1: TMenuItem
-          Caption = 'Decrease size'
-          OnClick = FR_DecFontSize
-        end
+      object Select1: TMenuItem
+        Caption = 'Select'
+        OnClick = FR_SelectFont
       end
-      object Charset1: TMenuItem
-        Caption = 'Charset'
-        object Addtable2: TMenuItem
-          Caption = 'Add table'
-          OnClick = FR_AddTable
-        end
-        object Renametable2: TMenuItem
-          Caption = 'Rename table'
-          OnClick = FR_RenameTable
-        end
-        object Addsymbols2: TMenuItem
-          Caption = 'Add symbols'
-          OnClick = FR_AddRange
-        end
-        object Delete2: TMenuItem
-          Caption = 'Delete'
-          OnClick = FR_Delete
-        end
+      object Increasesize1: TMenuItem
+        Caption = 'Increase size'
+        OnClick = FR_IncFontSize
       end
-      object Symbol1: TMenuItem
-        Caption = 'Glyphs'
-        object Moveup1: TMenuItem
-          Caption = 'Move up'
-        end
-        object Movedown1: TMenuItem
-          Caption = 'Move down'
-        end
-        object Moveleft1: TMenuItem
-          Caption = 'Move left'
-        end
-        object Moderight1: TMenuItem
-          Caption = 'Mode right'
-        end
-        object N2: TMenuItem
-          Caption = '-'
-        end
-        object Addrowattop1: TMenuItem
-          Caption = 'Add row at top'
-        end
-        object Addrowatbottom1: TMenuItem
-          Caption = 'Add row at bottom'
-        end
-        object Addcolumnatleft1: TMenuItem
-          Caption = 'Add column at left'
-        end
-        object Addcolumnatright1: TMenuItem
-          Caption = 'Add column at right'
-        end
-        object N1: TMenuItem
-          Caption = '-'
-        end
-        object Removerowattop1: TMenuItem
-          Caption = 'Remove row at top'
-        end
-        object Removerowatbottom1: TMenuItem
-          Caption = 'Remove row at bottom'
-        end
-        object Removecolumnatleft1: TMenuItem
-          Caption = 'Remove column at left'
-        end
-        object Removecolumnatright1: TMenuItem
-          Caption = 'Remove column at right'
-        end
+      object Decreasesize1: TMenuItem
+        Caption = 'Decrease size'
+        OnClick = FR_DecFontSize
+      end
+    end
+    object Charset1: TMenuItem
+      Caption = 'Charset'
+      object Addtable2: TMenuItem
+        Caption = 'Add table'
+        OnClick = FR_AddTable
+      end
+      object Renametable2: TMenuItem
+        Caption = 'Rename table'
+        OnClick = FR_RenameTable
+      end
+      object Addsymbols2: TMenuItem
+        Caption = 'Add symbols'
+        OnClick = FR_AddRange
+      end
+      object Delete2: TMenuItem
+        Caption = 'Delete'
+        OnClick = FR_Delete
+      end
+    end
+    object Symbol1: TMenuItem
+      Caption = 'Glyphs'
+      object Moveup1: TMenuItem
+        Caption = 'Move up'
+      end
+      object Movedown1: TMenuItem
+        Caption = 'Move down'
+      end
+      object Moveleft1: TMenuItem
+        Caption = 'Move left'
+      end
+      object Moderight1: TMenuItem
+        Caption = 'Mode right'
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object Addrowattop1: TMenuItem
+        Caption = 'Add row at top'
+      end
+      object Addrowatbottom1: TMenuItem
+        Caption = 'Add row at bottom'
+      end
+      object Addcolumnatleft1: TMenuItem
+        Caption = 'Add column at left'
+      end
+      object Addcolumnatright1: TMenuItem
+        Caption = 'Add column at right'
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object Removerowattop1: TMenuItem
+        Caption = 'Remove row at top'
+      end
+      object Removerowatbottom1: TMenuItem
+        Caption = 'Remove row at bottom'
+      end
+      object Removecolumnatleft1: TMenuItem
+        Caption = 'Remove column at left'
+      end
+      object Removecolumnatright1: TMenuItem
+        Caption = 'Remove column at right'
       end
     end
     object Help1: TMenuItem
