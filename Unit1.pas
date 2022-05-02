@@ -123,6 +123,7 @@ type
   private
     // curNode: TTreeNode;
     face: TFTFace;
+    bpc: integer;
     min_w: integer;
     max_w: integer;
     pFont: PByte;
@@ -138,8 +139,9 @@ type
     procedure FR_FreeSymb(var symb: PSymb);
     procedure FR_GenSymb(var f: TextFile; symb: PSymb; MaxW: integer);
     procedure FR_GenerageOld;
+    procedure FR_GenerateNew;
     function FR_FontStyleToString(style: TFontStyles): string;
-    function FR_SearchUnicodeName(Code: integer): string;
+    function FR_SearchUnicodeName(Code: integer): TUnicodeData;
   public
     { Public declarations }
   end;
@@ -179,7 +181,8 @@ begin
     if psy <> nil then
     begin
       FR_Render(psy);
-      if (TreeView1.Selected <> nil) and (i = TreeView1.Selected.AbsoluteIndex) then
+      if (TreeView1.Selected <> nil) and (i = TreeView1.Selected.AbsoluteIndex)
+      then
         FR_ShowSymbol(psy);
     end;
   end;
@@ -251,6 +254,92 @@ begin
   CloseFile(f);
 end;
 
+function gen_symb(var f: TextFile; psy: PSymb): string;
+var
+  UD: TUnicodeData;
+  i: integer;
+begin
+  if psy = nil then
+    exit;
+  UD := Form1.FR_SearchUnicodeName(psy.Code);
+  writeln(f, '/* ' + 'U+' + UD.U_plus + ' - ' + UD.Name + ' */');
+  write(f, 'static const unsigned char _U_' + UD.U_plus + '[] = {');
+  Result := '_U_' + UD.U_plus;
+  if psy.Buffer = nil then
+  begin
+    writeln(f, '/* NO DATA */ };');
+    exit;
+  end;
+  write(f, '0x', IntToHex(byte(psy.Width)), ', ');
+  for i := 0 to psy.BufferSize - 1 do
+    write(f, '0x', IntToHex(psy.Buffer[i]), ', ');
+  writeln(f, '};');
+end;
+
+function gen_table(var f: TextFile; table: TTreeNode): string;
+var
+  i: integer;
+  tmp: TTreeNode;
+  S: string;
+begin
+  S := '';
+  tmp := table.getFirstChild;
+  while tmp <> nil do
+  begin
+    S := S + gen_symb(f, tmp.Data) + ', ';
+    tmp := table.GetNextChild(tmp);
+  end;
+
+  writeln(f, 'static const TFontTable ', '_' + table.Text, ' = {');
+  tmp := table.getFirstChild;
+  writeln(f, '#warning "set first char code"');
+  writeln(f, '32,');
+  writeln(f, '{ ' + S + '}');
+  writeln(f, '};');
+  writeln(f);
+
+  Result := '_' + table.Text;
+end;
+
+function without_spaces(S: string): string;
+var
+  i: integer;
+begin
+  Result := '';
+  for i := 1 to length(S) do
+    if S[i] = ' ' then
+      Result := Result + '_'
+    else
+      Result := Result + S[i];
+end;
+
+procedure TForm1.FR_GenerateNew;
+var
+  i: integer;
+  f: TextFile;
+  S: string;
+begin
+  S := '';
+  AssignFile(f, 'out.c');
+  rewrite(f);
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if TreeView1.Items[i].Parent = nil then
+      S := S + '&' + gen_table(f, TreeView1.Items[i]) + ', ';
+
+  writeln(f);
+  writeln(f, 'static const TFont _' + without_spaces(extended_font_name)
+    + ' = {');
+  writeln(f, IntToStr(Form1.face.Size.Metrics.Height div 64) + ', ' +
+    IntToStr(Form1.face.Size.Metrics.MaxAdvance div 64) + ', ' +
+    IntToStr(Form1.bpc) + ',');
+  writeln(f, '{' + S + '}');
+  writeln(f, '};');
+  writeln(f);
+  writeln(f, 'const PFont ' + without_spaces(extended_font_name) + ' = &_' +
+    without_spaces(extended_font_name) + ';');
+  CloseFile(f);
+end;
+
 procedure TForm1.FR_GenSymb(var f: TextFile; symb: PSymb; MaxW: integer);
 var
   i: integer;
@@ -277,7 +366,7 @@ end;
 
 procedure TForm1.Button5Click(Sender: TObject);
 begin
-  FR_GenerageOld;
+  FR_GenerateNew;
 end;
 
 procedure TForm1.FR_AddRange(Sender: TObject);
@@ -446,7 +535,7 @@ begin
   Form1.Caption := 'NS Font Creator' + ' - ' + SaveDialog1.FileName;
 end;
 
-function TForm1.FR_SearchUnicodeName(Code: integer): string;
+function TForm1.FR_SearchUnicodeName(Code: integer): TUnicodeData;
 var
   a, b, i: integer;
 begin
@@ -459,7 +548,8 @@ begin
     else
       b := i;
   until glyph_names_arr[i].Code = Code;
-  Result := glyph_names_arr[i].U_plus + ' - ' + glyph_names_arr[i].Name;
+  Result := glyph_names_arr[i];
+  // Result := glyph_names_arr[i].U_plus + ' - ' + glyph_names_arr[i].Name;
 end;
 
 procedure TForm1.FR_Load(FName: string);
@@ -538,7 +628,7 @@ begin
     sl.DelimitedText := S;
     glyph_names_arr[i].Code := StrToInt('$' + sl[0]);
     glyph_names_arr[i].Name := sl[1];
-    glyph_names_arr[i].U_plus := 'U+' + sl[0];
+    glyph_names_arr[i].U_plus := sl[0];
     inc(i);
   until EOF(f);
   sl.Free;
@@ -572,6 +662,7 @@ begin
 
   if symb.BytesPerColumn * 8 < symb.Heigth then
     inc(symb.BytesPerColumn);
+  bpc := symb.BytesPerColumn;
   symb.BufferSize := symb.BytesPerColumn * symb.Width;
   symb.Buffer := AllocMem(symb.BufferSize); // не надо очищать
   k := 0;
@@ -586,7 +677,8 @@ begin
         byte_idx := (P_y div 8) + symb.BytesPerColumn * P_x;
         // symb.Buffer[byte_idx] := symb.Buffer[byte_idx] + 1 shl (7 - P_y mod 8); так было изначально, символы перевернуты получаются
         symb.Buffer[byte_idx] := symb.Buffer[byte_idx] +
-          128 shr (7 - P_y mod 8); // так есть совместимость с GLCD font creator
+          128 shr (7 - P_y mod 8);
+        // так есть совместимость с GLCD font creator
       end;
     inc(k);
     if k = face.glyph.Bitmap.Pitch then
@@ -620,11 +712,11 @@ begin
   StatusBar1.Panels[0].Text := extended_font_name;
   max_w := 0;
   min_w := face.Size.Metrics.MaxAdvance div 64;
-    StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x'
-      + IntToStr(min_w) + '..' + IntToStr(max_w)
-//  else
-//    StatusBar1.Panels[1].Text :=
-//      IntToStr(face.Size.Metrics.Height div 64) + 'x??';
+  StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x' +
+    IntToStr(min_w) + '..' + IntToStr(max_w)
+  // else
+  // StatusBar1.Panels[1].Text :=
+  // IntToStr(face.Size.Metrics.Height div 64) + 'x??';
 end;
 
 procedure TForm1.FR_ShowSymbol(var symbol: PSymb);
@@ -635,6 +727,7 @@ var
   origin: TPoint;
   bbox: TRect;
   R: TRect;
+  UD: TUnicodeData;
 begin
   // очистка канвы
   Image2.Picture.Bitmap.Width := Image2.Width;
@@ -706,7 +799,8 @@ begin
     // горизонтальные красные линии
     pen.Color := clRed;
     MoveTo(0, origin.Y);
-    LineTo(Image2.Width, origin.Y); // базовая линия горизонтальная
+    LineTo(Image2.Width, origin.Y);
+    // базовая линия горизонтальная
     MoveTo(0, bbox.Top);
     LineTo(Image2.Width, bbox.Top); // Ascender
     MoveTo(0, bbox.Bottom);
@@ -730,11 +824,14 @@ begin
     // вертикальные красные линии
     pen.Color := clRed;
     MoveTo(origin.X, 0);
-    LineTo(origin.X, Image2.Height); // базовая линия вертикальная
+    LineTo(origin.X, Image2.Height);
+    // базовая линия вертикальная
     MoveTo(bbox.Right, 0);
     LineTo(bbox.Right, Image2.Height); // Advance
   end;
-  StatusBar1.Panels[2].Text := FR_SearchUnicodeName(symbol.Code);
+  UD := FR_SearchUnicodeName(symbol.Code);
+  StatusBar1.Panels[2].Text := 'U+' + UD.U_plus + ' - ' + UD.Name;
+
 end;
 
 procedure TForm1.Open1Click(Sender: TObject);

@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 843
+  ClientHeight = 844
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -23,7 +23,7 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 719
+    Top = 720
     Width = 1424
     Height = 105
     Align = alBottom
@@ -33,7 +33,7 @@ object Form1: TForm1
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 716
+    Top = 717
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -47,7 +47,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 151
     Top = 0
-    Height = 716
+    Height = 717
     AutoSnap = False
     ExplicitLeft = 168
     ExplicitTop = 280
@@ -57,7 +57,7 @@ object Form1: TForm1
     Left = 154
     Top = 0
     Width = 1043
-    Height = 716
+    Height = 717
     Align = alClient
     ExplicitTop = 29
     ExplicitHeight = 660
@@ -66,10 +66,10 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 716
+    Height = 717
     Align = alRight
     TabOrder = 0
-    ExplicitHeight = 694
+    ExplicitHeight = 696
     object Label1: TLabel
       Left = 6
       Top = 690
@@ -157,7 +157,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 151
-    Height = 716
+    Height = 717
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
@@ -173,11 +173,11 @@ object Form1: TForm1
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
-    ExplicitHeight = 694
+    ExplicitHeight = 696
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 824
+    Top = 825
     Width = 1424
     Height = 19
     Panels = <
@@ -194,7 +194,7 @@ object Form1: TForm1
         Alignment = taRightJustify
         Width = 150
       end>
-    ExplicitTop = 802
+    ExplicitTop = 804
   end
   object FontDialog1: TFontDialog
     Ctl3D = False
