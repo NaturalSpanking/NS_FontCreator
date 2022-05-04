@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 844
+  ClientHeight = 841
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -23,17 +23,16 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 720
+    Top = 717
     Width = 1424
     Height = 105
     Align = alBottom
     Constraints.MaxHeight = 300
     Constraints.MinHeight = 46
-    ExplicitTop = 717
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 717
+    Top = 714
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -47,7 +46,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 151
     Top = 0
-    Height = 717
+    Height = 714
     AutoSnap = False
     ExplicitLeft = 168
     ExplicitTop = 280
@@ -57,7 +56,7 @@ object Form1: TForm1
     Left = 154
     Top = 0
     Width = 1043
-    Height = 717
+    Height = 714
     Align = alClient
     ExplicitTop = 29
     ExplicitHeight = 660
@@ -66,10 +65,10 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 717
+    Height = 714
     Align = alRight
     TabOrder = 0
-    ExplicitHeight = 696
+    ExplicitHeight = 693
     object Label1: TLabel
       Left = 6
       Top = 690
@@ -157,7 +156,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 151
-    Height = 717
+    Height = 714
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
@@ -173,11 +172,11 @@ object Form1: TForm1
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
-    ExplicitHeight = 696
+    ExplicitHeight = 693
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 825
+    Top = 822
     Width = 1424
     Height = 19
     Panels = <
@@ -194,7 +193,7 @@ object Form1: TForm1
         Alignment = taRightJustify
         Width = 150
       end>
-    ExplicitTop = 804
+    ExplicitTop = 801
   end
   object FontDialog1: TFontDialog
     Ctl3D = False
@@ -214,6 +213,7 @@ object Form1: TForm1
       object Makesources1: TMenuItem
         Caption = 'Build'
         ShortCut = 16450
+        OnClick = Makesources1Click
       end
       object New1: TMenuItem
         Caption = 'New'
@@ -273,7 +273,7 @@ object Form1: TForm1
         OnClick = FR_AddTable
       end
       object Renametable2: TMenuItem
-        Caption = 'Rename table'
+        Caption = 'Edit table'
         OnClick = FR_RenameTable
       end
       object Addsymbols2: TMenuItem
@@ -345,7 +345,7 @@ object Form1: TForm1
       OnClick = FR_AddTable
     end
     object Renametable1: TMenuItem
-      Caption = 'Rename table'
+      Caption = 'Edit table'
       OnClick = FR_RenameTable
     end
     object Addsymbols1: TMenuItem
@@ -367,5 +367,10 @@ object Form1: TForm1
     Filter = 'NS Font file|*.nsfont'
     Left = 232
     Top = 128
+  end
+  object SaveDialog2: TSaveDialog
+    Filter = 'C source code|*.c'
+    Left = 232
+    Top = 184
   end
 end

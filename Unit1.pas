@@ -23,7 +23,6 @@ type
     BearingX: integer;
     BearingY: integer;
     Advance: integer;
-    BytesPerColumn: integer;
     BufferSize: integer;
     Buffer: PByte;
   end;
@@ -95,6 +94,7 @@ type
     Decreasesize1: TMenuItem;
     N3: TMenuItem;
     Button5: TButton;
+    SaveDialog2: TSaveDialog;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -120,6 +120,7 @@ type
     procedure Saveas1Click(Sender: TObject);
     procedure Autorepaint1Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure Makesources1Click(Sender: TObject);
   private
     // curNode: TTreeNode;
     face: TFTFace;
@@ -137,9 +138,10 @@ type
     procedure FR_LoadUnicodeNames;
     procedure FR_Render(symb: PSymb);
     procedure FR_FreeSymb(var symb: PSymb);
-    procedure FR_GenSymb(var f: TextFile; symb: PSymb; MaxW: integer);
-    procedure FR_GenerageOld;
     procedure FR_GenerateNew;
+    function gen_table(var f: TextFile; table: TTreeNode): string;
+    function gen_symb(var f: TextFile; psy: PSymb): string;
+    function mv_spaces(S: string): string;
     function FR_FontStyleToString(style: TFontStyles): string;
     function FR_SearchUnicodeName(Code: integer): TUnicodeData;
   public
@@ -153,15 +155,19 @@ implementation
 
 {$R *.dfm}
 
-uses add_table;
+uses add_table, Unit3;
 
 procedure TForm1.FR_AddTable(Sender: TObject);
 var
-  S: string;
+  p: ^integer;
 begin
-  S := 'table1';
-  if InputQuery('Table name', 'Enter new table name', S) then
-    TreeView1.Items.Add(nil, S);
+  if Form3.Execute then
+  begin
+    new(p);
+    p^ := Form3.FirstChar;
+    TreeView1.Items.AddObject(nil, Form3.TableName + ': ' + '''' + chr(p^)
+      + '''', p);
+  end;
 end;
 
 procedure TForm1.FR_FullRepaint(Sender: TObject);
@@ -176,16 +182,14 @@ begin
     exit;
   end;
   for i := 0 to TreeView1.Items.Count - 1 do
-  begin
-    psy := TreeView1.Items[i].Data;
-    if psy <> nil then
+    if TreeView1.Items[i].Parent <> nil then
     begin
+      psy := TreeView1.Items[i].Data;
       FR_Render(psy);
       if (TreeView1.Selected <> nil) and (i = TreeView1.Selected.AbsoluteIndex)
       then
         FR_ShowSymbol(psy);
     end;
-  end;
   StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x' +
     IntToStr(min_w) + '..' + IntToStr(max_w);
 end;
@@ -215,46 +219,7 @@ begin
   FR_Load('saving.dat');
 end;
 
-procedure TForm1.FR_GenerageOld;
-var
-  f: TextFile;
-  i: integer;
-  max_w: integer;
-  p: PSymb;
-  bracket: Boolean;
-begin
-  bracket := false;
-  max_w := 0;
-  for i := 0 to TreeView1.Items.Count - 1 do
-  begin
-    if TreeView1.Items[i].Parent <> nil then
-    begin
-      p := TreeView1.Items[i].Data;
-      if p.Buffer <> nil then
-        if p.Width > max_w then
-          max_w := p.Width;
-    end;
-  end;
-
-  AssignFile(f, 'out.c');
-  rewrite(f);
-  for i := 0 to TreeView1.Items.Count - 1 do
-  begin
-    if TreeView1.Items[i].Parent <> nil then
-      FR_GenSymb(f, TreeView1.Items[i].Data, max_w)
-    else
-    begin
-      if bracket then
-        writeln(f, '};');
-      writeln(f, 'static const unsigned char ' + TreeView1.Items[i].Text +
-        '[] = {');
-      bracket := true;
-    end;
-  end;
-  CloseFile(f);
-end;
-
-function gen_symb(var f: TextFile; psy: PSymb): string;
+function TForm1.gen_symb(var f: TextFile; psy: PSymb): string;
 var
   UD: TUnicodeData;
   i: integer;
@@ -267,7 +232,7 @@ begin
   Result := '_U_' + UD.U_plus;
   if psy.Buffer = nil then
   begin
-    writeln(f, '/* NO DATA */ };');
+    writeln(f, '/* NO DATA */};');
     exit;
   end;
   write(f, '0x', IntToHex(byte(psy.Width)), ', ');
@@ -276,11 +241,11 @@ begin
   writeln(f, '};');
 end;
 
-function gen_table(var f: TextFile; table: TTreeNode): string;
+function TForm1.gen_table(var f: TextFile; table: TTreeNode): string;
 var
-  i: integer;
   tmp: TTreeNode;
   S: string;
+  p: ^integer;
 begin
   S := '';
   tmp := table.getFirstChild;
@@ -289,19 +254,24 @@ begin
     S := S + gen_symb(f, tmp.Data) + ', ';
     tmp := table.GetNextChild(tmp);
   end;
-
-  writeln(f, 'static const TFontTable ', '_' + table.Text, ' = {');
-  tmp := table.getFirstChild;
-  writeln(f, '#warning "set first char code"');
-  writeln(f, '32,');
-  writeln(f, '{ ' + S + '}');
+  writeln(f);
+  writeln(f, 'static const TFontTable ', '_' + copy(table.Text, 1,
+    pos(':', table.Text) - 1), ' = {');
+  p := table.Data;
+  writeln(f, #9, '''' + chr(p^) + '''' + ',');
+  writeln(f, #9, '{ ' + S + '}');
   writeln(f, '};');
   writeln(f);
 
-  Result := '_' + table.Text;
+  Result := '_' + copy(table.Text, 1, pos(':', table.Text) - 1);
 end;
 
-function without_spaces(S: string): string;
+procedure TForm1.Makesources1Click(Sender: TObject);
+begin
+  FR_GenerateNew;
+end;
+
+function TForm1.mv_spaces(S: string): string;
 var
   i: integer;
 begin
@@ -320,48 +290,34 @@ var
   S: string;
 begin
   S := '';
-  AssignFile(f, 'out.c');
+  SaveDialog2.FileName := mv_spaces(extended_font_name) + '.c';
+  if not SaveDialog2.Execute then
+    exit;
+
+  AssignFile(f, SaveDialog2.FileName);
   rewrite(f);
+  writeln(f, '/* This font generated by NS Font creator */');
+  writeln(f);
+  writeln(f, '#include "NS_fonts.h"');
+  writeln(f);
   for i := 0 to TreeView1.Items.Count - 1 do
     if TreeView1.Items[i].Parent = nil then
       S := S + '&' + gen_table(f, TreeView1.Items[i]) + ', ';
 
   writeln(f);
-  writeln(f, 'static const TFont _' + without_spaces(extended_font_name)
-    + ' = {');
-  writeln(f, IntToStr(Form1.face.Size.Metrics.Height div 64) + ', ' +
-    IntToStr(Form1.face.Size.Metrics.MaxAdvance div 64) + ', ' +
-    IntToStr(Form1.bpc) + ',');
-  writeln(f, '{' + S + '}');
+  writeln(f, 'static const TFont _' + mv_spaces(extended_font_name) + ' = {');
+  write(f, #9);
+  if font_mem_size > 0 then
+    writeln(f, IntToStr(Form1.face.Size.Metrics.Height div 64) + ', ' +
+      IntToStr(Form1.face.Size.Metrics.MaxAdvance div 64) + ', ' +
+      IntToStr(Form1.bpc) + ',');
+
+  writeln(f, #9, '{' + S + '}');
   writeln(f, '};');
   writeln(f);
-  writeln(f, 'const PFont ' + without_spaces(extended_font_name) + ' = &_' +
-    without_spaces(extended_font_name) + ';');
+  writeln(f, 'const PFont ' + mv_spaces(extended_font_name) + ' = &_' +
+    mv_spaces(extended_font_name) + ';');
   CloseFile(f);
-end;
-
-procedure TForm1.FR_GenSymb(var f: TextFile; symb: PSymb; MaxW: integer);
-var
-  i: integer;
-begin
-  if symb = nil then
-    exit;
-  // writeln(f, '/* ' + FR_SearchUnicodeName(symb.Code) + ' */');
-  if symb.Buffer = nil then
-  begin
-    writeln(f, '/* NO DATA */');
-    exit;
-  end;
-  write(f, '0x', IntToHex(byte(symb.Width)), ', ');
-  // for i := 0 to symb.BufferSize - 1 do
-  for i := 0 to symb.BytesPerColumn * MaxW - 1 do
-  begin
-    if i < symb.BufferSize then
-      write(f, '0x', IntToHex(symb.Buffer[i]), ', ')
-    else
-      write(f, '0x00, ');
-  end;
-  writeln(f);
 end;
 
 procedure TForm1.Button5Click(Sender: TObject);
@@ -473,8 +429,11 @@ var
 begin
   if TreeView1.Selected = nil then
     exit;
-  psy := TreeView1.Selected.Data;
-  FR_ShowSymbol(psy);
+  if TreeView1.Selected.Parent <> nil then
+  begin
+    psy := TreeView1.Selected.Data;
+    FR_ShowSymbol(psy);
+  end;
 
 end;
 
@@ -485,6 +444,7 @@ var
   i: integer;
   b: byte;
   psy: PSymb;
+  p: ^integer;
 begin
   stream := TMemoryStream.Create;
   AssignFile(f, FName);
@@ -496,11 +456,11 @@ begin
   stream.Free;
   for i := 0 to TreeView1.Items.Count - 1 do
   begin
-    psy := TreeView1.Items[i].Data;
-    if psy <> nil then
+    if TreeView1.Items[i].Parent <> nil then
     begin
       b := 1;
       BlockWrite(f, b, 1);
+      psy := TreeView1.Items[i].Data;
       BlockWrite(f, psy^, sizeof(TSymb));
       BlockWrite(f, psy.Buffer^, psy.BufferSize);
     end
@@ -508,6 +468,8 @@ begin
     begin
       b := 0;
       BlockWrite(f, b, 1);
+      p := TreeView1.Items[i].Data;
+      BlockWrite(f, p^, sizeof(integer));
     end;
   end;
   if font_mem_size = 0 then
@@ -560,6 +522,7 @@ var
   b: byte;
   S: string;
   psy: PSymb;
+  p: ^integer;
 begin
   stream := TMemoryStream.Create;
   AssignFile(f, FName);
@@ -584,6 +547,12 @@ begin
       TreeView1.Items[i].Data := psy;
       TreeView1.Items[i].Text := '''' + chr(psy.Code) + '''' + ' - ' +
         IntToStr(psy.Code);
+    end
+    else
+    begin
+      new(p);
+      BlockRead(f, p^, sizeof(integer));
+      TreeView1.Items[i].Data := p;
     end;
   end;
   BlockRead(f, b, 1);
@@ -654,16 +623,12 @@ begin
   symb.Advance := face.glyph.Metrics.HorzAdvance div 64;
   if symb.Code = 32 then
     symb.Width := symb.Advance;
-  symb.BytesPerColumn := symb.Heigth div 8;
+
   if symb.Width > max_w then
     max_w := symb.Width;
   if symb.Width < min_w then
     min_w := symb.Width;
-
-  if symb.BytesPerColumn * 8 < symb.Heigth then
-    inc(symb.BytesPerColumn);
-  bpc := symb.BytesPerColumn;
-  symb.BufferSize := symb.BytesPerColumn * symb.Width;
+  symb.BufferSize := bpc * symb.Width;
   symb.Buffer := AllocMem(symb.BufferSize); // не надо очищать
   k := 0;
   for i := 0 to (face.glyph.Bitmap.Rows * face.glyph.Bitmap.Pitch) - 1 do
@@ -674,7 +639,7 @@ begin
         P_x := k * 8 + j; // это правильнее
         P_y := (face.Size.Metrics.Ascender - face.glyph.Metrics.HorzBearingY)
           div 64 + i div face.glyph.Bitmap.Pitch;
-        byte_idx := (P_y div 8) + symb.BytesPerColumn * P_x;
+        byte_idx := (P_y div 8) + bpc * P_x;
         // symb.Buffer[byte_idx] := symb.Buffer[byte_idx] + 1 shl (7 - P_y mod 8); так было изначально, символы перевернуты получаются
         symb.Buffer[byte_idx] := symb.Buffer[byte_idx] +
           128 shr (7 - P_y mod 8);
@@ -710,6 +675,9 @@ begin
     ' ' + FR_FontStyleToString(FontDialog1.Font.style) +
     string(IntToStr(FontDialog1.Font.Size));
   StatusBar1.Panels[0].Text := extended_font_name;
+  bpc := (face.Size.Metrics.Height div 64) div 8;
+  if bpc * 8 < face.Size.Metrics.Height div 64 then
+    inc(bpc);
   max_w := 0;
   min_w := face.Size.Metrics.MaxAdvance div 64;
   StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x' +
@@ -768,8 +736,8 @@ begin
   for i := 0 to symbol.BufferSize - 1 do
     for j := 0 to 7 do
     begin
-      X := i div symbol.BytesPerColumn + symbol.BearingX;
-      Y := 8 * (i mod symbol.BytesPerColumn) + j;
+      X := i div bpc + symbol.BearingX;
+      Y := 8 * (i mod bpc) + j;
       R := Rect(bbox.Left + X * grid_size, bbox.Top + Y * grid_size,
         bbox.Left + X * grid_size + grid_size, bbox.Top + Y * grid_size +
         grid_size);
@@ -845,13 +813,22 @@ end;
 
 procedure TForm1.FR_RenameTable(Sender: TObject);
 var
-  S: string;
+  S, X: string;
+  p: ^integer;
 begin
   if TreeView1.Selected.Parent <> nil then
     TreeView1.Selected := TreeView1.Selected.Parent;
   S := TreeView1.Selected.Text;
-  if InputQuery('Rename table', 'Enter new name:', S) then
-    TreeView1.Selected.Text := S;
+  X := copy(S, pos(':', S), length(S));
+  S := copy(S, 1, pos(':', S) - 1);
+  p := TreeView1.Selected.Data;
+  Form3.TableName := S;
+  Form3.FirstChar := p^;
+  if Form3.Execute then
+  begin
+    p^ := Form3.FirstChar;
+    TreeView1.Selected.Text := Form3.TableName + ': ' + '''' + chr(p^) + '''';
+  end;
 end;
 
 procedure TForm1.Save1Click(Sender: TObject);
@@ -896,9 +873,18 @@ end;
 procedure TForm1.TreeView1Deletion(Sender: TObject; Node: TTreeNode);
 var
   psy: PSymb;
+  p: ^integer;
 begin
-  psy := Node.Data;
-  FR_FreeSymb(psy);
+  if Node.Text[1] = '''' then
+  begin
+    psy := Node.Data;
+    FR_FreeSymb(psy);
+  end
+  else
+  begin
+    p := Node.Data;
+    Dispose(p);
+  end;
 end;
 
 procedure TForm1.TreeView1DragDrop(Sender, Source: TObject; X, Y: integer);
