@@ -121,6 +121,9 @@ type
     procedure Autorepaint1Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
     procedure Makesources1Click(Sender: TObject);
+    procedure Exit1Click(Sender: TObject);
+    procedure Moveup1Click(Sender: TObject);
+    procedure Movedown1Click(Sender: TObject);
   private
     // curNode: TTreeNode;
     face: TFTFace;
@@ -271,6 +274,58 @@ begin
   FR_GenerateNew;
 end;
 
+procedure TForm1.Movedown1Click(Sender: TObject);
+var
+  psy: PSymb;
+  i: integer;
+  b: integer;
+  y: integer;
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+
+  psy := TreeView1.Selected.Data;
+  y:=0;
+  for i := 1 to 8 - (bpc*8 - psy.Heigth) do
+  begin
+    y:=y shl 1;
+    inc(y);
+  end;
+  for i := psy.BufferSize - 1 downto 0 do
+  begin
+    if ((psy.Buffer[i - 1] and 128) <> 0) and ((i - 1) mod bpc <> bpc - 1) then
+      b := 1
+    else
+      b := 0;
+    if i mod bpc = bpc - 1 then
+      psy.Buffer[i] := ((psy.Buffer[i] shl 1) or b) and y
+    else
+      psy.Buffer[i] := (psy.Buffer[i] shl 1) or b;
+  end;
+  FR_ShowSymbol(psy);
+end;
+
+procedure TForm1.Moveup1Click(Sender: TObject);
+var
+  psy: PSymb;
+  i: integer;
+  b: integer;
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+
+  psy := TreeView1.Selected.Data;
+  for i := 0 to psy.BufferSize - 1 do
+  begin
+    if ((psy.Buffer[i + 1] and 1) <> 0) and ((i + 1) mod bpc <> 0) then
+      b := 128
+    else
+      b := 0;
+    psy.Buffer[i] := (psy.Buffer[i] shr 1) or b;
+  end;
+  FR_ShowSymbol(psy);
+end;
+
 function TForm1.mv_spaces(S: string): string;
 var
   i: integer;
@@ -323,6 +378,11 @@ end;
 procedure TForm1.Button5Click(Sender: TObject);
 begin
   FR_GenerateNew;
+end;
+
+procedure TForm1.Exit1Click(Sender: TObject);
+begin
+  Form1.Close;
 end;
 
 procedure TForm1.FR_AddRange(Sender: TObject);

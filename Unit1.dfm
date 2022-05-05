@@ -68,7 +68,7 @@ object Form1: TForm1
     Height = 714
     Align = alRight
     TabOrder = 0
-    ExplicitHeight = 693
+    ExplicitHeight = 694
     object Label1: TLabel
       Left = 6
       Top = 690
@@ -172,7 +172,7 @@ object Form1: TForm1
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
-    ExplicitHeight = 693
+    ExplicitHeight = 694
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -193,7 +193,7 @@ object Form1: TForm1
         Alignment = taRightJustify
         Width = 150
       end>
-    ExplicitTop = 801
+    ExplicitTop = 802
   end
   object FontDialog1: TFontDialog
     Ctl3D = False
@@ -236,6 +236,7 @@ object Form1: TForm1
       object Exit1: TMenuItem
         Caption = 'Exit'
         ShortCut = 32883
+        OnClick = Exit1Click
       end
     end
     object Font1: TMenuItem
@@ -289,9 +290,11 @@ object Form1: TForm1
       Caption = 'Glyphs'
       object Moveup1: TMenuItem
         Caption = 'Move up'
+        OnClick = Moveup1Click
       end
       object Movedown1: TMenuItem
         Caption = 'Move down'
+        OnClick = Movedown1Click
       end
       object Moveleft1: TMenuItem
         Caption = 'Move left'
