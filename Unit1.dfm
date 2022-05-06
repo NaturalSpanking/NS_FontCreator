@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 841
+  ClientHeight = 842
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -23,16 +23,17 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 717
+    Top = 718
     Width = 1424
     Height = 105
     Align = alBottom
     Constraints.MaxHeight = 300
     Constraints.MinHeight = 46
+    ExplicitTop = 717
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 714
+    Top = 715
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -46,7 +47,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 151
     Top = 0
-    Height = 714
+    Height = 715
     AutoSnap = False
     ExplicitLeft = 168
     ExplicitTop = 280
@@ -56,7 +57,7 @@ object Form1: TForm1
     Left = 154
     Top = 0
     Width = 1043
-    Height = 714
+    Height = 715
     Align = alClient
     ExplicitTop = 29
     ExplicitHeight = 660
@@ -65,7 +66,7 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 714
+    Height = 715
     Align = alRight
     TabOrder = 0
     ExplicitHeight = 694
@@ -156,7 +157,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 151
-    Height = 714
+    Height = 715
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
@@ -176,7 +177,7 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 822
+    Top = 823
     Width = 1424
     Height = 19
     Panels = <
@@ -298,24 +299,29 @@ object Form1: TForm1
       end
       object Moveleft1: TMenuItem
         Caption = 'Move left'
+        OnClick = Moveleft1Click
       end
-      object Moderight1: TMenuItem
-        Caption = 'Mode right'
+      object Moveright1: TMenuItem
+        Caption = 'Move right'
+        OnClick = Moveright1Click
       end
       object N2: TMenuItem
         Caption = '-'
       end
       object Addrowattop1: TMenuItem
         Caption = 'Add row at top'
+        OnClick = Addrowattop1Click
       end
       object Addrowatbottom1: TMenuItem
         Caption = 'Add row at bottom'
       end
       object Addcolumnatleft1: TMenuItem
         Caption = 'Add column at left'
+        OnClick = Addcolumnatleft1Click
       end
       object Addcolumnatright1: TMenuItem
         Caption = 'Add column at right'
+        OnClick = Addcolumnatright1Click
       end
       object N1: TMenuItem
         Caption = '-'
@@ -328,9 +334,11 @@ object Form1: TForm1
       end
       object Removecolumnatleft1: TMenuItem
         Caption = 'Remove column at left'
+        OnClick = Removecolumnatleft1Click
       end
       object Removecolumnatright1: TMenuItem
         Caption = 'Remove column at right'
+        OnClick = Removecolumnatright1Click
       end
     end
     object Help1: TMenuItem

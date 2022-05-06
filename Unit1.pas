@@ -82,7 +82,7 @@ type
     Moveup1: TMenuItem;
     Movedown1: TMenuItem;
     Moveleft1: TMenuItem;
-    Moderight1: TMenuItem;
+    Moveright1: TMenuItem;
     New1: TMenuItem;
     Makesources1: TMenuItem;
     Abuot: TMenuItem;
@@ -124,6 +124,13 @@ type
     procedure Exit1Click(Sender: TObject);
     procedure Moveup1Click(Sender: TObject);
     procedure Movedown1Click(Sender: TObject);
+    procedure Addcolumnatright1Click(Sender: TObject);
+    procedure Addcolumnatleft1Click(Sender: TObject);
+    procedure Moveright1Click(Sender: TObject);
+    procedure Moveleft1Click(Sender: TObject);
+    procedure Removecolumnatleft1Click(Sender: TObject);
+    procedure Removecolumnatright1Click(Sender: TObject);
+    procedure Addrowattop1Click(Sender: TObject);
   private
     // curNode: TTreeNode;
     face: TFTFace;
@@ -195,6 +202,55 @@ begin
     end;
   StatusBar1.Panels[1].Text := IntToStr(face.Size.Metrics.Height div 64) + 'x' +
     IntToStr(min_w) + '..' + IntToStr(max_w);
+end;
+
+procedure TForm1.Addcolumnatleft1Click(Sender: TObject);
+var
+  psy: PSymb;
+  p: PByte;
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+
+  psy := TreeView1.Selected.Data;
+  p := AllocMem(psy.BufferSize + bpc);
+  CopyMemory(p + bpc, psy.Buffer, psy.BufferSize);
+  FreeMemory(psy.Buffer);
+  psy.Buffer := p;
+  inc(psy.Width);
+  inc(psy.BufferSize, bpc);
+  FR_ShowSymbol(psy);
+end;
+
+procedure TForm1.Addcolumnatright1Click(Sender: TObject);
+var
+  psy: PSymb;
+  p: PByte;
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+
+  psy := TreeView1.Selected.Data;
+  p := AllocMem(psy.BufferSize + bpc);
+  CopyMemory(p, psy.Buffer, psy.BufferSize);
+  FreeMemory(psy.Buffer);
+  psy.Buffer := p;
+  inc(psy.Width);
+  inc(psy.BufferSize, bpc);
+  FR_ShowSymbol(psy);
+end;
+
+procedure TForm1.Addrowattop1Click(Sender: TObject);
+var
+  psy: PSymb;
+  p: PByte;
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+
+  psy := TreeView1.Selected.Data;
+
+psy.Heigth
 end;
 
 procedure TForm1.Autorepaint1Click(Sender: TObject);
@@ -279,17 +335,17 @@ var
   psy: PSymb;
   i: integer;
   b: integer;
-  y: integer;
+  Y: integer;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
 
   psy := TreeView1.Selected.Data;
-  y:=0;
-  for i := 1 to 8 - (bpc*8 - psy.Heigth) do
+  Y := 0;
+  for i := 1 to 8 - (bpc * 8 - psy.Heigth) do
   begin
-    y:=y shl 1;
-    inc(y);
+    Y := Y shl 1;
+    inc(Y);
   end;
   for i := psy.BufferSize - 1 downto 0 do
   begin
@@ -298,10 +354,44 @@ begin
     else
       b := 0;
     if i mod bpc = bpc - 1 then
-      psy.Buffer[i] := ((psy.Buffer[i] shl 1) or b) and y
+      psy.Buffer[i] := ((psy.Buffer[i] shl 1) or b) and Y
     else
       psy.Buffer[i] := (psy.Buffer[i] shl 1) or b;
   end;
+  FR_ShowSymbol(psy);
+end;
+
+procedure TForm1.Moveleft1Click(Sender: TObject);
+var
+  psy: PSymb;
+  i: integer;
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+
+  psy := TreeView1.Selected.Data;
+  for i := 0 to psy.BufferSize - bpc do
+  begin
+    psy.Buffer[i] := psy.Buffer[i + bpc];
+  end;
+  FillChar(psy.Buffer[psy.BufferSize - bpc], bpc, 0);
+  FR_ShowSymbol(psy);
+end;
+
+procedure TForm1.Moveright1Click(Sender: TObject);
+var
+  psy: PSymb;
+  i: integer;
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+
+  psy := TreeView1.Selected.Data;
+  for i := psy.BufferSize - 1 downto bpc do
+  begin
+    psy.Buffer[i] := psy.Buffer[i - bpc];
+  end;
+  FillChar(psy.Buffer[0], bpc, 0);
   FR_ShowSymbol(psy);
 end;
 
@@ -869,6 +959,42 @@ begin
     FR_Load(OpenDialog1.FileName);
     SaveDialog1.FileName := OpenDialog1.FileName;
   end;
+end;
+
+procedure TForm1.Removecolumnatleft1Click(Sender: TObject);
+var
+  psy: PSymb;
+  p: PByte;
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+
+  psy := TreeView1.Selected.Data;
+  p := AllocMem(psy.BufferSize - bpc);
+  CopyMemory(p, psy.Buffer + bpc, psy.BufferSize - bpc);
+  FreeMemory(psy.Buffer);
+  psy.Buffer := p;
+  dec(psy.Width);
+  dec(psy.BufferSize, bpc);
+  FR_ShowSymbol(psy);
+end;
+
+procedure TForm1.Removecolumnatright1Click(Sender: TObject);
+var
+  psy: PSymb;
+  p: PByte;
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+
+  psy := TreeView1.Selected.Data;
+  p := AllocMem(psy.BufferSize - bpc);
+  CopyMemory(p, psy.Buffer, psy.BufferSize - bpc);
+  FreeMemory(psy.Buffer);
+  psy.Buffer := p;
+  dec(psy.Width);
+  dec(psy.BufferSize, bpc);
+  FR_ShowSymbol(psy);
 end;
 
 procedure TForm1.FR_RenameTable(Sender: TObject);
