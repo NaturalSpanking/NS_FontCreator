@@ -311,91 +311,35 @@ begin
 end;
 
 procedure TForm1.Movedown1Click(Sender: TObject);
-var
-  psy: PSymb;
-  i: integer;
-  b: integer;
-  Y: integer;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-
-  psy := TreeView1.Selected.Data;
-  Y := 0;
-  for i := 1 to 8 - (font_data.bpc * 8 - font_data.Height) do
-  begin
-    Y := Y shl 1;
-    inc(Y);
-  end;
-  for i := psy.BufferSize - 1 downto 0 do
-  begin
-    if ((psy.Buffer[i - 1] and 128) <> 0) and
-      ((i - 1) mod font_data.bpc <> font_data.bpc - 1) then
-      b := 1
-    else
-      b := 0;
-    if i mod font_data.bpc = font_data.bpc - 1 then
-      psy.Buffer[i] := ((psy.Buffer[i] shl 1) or b) and Y
-    else
-      psy.Buffer[i] := (psy.Buffer[i] shl 1) or b;
-  end;
-  FR_ShowSymbol(psy);
+  FR_MoveDown(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data);
 end;
 
 procedure TForm1.Moveleft1Click(Sender: TObject);
-var
-  psy: PSymb;
-  i: integer;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-
-  psy := TreeView1.Selected.Data;
-  for i := 0 to psy.BufferSize - font_data.bpc do
-  begin
-    psy.Buffer[i] := psy.Buffer[i + font_data.bpc];
-  end;
-  FillChar(psy.Buffer[psy.BufferSize - font_data.bpc], font_data.bpc, 0);
-  FR_ShowSymbol(psy);
+  FR_MoveLeft(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data);
 end;
 
 procedure TForm1.Moveright1Click(Sender: TObject);
-var
-  psy: PSymb;
-  i: integer;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-
-  psy := TreeView1.Selected.Data;
-  for i := psy.BufferSize - 1 downto font_data.bpc do
-  begin
-    psy.Buffer[i] := psy.Buffer[i - font_data.bpc];
-  end;
-  FillChar(psy.Buffer[0], font_data.bpc, 0);
-  FR_ShowSymbol(psy);
+  FR_MoveRight(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data);
 end;
 
 procedure TForm1.Moveup1Click(Sender: TObject);
-var
-  psy: PSymb;
-  i: integer;
-  b: integer;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-
-  psy := TreeView1.Selected.Data;
-  for i := 0 to psy.BufferSize - 1 do
-  begin
-    if ((psy.Buffer[i + 1] and 1) <> 0) and ((i + 1) mod font_data.bpc <> 0)
-    then
-      b := 128
-    else
-      b := 0;
-    psy.Buffer[i] := (psy.Buffer[i] shr 1) or b;
-  end;
-  FR_ShowSymbol(psy);
+  FR_MoveUp(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data);
 end;
 
 function TForm1.mv_spaces(S: string): string;

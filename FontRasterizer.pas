@@ -35,19 +35,89 @@ var
   font_data: T_FR_Font;
 
 procedure FR_SetFont(const Font: TFont);
+
 procedure FR_Render(symb: PSymb);
+
 procedure FR_AddColAtLeft(psy: PSymb);
 procedure FR_AddColAtRight(psy: PSymb);
 procedure FR_DelColAtLeft(psy: PSymb);
 procedure FR_DelColAtRight(psy: PSymb);
 
+procedure FR_MoveUp(psy: PSymb);
+procedure FR_MoveDown(psy: PSymb);
+procedure FR_MoveLeft(psy: PSymb);
+procedure FR_MoveRight(psy: PSymb);
+
 implementation
+
+procedure FR_MoveLeft(psy: PSymb);
+var
+  i: integer;
+begin
+  for i := 0 to psy.BufferSize - font_data.bpc do
+  begin
+    psy.Buffer[i] := psy.Buffer[i + font_data.bpc];
+  end;
+  FillChar(psy.Buffer[psy.BufferSize - font_data.bpc], font_data.bpc, 0);
+end;
+
+procedure FR_MoveRight(psy: PSymb);
+var
+  i: integer;
+begin
+  for i := psy.BufferSize - 1 downto font_data.bpc do
+  begin
+    psy.Buffer[i] := psy.Buffer[i - font_data.bpc];
+  end;
+  FillChar(psy.Buffer[0], font_data.bpc, 0);
+end;
+
+procedure FR_MoveUp(psy: PSymb);
+var
+  i: integer;
+  b: integer;
+begin
+  for i := 0 to psy.BufferSize - 1 do
+  begin
+    if ((psy.Buffer[i + 1] and 1) <> 0) and ((i + 1) mod font_data.bpc <> 0)
+    then
+      b := 128
+    else
+      b := 0;
+    psy.Buffer[i] := (psy.Buffer[i] shr 1) or b;
+  end;
+end;
+
+procedure FR_MoveDown(psy: PSymb);
+var
+  i: integer;
+  b: integer;
+  Y: integer;
+begin
+  Y := 0;
+  for i := 1 to 8 - (font_data.bpc * 8 - font_data.height) do
+  begin
+    Y := Y shl 1;
+    inc(Y);
+  end;
+  for i := psy.BufferSize - 1 downto 0 do
+  begin
+    if ((psy.Buffer[i - 1] and 128) <> 0) and
+      ((i - 1) mod font_data.bpc <> font_data.bpc - 1) then
+      b := 1
+    else
+      b := 0;
+    if i mod font_data.bpc = font_data.bpc - 1 then
+      psy.Buffer[i] := ((psy.Buffer[i] shl 1) or b) and Y
+    else
+      psy.Buffer[i] := (psy.Buffer[i] shl 1) or b;
+  end;
+end;
 
 procedure FR_DelColAtLeft(psy: PSymb);
 var
   p: PByte;
 begin
-
   p := AllocMem(psy.BufferSize - font_data.bpc);
   CopyMemory(p, psy.Buffer + font_data.bpc, psy.BufferSize - font_data.bpc);
   FreeMemory(psy.Buffer);
