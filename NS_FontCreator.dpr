@@ -4,7 +4,9 @@ uses
   Vcl.Forms,
   Unit1 in 'Unit1.pas' {Form1},
   add_table in 'add_table.pas' {Form2},
-  Unit3 in 'Unit3.pas' {Form3};
+  Unit3 in 'Unit3.pas' {Form3},
+  FontRasterizer in 'FontRasterizer.pas',
+  UnicodeNames in 'UnicodeNames.pas';
 
 {$R *.res}
 
