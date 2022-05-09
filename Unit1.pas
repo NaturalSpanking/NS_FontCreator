@@ -278,7 +278,7 @@ end;
 
 function TForm1.gen_symb(var f: TextFile; psy: PSymb): string;
 var
-  UD: TUniData;
+  UD: PUniData;
   i: integer;
 begin
   if psy = nil then
@@ -595,7 +595,7 @@ begin
     font_data.face.Destroy;
     FreeMemory(font_data.pFont);
   end;
-  UniNamer.Destroy;
+  UniNamer.Free;
 end;
 
 procedure TForm1.FormResize(Sender: TObject);
@@ -621,42 +621,48 @@ var
   psy: PSymb;
   p: ^integer;
 begin
-  stream := TMemoryStream.Create;
+  stream := TMemoryStream.Create; // соханение дерева
   AssignFile(f, FName);
   rewrite(f, 1);
   TreeView1.SaveToStream(stream);
   i := stream.Size;
-  BlockWrite(f, i, sizeof(integer));
-  BlockWrite(f, stream.Memory^, i);
+  BlockWrite(f, i, sizeof(integer)); // запись размера дерева
+  BlockWrite(f, stream.Memory^, i); // запись дерева
   stream.Free;
-  for i := 0 to TreeView1.Items.Count - 1 do
+
+  for i := 0 to TreeView1.Items.Count - 1 do // сохранение данных дерева
   begin
     if TreeView1.Items[i].Parent <> nil then
     begin
-      b := 1;
-      BlockWrite(f, b, 1);
+      b := 1; // 1 - листочек
+      BlockWrite(f, b, 1); // запись признака
       psy := TreeView1.Items[i].Data;
-      BlockWrite(f, psy^, sizeof(TSymb));
-      BlockWrite(f, psy.Buffer^, psy.BufferSize);
+      BlockWrite(f, psy^, sizeof(TSymb)); // запись структуры символа
+      BlockWrite(f, psy.Buffer^, psy.BufferSize); // запись массива пикселей
     end
     else
     begin
-      b := 0;
-      BlockWrite(f, b, 1);
+      b := 0; // 0 - корень
+      BlockWrite(f, b, 1); // запись признака
       p := TreeView1.Items[i].Data;
-      BlockWrite(f, p^, sizeof(integer));
+      BlockWrite(f, p^, sizeof(integer)); // запись первого символа
     end;
   end;
-  if font_data.font_mem_size = 0 then
+
+  if font_data.font_mem_size = 0 then // сохранение параметров шрифта
   begin
-    b := 0;
+    b := 0; // 0 - нет данных о шрифте
     BlockWrite(f, b, 1);
   end
   else
   begin
-    b := 1;
+    b := 1; // 1 - есть данные о шрифте
     BlockWrite(f, b, 1);
-    BlockWrite(f, font_data, sizeof(T_FR_Font));
+    BlockWrite(f, font_data.Heigth, sizeof(integer)); // запись данных шрифта
+    BlockWrite(f, font_data.bpc, sizeof(integer)); // запись данных шрифта
+    BlockWrite(f, font_data.min_w, sizeof(integer)); // запись данных шрифта
+    BlockWrite(f, font_data.max_w, sizeof(integer)); // запись данных шрифта
+
     i := FontDialog1.Font.Charset;
     BlockWrite(f, i, sizeof(integer));
     i := FontDialog1.Font.Color;
@@ -683,7 +689,8 @@ var
   psy: PSymb;
   p: ^integer;
 begin
-  stream := TMemoryStream.Create;
+
+  stream := TMemoryStream.Create; // загрузка дерева
   AssignFile(f, FName);
   reset(f, 1);
   BlockRead(f, i, sizeof(integer));
@@ -691,10 +698,11 @@ begin
   BlockRead(f, stream.Memory^, i);
   TreeView1.LoadFromStream(stream);
   stream.Free;
-  for i := 0 to TreeView1.Items.Count - 1 do
+
+  for i := 0 to TreeView1.Items.Count - 1 do // загрузка данных дерева
   begin
-    BlockRead(f, b, 1);
-    if b = 1 then
+    BlockRead(f, b, 1); // чтение признака
+    if b = 1 then // листочек
     begin
       psy := new(PSymb);
       BlockRead(f, psy^, sizeof(TSymb));
@@ -707,19 +715,24 @@ begin
       TreeView1.Items[i].Text := '''' + chr(psy.Code) + '''' + ' - ' +
         IntToStr(psy.Code);
     end
-    else
+    else // корень
     begin
       new(p);
-      BlockRead(f, p^, sizeof(integer));
+      BlockRead(f, p^, sizeof(integer)); // чтение первого символа
       TreeView1.Items[i].Data := p;
     end;
   end;
-  BlockRead(f, b, 1);
+
+  BlockRead(f, b, 1); // чтения наличия данных о шрифте
   if b = 1 then
   begin
-    BlockRead(f, font_data, sizeof(T_FR_Font));
+    BlockRead(f, font_data.Heigth, sizeof(integer)); // загрузка данных шрифта
+    BlockRead(f, font_data.bpc, sizeof(integer));
+    BlockRead(f, font_data.min_w, sizeof(integer));
+    BlockRead(f, font_data.max_w, sizeof(integer));
     font_data.font_mem_size := 0;
     font_data.pFont := nil;
+
     BlockRead(f, i, sizeof(integer));
     FontDialog1.Font.Charset := TFontCharset(i);
     BlockRead(f, i, sizeof(integer));
@@ -840,7 +853,7 @@ var
   origin: TPoint;
   bbox: TRect;
   R: TRect;
-  UD: TUniData;
+  UD: PUniData;
 begin
   // очистка канвы
   Image2.Picture.Bitmap.Width := Image2.Width;
@@ -943,7 +956,8 @@ begin
     LineTo(bbox.Right, Image2.Height); // Advance
   end;
   UD := UniNamer.Data[symbol.Code];
-  StatusBar1.Panels[2].Text := 'U+' + UD.U_plus + ' - ' + UD.Name;
+  if UD <> nil then
+    StatusBar1.Panels[2].Text := 'U+' + UD.U_plus + ' - ' + UD.Name;
 
 end;
 

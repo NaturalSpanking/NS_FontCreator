@@ -6,6 +6,7 @@ uses
   SysUtils, Classes;
 
 type
+  PUniData = ^TUniData;
 
   TUniData = record
     Code: integer;
@@ -18,11 +19,13 @@ type
     arr_size: integer;
     // [0 .. 34627]
     glyph_names_arr: array of TUniData;
-    function search_data(Code: integer): TUniData;
+    // glyph_names_arr: PUniData;
+    function search_data(Code: integer): PUniData;
   public
+    procedure Free;
     constructor Create;
     destructor Destroy; override;
-    property Data[Code: integer]: TUniData read search_data;
+    property Data[Code: integer]: PUniData read search_data;
   end;
 
 implementation
@@ -70,13 +73,24 @@ end;
 
 destructor TUnicodeNamer.Destroy;
 begin
+  arr_size := 0;
   inherited Destroy;
 end;
 
-function TUnicodeNamer.search_data(Code: integer): TUniData;
+procedure TUnicodeNamer.Free;
+begin
+  if Self <> nil then
+    Destroy;
+end;
+
+function TUnicodeNamer.search_data(Code: integer): PUniData;
 var
   a, b, i: integer;
 begin
+  Result := nil;
+  if arr_size = 0 then
+    exit;
+
   b := arr_size;
   a := 0;
   repeat
@@ -86,7 +100,7 @@ begin
     else
       b := i;
   until glyph_names_arr[i].Code = Code;
-  Result := glyph_names_arr[i];
+  Result := @glyph_names_arr[i];
   // Result := glyph_names_arr[i].U_plus + ' - ' + glyph_names_arr[i].Name;
 end;
 

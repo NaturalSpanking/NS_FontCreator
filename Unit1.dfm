@@ -68,7 +68,7 @@ object Form1: TForm1
     Height = 714
     Align = alRight
     TabOrder = 0
-    ExplicitHeight = 695
+    ExplicitHeight = 694
     object Label1: TLabel
       Left = 6
       Top = 690
@@ -172,7 +172,7 @@ object Form1: TForm1
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
-    ExplicitHeight = 695
+    ExplicitHeight = 694
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -193,7 +193,7 @@ object Form1: TForm1
         Alignment = taRightJustify
         Width = 150
       end>
-    ExplicitTop = 803
+    ExplicitTop = 802
   end
   object FontDialog1: TFontDialog
     Ctl3D = False
