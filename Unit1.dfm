@@ -313,6 +313,7 @@ object Form1: TForm1
       end
       object Addrowatbottom1: TMenuItem
         Caption = 'Add row at bottom'
+        OnClick = Addrowatbottom1Click
       end
       object Addcolumnatleft1: TMenuItem
         Caption = 'Add column at left'
