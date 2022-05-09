@@ -6,43 +6,10 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, System.UITypes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uFreeType, Vcl.StdCtrls, Vcl.ExtCtrls,
-  Vcl.Imaging.jpeg, Vcl.Grids, Vcl.ComCtrls, Vcl.Menus, Vcl.ToolWin;
-
-const
-  UnicodeArrSize = 34627;
+  Vcl.Imaging.jpeg, Vcl.Grids, Vcl.ComCtrls, Vcl.Menus, Vcl.ToolWin,
+  FontRasterizer, UnicodeNames;
 
 type
-  PSymb = ^TSymb;
-
-  TSymb = record
-    Code: integer;
-    Width: integer;
-    Heigth: integer;
-    Ascender: integer;
-    Descender: integer;
-    BearingX: integer;
-    BearingY: integer;
-    Advance: integer;
-    BufferSize: integer;
-    Buffer: PByte;
-  end;
-
-  T_FR_Font = record
-    face: TFTFace;
-    bpc: integer;
-    min_w: integer;
-    max_w: integer;
-    pFont: PByte;
-    font_mem_size: integer;
-    extended_font_name: string;
-  end;
-
-  TUnicodeData = record
-    Code: integer;
-    U_plus: string;
-    Name: string; // [60]
-  end;
-
   TForm1 = class(TForm)
     Button1: TButton;
     Button2: TButton;
@@ -143,13 +110,12 @@ type
     procedure New1Click(Sender: TObject);
     procedure Addrowatbottom1Click(Sender: TObject);
   private
+    UniNamer: TUnicodeNamer;
     font_data: T_FR_Font;
-    glyph_names_arr: array [0 .. UnicodeArrSize] of TUnicodeData;
     procedure FR_Save(FName: string);
     procedure FR_Load(FName: string);
     procedure FR_SetFont;
     procedure FR_ShowSymbol(symbol: PSymb);
-    procedure FR_LoadUnicodeNames;
     procedure FR_Render(symb: PSymb);
     procedure FR_FreeSymb(symb: PSymb);
     procedure FR_GenerateNew;
@@ -157,7 +123,7 @@ type
     function gen_symb(var f: TextFile; psy: PSymb): string;
     function mv_spaces(S: string): string;
     function FR_FontStyleToString(style: TFontStyles): string;
-    function FR_SearchUnicodeName(Code: integer): TUnicodeData;
+
   public
     { Public declarations }
   end;
@@ -204,7 +170,8 @@ begin
       then
         FR_ShowSymbol(psy);
     end;
-  StatusBar1.Panels[1].Text := IntToStr(font_data.face.Size.Metrics.Height div 64) + 'x' +
+  StatusBar1.Panels[1].Text :=
+    IntToStr(font_data.face.Size.Metrics.Height div 64) + 'x' +
     IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
 end;
 
@@ -252,6 +219,7 @@ var
   p: PByte;
 begin
   isIncBpc := false;
+  inc(font_data.Heigth);
   for i := 0 to TreeView1.Items.Count - 1 do
   begin
     if (TreeView1.Items[i].Text[1] <> '''') or (TreeView1.Items[i].Data = nil)
@@ -260,8 +228,7 @@ begin
     psy := TreeView1.Items[i].Data;
     if psy.Buffer = nil then
       continue;
-    inc(psy.Heigth);
-    if (psy.Heigth div 8) > font_data.bpc then
+    if (font_data.Heigth div 8) > font_data.bpc then
     begin
       isIncBpc := true;
       p := AllocMem(psy.BufferSize + psy.Width);
@@ -311,12 +278,12 @@ end;
 
 function TForm1.gen_symb(var f: TextFile; psy: PSymb): string;
 var
-  UD: TUnicodeData;
+  UD: TUniData;
   i: integer;
 begin
   if psy = nil then
     exit;
-  UD := Form1.FR_SearchUnicodeName(psy.Code);
+  UD := UniNamer.Data[psy.Code];
   writeln(f, '/* ' + 'U+' + UD.U_plus + ' - ' + UD.Name + ' */');
   write(f, 'static const unsigned char _U_' + UD.U_plus + '[] = {');
   Result := '_U_' + UD.U_plus;
@@ -373,14 +340,15 @@ begin
 
   psy := TreeView1.Selected.Data;
   Y := 0;
-  for i := 1 to 8 - (font_data.bpc * 8 - psy.Heigth) do
+  for i := 1 to 8 - (font_data.bpc * 8 - font_data.Heigth) do
   begin
     Y := Y shl 1;
     inc(Y);
   end;
   for i := psy.BufferSize - 1 downto 0 do
   begin
-    if ((psy.Buffer[i - 1] and 128) <> 0) and ((i - 1) mod font_data.bpc <> font_data.bpc - 1) then
+    if ((psy.Buffer[i - 1] and 128) <> 0) and
+      ((i - 1) mod font_data.bpc <> font_data.bpc - 1) then
       b := 1
     else
       b := 0;
@@ -438,7 +406,8 @@ begin
   psy := TreeView1.Selected.Data;
   for i := 0 to psy.BufferSize - 1 do
   begin
-    if ((psy.Buffer[i + 1] and 1) <> 0) and ((i + 1) mod font_data.bpc <> 0) then
+    if ((psy.Buffer[i + 1] and 1) <> 0) and ((i + 1) mod font_data.bpc <> 0)
+    then
       b := 128
     else
       b := 0;
@@ -504,18 +473,19 @@ begin
       S := S + '&' + gen_table(f, TreeView1.Items[i]) + ', ';
 
   writeln(f);
-  writeln(f, 'static const TFont _' + mv_spaces(font_data.extended_font_name) + ' = {');
+  writeln(f, 'static const TFont _' + mv_spaces(font_data.extended_font_name)
+    + ' = {');
   write(f, #9);
   if font_data.font_mem_size > 0 then
-    writeln(f, IntToStr(Form1.font_data.face.Size.Metrics.Height div 64) + ', ' +
-      IntToStr(Form1.font_data.face.Size.Metrics.MaxAdvance div 64) + ', ' +
+    writeln(f, IntToStr(Form1.font_data.face.Size.Metrics.Height div 64) + ', '
+      + IntToStr(Form1.font_data.face.Size.Metrics.MaxAdvance div 64) + ', ' +
       IntToStr(Form1.font_data.bpc) + ',');
 
   writeln(f, #9, '{' + S + '}');
   writeln(f, '};');
   writeln(f);
-  writeln(f, 'const PFont ' + mv_spaces(font_data.extended_font_name) + ' = &_' +
-    mv_spaces(font_data.extended_font_name) + ';');
+  writeln(f, 'const PFont ' + mv_spaces(font_data.extended_font_name) + ' = &_'
+    + mv_spaces(font_data.extended_font_name) + ';');
   CloseFile(f);
 end;
 
@@ -613,7 +583,7 @@ begin
     IntToStr(TFTManager.MinorVersion) + '.' + IntToStr(TFTManager.PatchVersion))
     + '       ';
   font_data.font_mem_size := 0;
-  FR_LoadUnicodeNames;
+  UniNamer := TUnicodeNamer.Create;
   FR_ShowSymbol(nil);
 end;
 
@@ -625,7 +595,7 @@ begin
     font_data.face.Destroy;
     FreeMemory(font_data.pFont);
   end;
-
+  UniNamer.Destroy;
 end;
 
 procedure TForm1.FormResize(Sender: TObject);
@@ -686,6 +656,7 @@ begin
   begin
     b := 1;
     BlockWrite(f, b, 1);
+    BlockWrite(f, font_data, sizeof(T_FR_Font));
     i := FontDialog1.Font.Charset;
     BlockWrite(f, i, sizeof(integer));
     i := FontDialog1.Font.Color;
@@ -700,23 +671,6 @@ begin
   end;
   CloseFile(f);
   Form1.Caption := 'NS Font Creator' + ' - ' + SaveDialog1.FileName;
-end;
-
-function TForm1.FR_SearchUnicodeName(Code: integer): TUnicodeData;
-var
-  a, b, i: integer;
-begin
-  b := UnicodeArrSize;
-  a := 0;
-  repeat
-    i := ((b - a) div 2) + a;
-    if glyph_names_arr[i].Code < Code then
-      a := i
-    else
-      b := i;
-  until glyph_names_arr[i].Code = Code;
-  Result := glyph_names_arr[i];
-  // Result := glyph_names_arr[i].U_plus + ' - ' + glyph_names_arr[i].Name;
 end;
 
 procedure TForm1.FR_Load(FName: string);
@@ -763,6 +717,9 @@ begin
   BlockRead(f, b, 1);
   if b = 1 then
   begin
+    BlockRead(f, font_data, sizeof(T_FR_Font));
+    font_data.font_mem_size := 0;
+    font_data.pFont := nil;
     BlockRead(f, i, sizeof(integer));
     FontDialog1.Font.Charset := TFontCharset(i);
     BlockRead(f, i, sizeof(integer));
@@ -783,31 +740,6 @@ begin
   Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
 end;
 
-procedure TForm1.FR_LoadUnicodeNames;
-var
-  f: TextFile;
-  sl: TStringList;
-  S: string;
-  i: integer;
-begin
-  sl := TStringList.Create;
-  sl.Clear;
-  sl.Delimiter := ';';
-  sl.StrictDelimiter := true;
-  AssignFile(f, 'UnicodeData.txt');
-  reset(f);
-  i := 0;
-  repeat
-    readln(f, S);
-    sl.DelimitedText := S;
-    glyph_names_arr[i].Code := StrToInt('$' + sl[0]);
-    glyph_names_arr[i].Name := sl[1];
-    glyph_names_arr[i].U_plus := sl[0];
-    inc(i);
-  until EOF(f);
-  sl.Free;
-end;
-
 procedure TForm1.FR_Render(symb: PSymb);
 var
   P_x, P_y, i, j, k: integer;
@@ -818,10 +750,11 @@ begin
     FreeMemory(symb.Buffer);
 
   glyph_index := font_data.face.GetCharIndex(symb.Code);
-  font_data.face.LoadGlyph(glyph_index, [ftlfMonochrome, ftlfTargetMono, ftlfRender]);
+  font_data.face.LoadGlyph(glyph_index, [ftlfMonochrome, ftlfTargetMono,
+    ftlfRender]);
   symb.BearingX := font_data.face.glyph.Metrics.HorzBearingX div 64;
   symb.BearingY := font_data.face.glyph.Metrics.HorzBearingY div 64;
-  symb.Heigth := font_data.face.Size.Metrics.Height div 64;
+  font_data.Heigth := font_data.face.Size.Metrics.Height div 64;
   symb.Width := font_data.face.glyph.Bitmap.Width; // это правильнее
   symb.Ascender := font_data.face.Size.Metrics.Ascender div 64;
   symb.Descender := font_data.face.Size.Metrics.Descender div 64;
@@ -836,14 +769,16 @@ begin
   symb.BufferSize := font_data.bpc * symb.Width;
   symb.Buffer := AllocMem(symb.BufferSize); // не надо очищать
   k := 0;
-  for i := 0 to (font_data.face.glyph.Bitmap.Rows * font_data.face.glyph.Bitmap.Pitch) - 1 do
+  for i := 0 to (font_data.face.glyph.Bitmap.Rows *
+    font_data.face.glyph.Bitmap.Pitch) - 1 do
   begin
     for j := 0 to 7 do
       if font_data.face.glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
       begin
         P_x := k * 8 + j; // это правильнее
-        P_y := (font_data.face.Size.Metrics.Ascender - font_data.face.glyph.Metrics.HorzBearingY)
-          div 64 + i div font_data.face.glyph.Bitmap.Pitch;
+        P_y := (font_data.face.Size.Metrics.Ascender -
+          font_data.face.glyph.Metrics.HorzBearingY) div 64 +
+          i div font_data.face.glyph.Bitmap.Pitch;
         byte_idx := (P_y div 8) + font_data.bpc * P_x;
         // symb.Buffer[byte_idx] := symb.Buffer[byte_idx] + 1 shl (7 - P_y mod 8); так было изначально, символы перевернуты получаются
         symb.Buffer[byte_idx] := symb.Buffer[byte_idx] +
@@ -869,24 +804,28 @@ begin
     FreeMemory(font_data.pFont);
     font_data.font_mem_size := 0;
   end;
-  font_data.font_mem_size := GetFontData(dc, 0, 0, nil, font_data.font_mem_size);
+  font_data.font_mem_size := GetFontData(dc, 0, 0, nil,
+    font_data.font_mem_size);
   font_data.pFont := GetMemory(font_data.font_mem_size);
-  if GetFontData(dc, 0, 0, font_data.pFont, font_data.font_mem_size) = GDI_ERROR then
+  if GetFontData(dc, 0, 0, font_data.pFont, font_data.font_mem_size) = GDI_ERROR
+  then
     raise Exception.Create('Failed to get font data.');
   font_data.face := TFTFace.Create(font_data.pFont, font_data.font_mem_size, 0);
   font_data.face.SetPixelSize(0, FontDialog1.Font.Size);
   CancelDC(dc);
   DeleteDC(dc);
-  font_data.extended_font_name := string(font_data.face.FamilyName) + ' ' + string(font_data.face.StyleName) +
-    ' ' + FR_FontStyleToString(FontDialog1.Font.style) +
-    string(IntToStr(FontDialog1.Font.Size));
+  font_data.extended_font_name := string(font_data.face.FamilyName) + ' ' +
+    string(font_data.face.StyleName) + ' ' + FR_FontStyleToString
+    (FontDialog1.Font.style) + string(IntToStr(FontDialog1.Font.Size));
   StatusBar1.Panels[0].Text := font_data.extended_font_name;
-  font_data.bpc := (font_data.face.Size.Metrics.Height div 64) div 8;
-  if font_data.bpc * 8 < font_data.face.Size.Metrics.Height div 64 then
+  font_data.Heigth := font_data.face.Size.Metrics.Height div 64;
+  font_data.bpc := font_data.Heigth div 8;
+  if font_data.bpc * 8 < font_data.Heigth then
     inc(font_data.bpc);
   font_data.max_w := 0;
   font_data.min_w := font_data.face.Size.Metrics.MaxAdvance div 64;
-  StatusBar1.Panels[1].Text := IntToStr(font_data.face.Size.Metrics.Height div 64) + 'x' +
+  StatusBar1.Panels[1].Text :=
+    IntToStr(font_data.face.Size.Metrics.Height div 64) + 'x' +
     IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w)
   // else
   // StatusBar1.Panels[1].Text :=
@@ -901,7 +840,7 @@ var
   origin: TPoint;
   bbox: TRect;
   R: TRect;
-  UD: TUnicodeData;
+  UD: TUniData;
 begin
   // очистка канвы
   Image2.Picture.Bitmap.Width := Image2.Width;
@@ -916,7 +855,7 @@ begin
     exit;
   end;
   // вычисление размера сетки
-  grid_size := round(Image2.Height * 7 / 10 / symbol.Heigth);
+  grid_size := round(Image2.Height * 7 / 10 / font_data.Heigth);
   i := round(Image2.Width * 5 / 10 / symbol.Width);
   if i < grid_size then
     grid_size := i;
@@ -930,7 +869,7 @@ begin
   // заливка коробки белым
   Image2.Canvas.Brush.Color := clWhite;
   for X := symbol.BearingX to symbol.Width - 1 + symbol.BearingX do
-    for Y := 0 to symbol.Heigth - 1 do
+    for Y := 0 to font_data.Heigth - 1 do
     begin
       R := Rect(bbox.Left + X * grid_size, bbox.Top + Y * grid_size,
         bbox.Left + X * grid_size + grid_size, bbox.Top + Y * grid_size +
@@ -1003,7 +942,7 @@ begin
     MoveTo(bbox.Right, 0);
     LineTo(bbox.Right, Image2.Height); // Advance
   end;
-  UD := FR_SearchUnicodeName(symbol.Code);
+  UD := UniNamer.Data[symbol.Code];
   StatusBar1.Panels[2].Text := 'U+' + UD.U_plus + ' - ' + UD.Name;
 
 end;
@@ -1092,8 +1031,7 @@ end;
 procedure TForm1.Saveas1Click(Sender: TObject);
 
 begin
-  SaveDialog1.FileName := font_data.
-  extended_font_name;
+  SaveDialog1.FileName := font_data.extended_font_name;
   if SaveDialog1.Execute then
     if not FileExists(SaveDialog1.FileName) then
       FR_Save(SaveDialog1.FileName)
