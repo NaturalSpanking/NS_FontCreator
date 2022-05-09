@@ -16,7 +16,8 @@ type
   TUnicodeNamer = class
   private
     arr_size: integer;
-    glyph_names_arr: array [0 .. 34627] of TUniData;
+    // [0 .. 34627]
+    glyph_names_arr: array of TUniData;
     function search_data(Code: integer): TUniData;
   public
     constructor Create;
@@ -51,7 +52,7 @@ begin
     readln(f);
     inc(arr_size);
   end;
-  // SetLength(glyph_names_arr, arr_size + 1);
+  SetLength(glyph_names_arr, arr_size + 1);
   CloseFile(f);
   reset(f);
   i := 0;
