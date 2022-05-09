@@ -111,18 +111,14 @@ type
     procedure Addrowatbottom1Click(Sender: TObject);
   private
     UniNamer: TUnicodeNamer;
-    font_data: T_FR_Font;
     procedure FR_Save(FName: string);
     procedure FR_Load(FName: string);
-    procedure FR_SetFont;
     procedure FR_ShowSymbol(symbol: PSymb);
-    procedure FR_Render(symb: PSymb);
     procedure FR_FreeSymb(symb: PSymb);
     procedure FR_GenerateNew;
     function gen_table(var f: TextFile; table: TTreeNode): string;
     function gen_symb(var f: TextFile; psy: PSymb): string;
     function mv_spaces(S: string): string;
-    function FR_FontStyleToString(style: TFontStyles): string;
 
   public
     { Public declarations }
@@ -219,7 +215,7 @@ var
   p: PByte;
 begin
   isIncBpc := false;
-  inc(font_data.Heigth);
+  inc(font_data.Height);
   for i := 0 to TreeView1.Items.Count - 1 do
   begin
     if (TreeView1.Items[i].Text[1] <> '''') or (TreeView1.Items[i].Data = nil)
@@ -228,7 +224,7 @@ begin
     psy := TreeView1.Items[i].Data;
     if psy.Buffer = nil then
       continue;
-    if (font_data.Heigth div 8) > font_data.bpc then
+    if (font_data.Height div 8) > font_data.bpc then
     begin
       isIncBpc := true;
       p := AllocMem(psy.BufferSize + psy.Width);
@@ -260,7 +256,13 @@ procedure TForm1.FR_SelectFont(Sender: TObject);
 begin
   if FontDialog1.Execute(Application.Handle) then
   begin
-    FR_SetFont;
+    FR_SetFont(FontDialog1.Font);
+    StatusBar1.Panels[0].Text := font_data.extended_font_name;
+    StatusBar1.Panels[1].Text := IntToStr(font_data.Height div 64) + 'x' +
+      IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
+    // else
+    // StatusBar1.Panels[1].Text :=
+    // IntToStr(face.Size.Metrics.Height div 64) + 'x??';
     if Autorepaint1.Checked then
       FR_FullRepaint(Sender);
   end;
@@ -340,7 +342,7 @@ begin
 
   psy := TreeView1.Selected.Data;
   Y := 0;
-  for i := 1 to 8 - (font_data.bpc * 8 - font_data.Heigth) do
+  for i := 1 to 8 - (font_data.bpc * 8 - font_data.Height) do
   begin
     Y := Y shl 1;
     inc(Y);
@@ -477,9 +479,9 @@ begin
     + ' = {');
   write(f, #9);
   if font_data.font_mem_size > 0 then
-    writeln(f, IntToStr(Form1.font_data.face.Size.Metrics.Height div 64) + ', '
-      + IntToStr(Form1.font_data.face.Size.Metrics.MaxAdvance div 64) + ', ' +
-      IntToStr(Form1.font_data.bpc) + ',');
+    writeln(f, IntToStr(font_data.face.Size.Metrics.Height div 64) + ', ' +
+      IntToStr(font_data.face.Size.Metrics.MaxAdvance div 64) + ', ' +
+      IntToStr(font_data.bpc) + ',');
 
   writeln(f, #9, '{' + S + '}');
   writeln(f, '};');
@@ -532,7 +534,11 @@ begin
     exit;
   end;
   FontDialog1.Font.Size := FontDialog1.Font.Size - 1;
-  FR_SetFont;
+  FR_SetFont(FontDialog1.Font);
+  StatusBar1.Panels[0].Text := font_data.extended_font_name;
+  StatusBar1.Panels[1].Text :=
+    IntToStr(font_data.face.Size.Metrics.Height div 64) + 'x' +
+    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
   if Autorepaint1.Checked then
     FR_FullRepaint(Sender);
 end;
@@ -546,7 +552,11 @@ begin
     exit;
   end;
   FontDialog1.Font.Size := FontDialog1.Font.Size + 1;
-  FR_SetFont;
+  FR_SetFont(FontDialog1.Font);
+  StatusBar1.Panels[0].Text := font_data.extended_font_name;
+  StatusBar1.Panels[1].Text :=
+    IntToStr(font_data.face.Size.Metrics.Height div 64) + 'x' +
+    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
   if Autorepaint1.Checked then
     FR_FullRepaint(Sender);
 end;
@@ -554,15 +564,6 @@ end;
 procedure TForm1.FR_Delete(Sender: TObject);
 begin
   TreeView1.Selected.Delete;
-end;
-
-function TForm1.FR_FontStyleToString(style: TFontStyles): string;
-begin
-  Result := '';
-  if fsStrikeOut in style then
-    Result := Result + 'StrikeOut ';
-  if fsUnderline in style then
-    Result := Result + 'Underline ';
 end;
 
 procedure TForm1.FR_FreeSymb(symb: PSymb);
@@ -658,7 +659,7 @@ begin
   begin
     b := 1; // 1 - есть данные о шрифте
     BlockWrite(f, b, 1);
-    BlockWrite(f, font_data.Heigth, sizeof(integer)); // запись данных шрифта
+    BlockWrite(f, font_data.Height, sizeof(integer)); // запись данных шрифта
     BlockWrite(f, font_data.bpc, sizeof(integer)); // запись данных шрифта
     BlockWrite(f, font_data.min_w, sizeof(integer)); // запись данных шрифта
     BlockWrite(f, font_data.max_w, sizeof(integer)); // запись данных шрифта
@@ -726,7 +727,7 @@ begin
   BlockRead(f, b, 1); // чтения наличия данных о шрифте
   if b = 1 then
   begin
-    BlockRead(f, font_data.Heigth, sizeof(integer)); // загрузка данных шрифта
+    BlockRead(f, font_data.Height, sizeof(integer)); // загрузка данных шрифта
     BlockRead(f, font_data.bpc, sizeof(integer));
     BlockRead(f, font_data.min_w, sizeof(integer));
     BlockRead(f, font_data.max_w, sizeof(integer));
@@ -745,104 +746,12 @@ begin
     SetLength(S, i);
     BlockRead(f, S[1], (i) * sizeof(char));
     FontDialog1.Font.Name := S;
-    FR_SetFont;
+    FR_SetFont(FontDialog1.Font);
   end;
 
   // TreeView1.Select(TreeView1.Items[0]);
   CloseFile(f);
   Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
-end;
-
-procedure TForm1.FR_Render(symb: PSymb);
-var
-  P_x, P_y, i, j, k: integer;
-  byte_idx: integer;
-  glyph_index: integer;
-begin
-  if symb.Buffer <> nil then
-    FreeMemory(symb.Buffer);
-
-  glyph_index := font_data.face.GetCharIndex(symb.Code);
-  font_data.face.LoadGlyph(glyph_index, [ftlfMonochrome, ftlfTargetMono,
-    ftlfRender]);
-  symb.BearingX := font_data.face.glyph.Metrics.HorzBearingX div 64;
-  symb.BearingY := font_data.face.glyph.Metrics.HorzBearingY div 64;
-  font_data.Heigth := font_data.face.Size.Metrics.Height div 64;
-  symb.Width := font_data.face.glyph.Bitmap.Width; // это правильнее
-  symb.Ascender := font_data.face.Size.Metrics.Ascender div 64;
-  symb.Descender := font_data.face.Size.Metrics.Descender div 64;
-  symb.Advance := font_data.face.glyph.Metrics.HorzAdvance div 64;
-  if symb.Code = 32 then
-    symb.Width := symb.Advance;
-
-  if symb.Width > font_data.max_w then
-    font_data.max_w := symb.Width;
-  if symb.Width < font_data.min_w then
-    font_data.min_w := symb.Width;
-  symb.BufferSize := font_data.bpc * symb.Width;
-  symb.Buffer := AllocMem(symb.BufferSize); // не надо очищать
-  k := 0;
-  for i := 0 to (font_data.face.glyph.Bitmap.Rows *
-    font_data.face.glyph.Bitmap.Pitch) - 1 do
-  begin
-    for j := 0 to 7 do
-      if font_data.face.glyph.Bitmap.Buffer[i] shl j and 128 > 0 then
-      begin
-        P_x := k * 8 + j; // это правильнее
-        P_y := (font_data.face.Size.Metrics.Ascender -
-          font_data.face.glyph.Metrics.HorzBearingY) div 64 +
-          i div font_data.face.glyph.Bitmap.Pitch;
-        byte_idx := (P_y div 8) + font_data.bpc * P_x;
-        // symb.Buffer[byte_idx] := symb.Buffer[byte_idx] + 1 shl (7 - P_y mod 8); так было изначально, символы перевернуты получаются
-        symb.Buffer[byte_idx] := symb.Buffer[byte_idx] +
-          128 shr (7 - P_y mod 8);
-        // так есть совместимость с GLCD font creator
-      end;
-    inc(k);
-    if k = font_data.face.glyph.Bitmap.Pitch then
-      k := 0;
-  end;
-  font_data.face.glyph.Bitmap.Done;
-end;
-
-procedure TForm1.FR_SetFont;
-var
-  dc: HDC;
-begin
-  dc := CreateDC('DISPLAY', nil, nil, nil);
-  SelectObject(dc, FontDialog1.Font.Handle);
-  if font_data.font_mem_size > 0 then
-  begin
-    font_data.face.Destroy;
-    FreeMemory(font_data.pFont);
-    font_data.font_mem_size := 0;
-  end;
-  font_data.font_mem_size := GetFontData(dc, 0, 0, nil,
-    font_data.font_mem_size);
-  font_data.pFont := GetMemory(font_data.font_mem_size);
-  if GetFontData(dc, 0, 0, font_data.pFont, font_data.font_mem_size) = GDI_ERROR
-  then
-    raise Exception.Create('Failed to get font data.');
-  font_data.face := TFTFace.Create(font_data.pFont, font_data.font_mem_size, 0);
-  font_data.face.SetPixelSize(0, FontDialog1.Font.Size);
-  CancelDC(dc);
-  DeleteDC(dc);
-  font_data.extended_font_name := string(font_data.face.FamilyName) + ' ' +
-    string(font_data.face.StyleName) + ' ' + FR_FontStyleToString
-    (FontDialog1.Font.style) + string(IntToStr(FontDialog1.Font.Size));
-  StatusBar1.Panels[0].Text := font_data.extended_font_name;
-  font_data.Heigth := font_data.face.Size.Metrics.Height div 64;
-  font_data.bpc := font_data.Heigth div 8;
-  if font_data.bpc * 8 < font_data.Heigth then
-    inc(font_data.bpc);
-  font_data.max_w := 0;
-  font_data.min_w := font_data.face.Size.Metrics.MaxAdvance div 64;
-  StatusBar1.Panels[1].Text :=
-    IntToStr(font_data.face.Size.Metrics.Height div 64) + 'x' +
-    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w)
-  // else
-  // StatusBar1.Panels[1].Text :=
-  // IntToStr(face.Size.Metrics.Height div 64) + 'x??';
 end;
 
 procedure TForm1.FR_ShowSymbol(symbol: PSymb);
@@ -868,7 +777,7 @@ begin
     exit;
   end;
   // вычисление размера сетки
-  grid_size := round(Image2.Height * 7 / 10 / font_data.Heigth);
+  grid_size := round(Image2.Height * 7 / 10 / font_data.Height);
   i := round(Image2.Width * 5 / 10 / symbol.Width);
   if i < grid_size then
     grid_size := i;
@@ -882,7 +791,7 @@ begin
   // заливка коробки белым
   Image2.Canvas.Brush.Color := clWhite;
   for X := symbol.BearingX to symbol.Width - 1 + symbol.BearingX do
-    for Y := 0 to font_data.Heigth - 1 do
+    for Y := 0 to font_data.Height - 1 do
     begin
       R := Rect(bbox.Left + X * grid_size, bbox.Top + Y * grid_size,
         bbox.Left + X * grid_size + grid_size, bbox.Top + Y * grid_size +
