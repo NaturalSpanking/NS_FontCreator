@@ -28,6 +28,9 @@ type
     property Data[Code: integer]: PUniData read search_data;
   end;
 
+var
+  UniNamer: TUnicodeNamer;
+
 implementation
 
 { TUnicodeNamer }
@@ -103,5 +106,13 @@ begin
   Result := @glyph_names_arr[i];
   // Result := glyph_names_arr[i].U_plus + ' - ' + glyph_names_arr[i].Name;
 end;
+
+initialization
+
+UniNamer := TUnicodeNamer.Create;
+
+finalization
+
+UniNamer.Free;
 
 end.
