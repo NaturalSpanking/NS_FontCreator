@@ -130,7 +130,7 @@ type
     procedure Moveleft1Click(Sender: TObject);
     procedure Removecolumnatleft1Click(Sender: TObject);
     procedure Removecolumnatright1Click(Sender: TObject);
-    procedure Addrowattop1Click(Sender: TObject);
+    procedure New1Click(Sender: TObject);
   private
     // curNode: TTreeNode;
     face: TFTFace;
@@ -144,10 +144,10 @@ type
     procedure FR_Save(FName: string);
     procedure FR_Load(FName: string);
     procedure FR_SetFont;
-    procedure FR_ShowSymbol(var symbol: PSymb);
+    procedure FR_ShowSymbol(symbol: PSymb);
     procedure FR_LoadUnicodeNames;
     procedure FR_Render(symb: PSymb);
-    procedure FR_FreeSymb(var symb: PSymb);
+    procedure FR_FreeSymb(symb: PSymb);
     procedure FR_GenerateNew;
     function gen_table(var f: TextFile; table: TTreeNode): string;
     function gen_symb(var f: TextFile; psy: PSymb): string;
@@ -238,19 +238,6 @@ begin
   inc(psy.Width);
   inc(psy.BufferSize, bpc);
   FR_ShowSymbol(psy);
-end;
-
-procedure TForm1.Addrowattop1Click(Sender: TObject);
-var
-  psy: PSymb;
-  p: PByte;
-begin
-  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
-    exit;
-
-  psy := TreeView1.Selected.Data;
-
-psy.Heigth
 end;
 
 procedure TForm1.Autorepaint1Click(Sender: TObject);
@@ -428,6 +415,29 @@ begin
       Result := Result + S[i];
 end;
 
+procedure TForm1.New1Click(Sender: TObject);
+begin
+  TreeView1.Items.Clear;
+  FR_ShowSymbol(nil);
+  SaveDialog1.FileName := '';
+  SaveDialog2.FileName := '';
+  OpenDialog1.FileName := '';
+  extended_font_name := '';
+  Form1.Caption := 'NS Font Creator';
+  if font_mem_size > 0 then
+  begin
+    face.Destroy;
+    FreeMemory(pFont);
+    font_mem_size := 0;
+  end;
+  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := '';
+  FontDialog1.Font.Name := 'Times New Roman';
+  FontDialog1.Font.Size := 14;
+  FontDialog1.Font.style := [];
+end;
+
 procedure TForm1.FR_GenerateNew;
 var
   i: integer;
@@ -541,7 +551,7 @@ begin
     Result := Result + 'Underline ';
 end;
 
-procedure TForm1.FR_FreeSymb(var symb: PSymb);
+procedure TForm1.FR_FreeSymb(symb: PSymb);
 begin
   if symb <> nil then
   begin
@@ -560,6 +570,7 @@ begin
     + '       ';
   font_mem_size := 0;
   FR_LoadUnicodeNames;
+  FR_ShowSymbol(nil);
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -812,6 +823,7 @@ begin
   begin
     face.Destroy;
     FreeMemory(pFont);
+    font_mem_size := 0;
   end;
   font_mem_size := GetFontData(dc, 0, 0, nil, font_mem_size);
   pFont := GetMemory(font_mem_size);
@@ -837,7 +849,7 @@ begin
   // IntToStr(face.Size.Metrics.Height div 64) + 'x??';
 end;
 
-procedure TForm1.FR_ShowSymbol(var symbol: PSymb);
+procedure TForm1.FR_ShowSymbol(symbol: PSymb);
 var
   i, j: integer;
   X, Y: integer;
