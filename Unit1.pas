@@ -172,39 +172,19 @@ begin
 end;
 
 procedure TForm1.Addcolumnatleft1Click(Sender: TObject);
-var
-  psy: PSymb;
-  p: PByte;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-
-  psy := TreeView1.Selected.Data;
-  p := AllocMem(psy.BufferSize + font_data.bpc);
-  CopyMemory(p + font_data.bpc, psy.Buffer, psy.BufferSize);
-  FreeMemory(psy.Buffer);
-  psy.Buffer := p;
-  inc(psy.Width);
-  inc(psy.BufferSize, font_data.bpc);
-  FR_ShowSymbol(psy);
+  FR_AddColAtLeft(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data);
 end;
 
 procedure TForm1.Addcolumnatright1Click(Sender: TObject);
-var
-  psy: PSymb;
-  p: PByte;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-
-  psy := TreeView1.Selected.Data;
-  p := AllocMem(psy.BufferSize + font_data.bpc);
-  CopyMemory(p, psy.Buffer, psy.BufferSize);
-  FreeMemory(psy.Buffer);
-  psy.Buffer := p;
-  inc(psy.Width);
-  inc(psy.BufferSize, font_data.bpc);
-  FR_ShowSymbol(psy);
+  FR_AddColAtRight(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data);
 end;
 
 procedure TForm1.Addrowatbottom1Click(Sender: TObject);
@@ -880,39 +860,19 @@ begin
 end;
 
 procedure TForm1.Removecolumnatleft1Click(Sender: TObject);
-var
-  psy: PSymb;
-  p: PByte;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-
-  psy := TreeView1.Selected.Data;
-  p := AllocMem(psy.BufferSize - font_data.bpc);
-  CopyMemory(p, psy.Buffer + font_data.bpc, psy.BufferSize - font_data.bpc);
-  FreeMemory(psy.Buffer);
-  psy.Buffer := p;
-  dec(psy.Width);
-  dec(psy.BufferSize, font_data.bpc);
-  FR_ShowSymbol(psy);
+  FR_DelColAtLeft(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data);
 end;
 
 procedure TForm1.Removecolumnatright1Click(Sender: TObject);
-var
-  psy: PSymb;
-  p: PByte;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-
-  psy := TreeView1.Selected.Data;
-  p := AllocMem(psy.BufferSize - font_data.bpc);
-  CopyMemory(p, psy.Buffer, psy.BufferSize - font_data.bpc);
-  FreeMemory(psy.Buffer);
-  psy.Buffer := p;
-  dec(psy.Width);
-  dec(psy.BufferSize, font_data.bpc);
-  FR_ShowSymbol(psy);
+  FR_DelColAtRight(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data);
 end;
 
 procedure TForm1.FR_RenameTable(Sender: TObject);

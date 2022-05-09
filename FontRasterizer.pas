@@ -36,8 +36,61 @@ var
 
 procedure FR_SetFont(const Font: TFont);
 procedure FR_Render(symb: PSymb);
+procedure FR_AddColAtLeft(psy: PSymb);
+procedure FR_AddColAtRight(psy: PSymb);
+procedure FR_DelColAtLeft(psy: PSymb);
+procedure FR_DelColAtRight(psy: PSymb);
 
 implementation
+
+procedure FR_DelColAtLeft(psy: PSymb);
+var
+  p: PByte;
+begin
+
+  p := AllocMem(psy.BufferSize - font_data.bpc);
+  CopyMemory(p, psy.Buffer + font_data.bpc, psy.BufferSize - font_data.bpc);
+  FreeMemory(psy.Buffer);
+  psy.Buffer := p;
+  dec(psy.Width);
+  dec(psy.BufferSize, font_data.bpc);
+end;
+
+procedure FR_DelColAtRight(psy: PSymb);
+var
+  p: PByte;
+begin
+  p := AllocMem(psy.BufferSize - font_data.bpc);
+  CopyMemory(p, psy.Buffer, psy.BufferSize - font_data.bpc);
+  FreeMemory(psy.Buffer);
+  psy.Buffer := p;
+  dec(psy.Width);
+  dec(psy.BufferSize, font_data.bpc);
+end;
+
+procedure FR_AddColAtRight(psy: PSymb);
+var
+  p: PByte;
+begin
+  p := AllocMem(psy.BufferSize + font_data.bpc);
+  CopyMemory(p, psy.Buffer, psy.BufferSize);
+  FreeMemory(psy.Buffer);
+  psy.Buffer := p;
+  inc(psy.Width);
+  inc(psy.BufferSize, font_data.bpc);
+end;
+
+procedure FR_AddColAtLeft(psy: PSymb);
+var
+  p: PByte;
+begin
+  p := AllocMem(psy.BufferSize + font_data.bpc);
+  CopyMemory(p + font_data.bpc, psy.Buffer, psy.BufferSize);
+  FreeMemory(psy.Buffer);
+  psy.Buffer := p;
+  inc(psy.Width);
+  inc(psy.BufferSize, font_data.bpc);
+end;
 
 function FR_FontStyleToString(style: TFontStyles): string;
 begin
