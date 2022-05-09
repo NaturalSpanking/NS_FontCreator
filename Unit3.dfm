@@ -43,7 +43,6 @@ object Form3: TForm3
     Width = 26
     Height = 29
     TabOrder = 1
-    Text = ' '
   end
   object Button1: TButton
     Left = 333

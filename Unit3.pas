@@ -37,6 +37,9 @@ implementation
 
 procedure TForm3.Button1Click(Sender: TObject);
 begin
+  if length(Edit2.Text) = 0 then
+    Edit2.Text := ' ';
+
   res := true;
   table_name := Edit1.Text;
   first_char := ord(Edit2.Text[1]);
@@ -51,7 +54,7 @@ end;
 
 function TForm3.Execute: boolean;
 begin
-  Edit1.Text:=table_name;
+  Edit1.Text := table_name;
   Edit2.Text := chr(first_char);
   Form3.ShowModal;
   Result := res;
