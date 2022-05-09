@@ -114,7 +114,6 @@ type
     procedure FR_Save(FName: string);
     procedure FR_Load(FName: string);
     procedure FR_ShowSymbol(symbol: PSymb);
-    procedure FR_FreeSymb(symb: PSymb);
     procedure FR_GenerateNew;
     function gen_table(var f: TextFile; table: TTreeNode): string;
     function gen_symb(var f: TextFile; psy: PSymb): string;
@@ -151,7 +150,7 @@ var
   psy: PSymb;
   i: integer;
 begin
-  if font_data.font_mem_size = 0 then
+  if font_data = nil then
   begin
     // MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
     FR_SelectFont(Sender);
@@ -166,8 +165,7 @@ begin
       then
         FR_ShowSymbol(psy);
     end;
-  StatusBar1.Panels[1].Text :=
-    IntToStr(font_data.face.Size.Metrics.Height div 64) + 'x' +
+  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
     IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
 end;
 
@@ -363,12 +361,9 @@ begin
   OpenDialog1.FileName := '';
   font_data.extended_font_name := '';
   Form1.Caption := 'NS Font Creator';
-  if font_data.font_mem_size > 0 then
-  begin
-    font_data.face.Destroy;
-    FreeMemory(font_data.pFont);
-    font_data.font_mem_size := 0;
-  end;
+
+  FR_FreeFont;
+
   StatusBar1.Panels[0].Text := '';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := '';
@@ -402,10 +397,9 @@ begin
   writeln(f, 'static const TFont _' + mv_spaces(font_data.extended_font_name)
     + ' = {');
   write(f, #9);
-  if font_data.font_mem_size > 0 then
-    writeln(f, IntToStr(font_data.face.Size.Metrics.Height div 64) + ', ' +
-      IntToStr(font_data.face.Size.Metrics.MaxAdvance div 64) + ', ' +
-      IntToStr(font_data.bpc) + ',');
+  if font_data <> nil then
+    writeln(f, IntToStr(font_data.Height) + ', ' +
+      IntToStr(font_data.MaxAdvance) + ', ' + IntToStr(font_data.bpc) + ',');
 
   writeln(f, #9, '{' + S + '}');
   writeln(f, '};');
@@ -435,10 +429,7 @@ begin
     for i := 0 to Form2.CharList.Count - 1 do
     begin
       p := Form2.CharList[i];
-      psy := new(PSymb);
-      psy.Code := p^;
-      psy.BufferSize := 0;
-      psy.Buffer := nil;
+      psy := FR_CreateSymb(p^);
       if TreeView1.Selected.Parent = nil then
         TreeView1.Items.AddChildObject(TreeView1.Selected,
           '''' + chr(psy.Code) + '''' + ' - ' + IntToStr(psy.Code), psy)
@@ -451,7 +442,7 @@ end;
 
 procedure TForm1.FR_DecFontSize(Sender: TObject);
 begin
-  if font_data.font_mem_size = 0 then
+  if font_data = nil then
   begin
     // MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
     FR_SelectFont(Sender);
@@ -460,8 +451,7 @@ begin
   FontDialog1.Font.Size := FontDialog1.Font.Size - 1;
   FR_SetFont(FontDialog1.Font);
   StatusBar1.Panels[0].Text := font_data.extended_font_name;
-  StatusBar1.Panels[1].Text :=
-    IntToStr(font_data.face.Size.Metrics.Height div 64) + 'x' +
+  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
     IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
   if Autorepaint1.Checked then
     FR_FullRepaint(Sender);
@@ -469,7 +459,7 @@ end;
 
 procedure TForm1.FR_IncFontSize(Sender: TObject);
 begin
-  if font_data.font_mem_size = 0 then
+  if font_data = nil then
   begin
     // MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
     FR_SelectFont(Sender);
@@ -478,8 +468,7 @@ begin
   FontDialog1.Font.Size := FontDialog1.Font.Size + 1;
   FR_SetFont(FontDialog1.Font);
   StatusBar1.Panels[0].Text := font_data.extended_font_name;
-  StatusBar1.Panels[1].Text :=
-    IntToStr(font_data.face.Size.Metrics.Height div 64) + 'x' +
+  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
     IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
   if Autorepaint1.Checked then
     FR_FullRepaint(Sender);
@@ -490,36 +479,21 @@ begin
   TreeView1.Selected.Delete;
 end;
 
-procedure TForm1.FR_FreeSymb(symb: PSymb);
-begin
-  if symb <> nil then
-  begin
-    if symb.Buffer <> nil then
-      FreeMemory(symb.Buffer);
-    Dispose(symb);
-  end;
-  symb := nil;
-end;
-
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   StatusBar1.Panels[3].Text :=
     ('FreeType''s version is ' + IntToStr(TFTManager.MajorVersion) + '.' +
     IntToStr(TFTManager.MinorVersion) + '.' + IntToStr(TFTManager.PatchVersion))
     + '       ';
-  font_data.font_mem_size := 0;
+
+  FR_CreateFont;
   UniNamer := TUnicodeNamer.Create;
   FR_ShowSymbol(nil);
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  if font_data.font_mem_size > 0 then
-  begin
-    font_data.face.glyph.Bitmap.Done;
-    font_data.face.Destroy;
-    FreeMemory(font_data.pFont);
-  end;
+  FR_FreeFont;
   UniNamer.Free;
 end;
 
@@ -574,7 +548,7 @@ begin
     end;
   end;
 
-  if font_data.font_mem_size = 0 then // сохранение параметров шрифта
+  if font_data = nil then // сохранение параметров шрифта
   begin
     b := 0; // 0 - нет данных о шрифте
     BlockWrite(f, b, 1);
@@ -629,7 +603,7 @@ begin
     BlockRead(f, b, 1); // чтение признака
     if b = 1 then // листочек
     begin
-      psy := new(PSymb);
+      psy := FR_CreateSymb(0);
       BlockRead(f, psy^, sizeof(TSymb));
       if psy.BufferSize > 0 then
       begin
@@ -655,8 +629,6 @@ begin
     BlockRead(f, font_data.bpc, sizeof(integer));
     BlockRead(f, font_data.min_w, sizeof(integer));
     BlockRead(f, font_data.max_w, sizeof(integer));
-    font_data.font_mem_size := 0;
-    font_data.pFont := nil;
 
     BlockRead(f, i, sizeof(integer));
     FontDialog1.Font.Charset := TFontCharset(i);
