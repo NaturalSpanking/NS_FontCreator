@@ -3,7 +3,8 @@ unit FontRasterizer;
 interface
 
 uses
-  SysUtils, Classes, uFreeType, Windows, Graphics;
+  SysUtils, Classes, Windows, Graphics, UITypes, ExtCtrls, UnicodeNames,
+  uFreeType;
 
 type
   PSymb = ^TSymb;
@@ -37,6 +38,7 @@ var
 function FR_CreateFont: P_FR_Font;
 procedure FR_SetFont(const Font: TFont);
 procedure FR_FreeFont;
+procedure FR_ShowSymbol(symbol: PSymb; var Image: TImage);
 
 procedure FR_Render(symb: PSymb);
 
@@ -53,6 +55,8 @@ procedure FR_MoveDown(psy: PSymb);
 procedure FR_MoveLeft(psy: PSymb);
 procedure FR_MoveRight(psy: PSymb);
 
+function FR_BuildSymb(psy: PSymb; var f: TextFile): string;
+
 implementation
 
 var
@@ -60,9 +64,144 @@ var
   pFont: PByte;
   font_mem_size: integer;
 
+procedure FR_ShowSymbol(symbol: PSymb; var Image: TImage);
+var
+  i, j: integer;
+  X, Y: integer;
+  grid_size: integer;
+  origin: TPoint;
+  bbox: TRect;
+  R: TRect;
+begin
+  // очистка канвы
+  Image.Picture.Bitmap.Width := Image.Width;
+  Image.Picture.Bitmap.height := Image.height;
+  Image.Canvas.Brush.Color := clGray;
+  Image.Canvas.FillRect(Rect(0, 0, Image.Width, Image.height));
+  if (symbol = nil) or (symbol.Buffer = nil) then
+  begin
+    Image.Canvas.Font.Name := 'Times New Roman';
+    Image.Canvas.Font.Size := 14;
+    SetTextAlign(Image.Canvas.Handle, TA_CENTER);
+    Image.Canvas.TextOut(Image.Width div 2, Image.height div 2, 'NO DATA');
+    exit;
+  end;
+  // вычисление размера сетки
+  grid_size := round(Image.height * 7 / 10 / font_data.height);
+  i := round(Image.Width * 5 / 10 / symbol.Width);
+  if i < grid_size then
+    grid_size := i;
+  // вычисление координат
+  origin.X := round(Image.Width / 8);
+  origin.Y := round(Image.height * 9 / 12);
+  bbox.Left := origin.X;
+  bbox.Right := origin.X + symbol.Advance * grid_size;
+  bbox.Top := origin.Y - symbol.Ascender * grid_size;
+  bbox.Bottom := origin.Y - symbol.Descender * grid_size;
+  // заливка коробки белым
+  Image.Canvas.Brush.Color := clWhite;
+  for X := symbol.BearingX to symbol.Width - 1 + symbol.BearingX do
+    for Y := 0 to font_data.height - 1 do
+    begin
+      R := Rect(bbox.Left + X * grid_size, bbox.Top + Y * grid_size,
+        bbox.Left + X * grid_size + grid_size, bbox.Top + Y * grid_size +
+        grid_size);
+      Image.Canvas.FillRect(R);
+    end;
+  // отрисовка символа
+  Image.Canvas.Brush.Color := clBlack;
+  for i := 0 to symbol.BufferSize - 1 do
+    for j := 0 to 7 do
+    begin
+      X := i div font_data.bpc + symbol.BearingX;
+      Y := 8 * (i mod font_data.bpc) + j;
+      R := Rect(bbox.Left + X * grid_size, bbox.Top + Y * grid_size,
+        bbox.Left + X * grid_size + grid_size, bbox.Top + Y * grid_size +
+        grid_size);
+      // if (symbol.Buffer[i] shl j) and 128 > 0 then
+      if (symbol.Buffer[i] shr j) and 1 > 0 then // совместимость с GLCD
+        Image.Canvas.FillRect(R);
+    end;
+  // отрисовка сетки
+  with Image.Canvas do
+  begin
+    // горизонтальные черные линии
+    pen.Color := clBlack;
+    j := origin.Y;
+    while j > 0 do // выше базовой
+    begin
+      MoveTo(0, j);
+      LineTo(Image.Width, j);
+      dec(j, grid_size);
+    end;
+    j := origin.Y;
+    while j < Image.height do // ниже базовой
+    begin
+      MoveTo(0, j);
+      LineTo(Image.Width, j);
+      inc(j, grid_size);
+    end;
+    // горизонтальные красные линии
+    pen.Color := clRed;
+    MoveTo(0, origin.Y);
+    LineTo(Image.Width, origin.Y);
+    // базовая линия горизонтальная
+    MoveTo(0, bbox.Top);
+    LineTo(Image.Width, bbox.Top); // Ascender
+    MoveTo(0, bbox.Bottom);
+    LineTo(Image.Width, bbox.Bottom); // Descender
+    // вертикальные черные линии
+    pen.Color := clBlack;
+    j := origin.X;
+    while j > 0 do // левее базовой
+    begin
+      MoveTo(j, 0);
+      LineTo(j, Image.height);
+      dec(j, grid_size);
+    end;
+    j := origin.X;
+    while j < Image.Width do // правее базовой
+    begin
+      MoveTo(j, 0);
+      LineTo(j, Image.height);
+      inc(j, grid_size);
+    end;
+    // вертикальные красные линии
+    pen.Color := clRed;
+    MoveTo(origin.X, 0);
+    LineTo(origin.X, Image.height);
+    // базовая линия вертикальная
+    MoveTo(bbox.Right, 0);
+    LineTo(bbox.Right, Image.height); // Advance
+  end;
+end;
+
+function FR_BuildSymb(psy: PSymb; var f: TextFile): string;
+var
+  UD: PUniData;
+  i: integer;
+begin
+  if psy = nil then
+    exit;
+  UD := UniNamer.Data[psy.Code];
+  writeln(f, '/* ' + 'U+' + UD.U_plus + ' - ' + UD.Name + ' */');
+  write(f, 'static const unsigned char _U_' + UD.U_plus + '[] = {');
+  Result := '_U_' + UD.U_plus;
+  if psy.Buffer = nil then
+  begin
+    writeln(f, '/* NO DATA */};');
+    exit;
+  end;
+  write(f, '0x', IntToHex(byte(psy.Width)), ', ');
+  for i := 0 to psy.BufferSize - 1 do
+    write(f, '0x', IntToHex(psy.Buffer[i]), ', ');
+  writeln(f, '};');
+end;
+
 function FR_CreateFont: P_FR_Font;
 begin
   new(font_data);
+  Result := font_data;
 end;
 
 procedure FR_FreeFont;
@@ -97,7 +236,6 @@ begin
       FreeMemory(symb.Buffer);
     Dispose(symb);
   end;
-  symb := nil;
 end;
 
 procedure FR_MoveLeft(psy: PSymb);
@@ -174,6 +312,7 @@ begin
   psy.Buffer := p;
   dec(psy.Width);
   dec(psy.BufferSize, font_data.bpc);
+  inc(psy.BearingX);
 end;
 
 procedure FR_DelColAtRight(psy: PSymb);
@@ -210,6 +349,7 @@ begin
   psy.Buffer := p;
   inc(psy.Width);
   inc(psy.BufferSize, font_data.bpc);
+  dec(psy.BearingX);
 end;
 
 function FR_FontStyleToString(style: TFontStyles): string;
@@ -281,7 +421,8 @@ begin
   symb.BufferSize := font_data.bpc * symb.Width;
   symb.Buffer := AllocMem(symb.BufferSize); // не надо очищать
   k := 0;
-  for i := 0 to (fr_face.glyph.Bitmap.Rows * fr_face.glyph.Bitmap.Pitch) - 1 do
+  for i := 0 to (abs(fr_face.glyph.Bitmap.Rows) *
+    (fr_face.glyph.Bitmap.Pitch)) - 1 do
   begin
     for j := 0 to 7 do
       if fr_face.glyph.Bitmap.Buffer[i] shl j and 128 > 0 then

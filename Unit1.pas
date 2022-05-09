@@ -110,13 +110,10 @@ type
     procedure New1Click(Sender: TObject);
     procedure Addrowatbottom1Click(Sender: TObject);
   private
-    UniNamer: TUnicodeNamer;
     procedure FR_Save(FName: string);
     procedure FR_Load(FName: string);
-    procedure FR_ShowSymbol(symbol: PSymb);
     procedure FR_GenerateNew;
     function gen_table(var f: TextFile; table: TTreeNode): string;
-    function gen_symb(var f: TextFile; psy: PSymb): string;
     function mv_spaces(S: string): string;
 
   public
@@ -163,7 +160,7 @@ begin
       FR_Render(psy);
       if (TreeView1.Selected <> nil) and (i = TreeView1.Selected.AbsoluteIndex)
       then
-        FR_ShowSymbol(psy);
+        FR_ShowSymbol(psy, Image2);
     end;
   StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
     IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
@@ -174,7 +171,7 @@ begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   FR_AddColAtLeft(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
 end;
 
 procedure TForm1.Addcolumnatright1Click(Sender: TObject);
@@ -182,7 +179,7 @@ begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   FR_AddColAtRight(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
 end;
 
 procedure TForm1.Addrowatbottom1Click(Sender: TObject);
@@ -222,7 +219,7 @@ begin
   if isIncBpc then
     inc(font_data.bpc);
   psy := TreeView1.Selected.Data;
-  FR_ShowSymbol(psy);
+  FR_ShowSymbol(psy, Image2);
 end;
 
 procedure TForm1.Autorepaint1Click(Sender: TObject);
@@ -256,28 +253,6 @@ begin
   FR_Load('saving.dat');
 end;
 
-function TForm1.gen_symb(var f: TextFile; psy: PSymb): string;
-var
-  UD: PUniData;
-  i: integer;
-begin
-  if psy = nil then
-    exit;
-  UD := UniNamer.Data[psy.Code];
-  writeln(f, '/* ' + 'U+' + UD.U_plus + ' - ' + UD.Name + ' */');
-  write(f, 'static const unsigned char _U_' + UD.U_plus + '[] = {');
-  Result := '_U_' + UD.U_plus;
-  if psy.Buffer = nil then
-  begin
-    writeln(f, '/* NO DATA */};');
-    exit;
-  end;
-  write(f, '0x', IntToHex(byte(psy.Width)), ', ');
-  for i := 0 to psy.BufferSize - 1 do
-    write(f, '0x', IntToHex(psy.Buffer[i]), ', ');
-  writeln(f, '};');
-end;
-
 function TForm1.gen_table(var f: TextFile; table: TTreeNode): string;
 var
   tmp: TTreeNode;
@@ -288,7 +263,7 @@ begin
   tmp := table.getFirstChild;
   while tmp <> nil do
   begin
-    S := S + gen_symb(f, tmp.Data) + ', ';
+    S := S + FR_BuildSymb(tmp.Data, f) + ', ';
     tmp := table.GetNextChild(tmp);
   end;
   writeln(f);
@@ -313,7 +288,7 @@ begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   FR_MoveDown(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
 end;
 
 procedure TForm1.Moveleft1Click(Sender: TObject);
@@ -321,7 +296,7 @@ begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   FR_MoveLeft(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
 end;
 
 procedure TForm1.Moveright1Click(Sender: TObject);
@@ -329,7 +304,7 @@ begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   FR_MoveRight(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
 end;
 
 procedure TForm1.Moveup1Click(Sender: TObject);
@@ -337,7 +312,7 @@ begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   FR_MoveUp(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
 end;
 
 function TForm1.mv_spaces(S: string): string;
@@ -355,7 +330,7 @@ end;
 procedure TForm1.New1Click(Sender: TObject);
 begin
   TreeView1.Items.Clear;
-  FR_ShowSymbol(nil);
+  FR_ShowSymbol(nil, Image2);
   SaveDialog1.FileName := '';
   SaveDialog2.FileName := '';
   OpenDialog1.FileName := '';
@@ -485,16 +460,13 @@ begin
     ('FreeType''s version is ' + IntToStr(TFTManager.MajorVersion) + '.' +
     IntToStr(TFTManager.MinorVersion) + '.' + IntToStr(TFTManager.PatchVersion))
     + '       ';
-
   FR_CreateFont;
-  UniNamer := TUnicodeNamer.Create;
-  FR_ShowSymbol(nil);
+  FR_ShowSymbol(nil, Image2);
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
   FR_FreeFont;
-  UniNamer.Free;
 end;
 
 procedure TForm1.FormResize(Sender: TObject);
@@ -506,7 +478,7 @@ begin
   if TreeView1.Selected.Parent <> nil then
   begin
     psy := TreeView1.Selected.Data;
-    FR_ShowSymbol(psy);
+    FR_ShowSymbol(psy, Image2);
   end;
 
 end;
@@ -647,123 +619,6 @@ begin
 
   // TreeView1.Select(TreeView1.Items[0]);
   CloseFile(f);
-  Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
-end;
-
-procedure TForm1.FR_ShowSymbol(symbol: PSymb);
-var
-  i, j: integer;
-  X, Y: integer;
-  grid_size: integer;
-  origin: TPoint;
-  bbox: TRect;
-  R: TRect;
-  UD: PUniData;
-begin
-  // очистка канвы
-  Image2.Picture.Bitmap.Width := Image2.Width;
-  Image2.Picture.Bitmap.Height := Image2.Height;
-  Image2.Canvas.Brush.Color := clGray;
-  Image2.Canvas.FillRect(Rect(0, 0, Image2.Width, Image2.Height));
-  if (symbol = nil) or (symbol.Buffer = nil) then
-  begin
-    Image2.Canvas.Font := Form1.Font;
-    SetTextAlign(Image2.Canvas.Handle, TA_CENTER);
-    Image2.Canvas.TextOut(Image2.Width div 2, Image2.Height div 2, 'NO DATA');
-    exit;
-  end;
-  // вычисление размера сетки
-  grid_size := round(Image2.Height * 7 / 10 / font_data.Height);
-  i := round(Image2.Width * 5 / 10 / symbol.Width);
-  if i < grid_size then
-    grid_size := i;
-  // вычисление координат
-  origin.X := round(Image2.Width / 8);
-  origin.Y := round(Image2.Height * 9 / 12);
-  bbox.Left := origin.X;
-  bbox.Right := origin.X + symbol.Advance * grid_size;
-  bbox.Top := origin.Y - symbol.Ascender * grid_size;
-  bbox.Bottom := origin.Y - symbol.Descender * grid_size;
-  // заливка коробки белым
-  Image2.Canvas.Brush.Color := clWhite;
-  for X := symbol.BearingX to symbol.Width - 1 + symbol.BearingX do
-    for Y := 0 to font_data.Height - 1 do
-    begin
-      R := Rect(bbox.Left + X * grid_size, bbox.Top + Y * grid_size,
-        bbox.Left + X * grid_size + grid_size, bbox.Top + Y * grid_size +
-        grid_size);
-      Image2.Canvas.FillRect(R);
-    end;
-  // отрисовка символа
-  Image2.Canvas.Brush.Color := clBlack;
-  for i := 0 to symbol.BufferSize - 1 do
-    for j := 0 to 7 do
-    begin
-      X := i div font_data.bpc + symbol.BearingX;
-      Y := 8 * (i mod font_data.bpc) + j;
-      R := Rect(bbox.Left + X * grid_size, bbox.Top + Y * grid_size,
-        bbox.Left + X * grid_size + grid_size, bbox.Top + Y * grid_size +
-        grid_size);
-      // if (symbol.Buffer[i] shl j) and 128 > 0 then
-      if (symbol.Buffer[i] shr j) and 1 > 0 then // совместимость с GLCD
-        Image2.Canvas.FillRect(R);
-    end;
-  // отрисовка сетки
-  with Image2.Canvas do
-  begin
-    // горизонтальные черные линии
-    pen.Color := clBlack;
-    j := origin.Y;
-    while j > 0 do // выше базовой
-    begin
-      MoveTo(0, j);
-      LineTo(Image2.Width, j);
-      dec(j, grid_size);
-    end;
-    j := origin.Y;
-    while j < Image2.Height do // ниже базовой
-    begin
-      MoveTo(0, j);
-      LineTo(Image2.Width, j);
-      inc(j, grid_size);
-    end;
-    // горизонтальные красные линии
-    pen.Color := clRed;
-    MoveTo(0, origin.Y);
-    LineTo(Image2.Width, origin.Y);
-    // базовая линия горизонтальная
-    MoveTo(0, bbox.Top);
-    LineTo(Image2.Width, bbox.Top); // Ascender
-    MoveTo(0, bbox.Bottom);
-    LineTo(Image2.Width, bbox.Bottom); // Descender
-    // вертикальные черные линии
-    pen.Color := clBlack;
-    j := origin.X;
-    while j > 0 do // левее базовой
-    begin
-      MoveTo(j, 0);
-      LineTo(j, Image2.Height);
-      dec(j, grid_size);
-    end;
-    j := origin.X;
-    while j < Image2.Width do // правее базовой
-    begin
-      MoveTo(j, 0);
-      LineTo(j, Image2.Height);
-      inc(j, grid_size);
-    end;
-    // вертикальные красные линии
-    pen.Color := clRed;
-    MoveTo(origin.X, 0);
-    LineTo(origin.X, Image2.Height);
-    // базовая линия вертикальная
-    MoveTo(bbox.Right, 0);
-    LineTo(bbox.Right, Image2.Height); // Advance
-  end;
-  UD := UniNamer.Data[symbol.Code];
-  if UD <> nil then
-    StatusBar1.Panels[2].Text := 'U+' + UD.U_plus + ' - ' + UD.Name;
-
 end;
 
 procedure TForm1.Open1Click(Sender: TObject);
@@ -772,6 +627,10 @@ begin
   begin
     FR_Load(OpenDialog1.FileName);
     SaveDialog1.FileName := OpenDialog1.FileName;
+    Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
+    StatusBar1.Panels[0].Text := font_data.extended_font_name;
+    StatusBar1.Panels[1].Text := IntToStr(font_data.Height div 64) + 'x' +
+      IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
   end;
 end;
 
@@ -780,7 +639,7 @@ begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   FR_DelColAtLeft(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
 end;
 
 procedure TForm1.Removecolumnatright1Click(Sender: TObject);
@@ -788,7 +647,7 @@ begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   FR_DelColAtRight(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data);
+  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
 end;
 
 procedure TForm1.FR_RenameTable(Sender: TObject);
@@ -841,29 +700,29 @@ end;
 
 procedure TForm1.TreeView1Change(Sender: TObject; Node: TTreeNode);
 var
+  UD: PUniData;
   psy: PSymb;
 begin
   if (Node.getFirstChild = nil) and (Node.Parent <> nil) then
   begin
     psy := Node.Data;
-    FR_ShowSymbol(psy);
-  end;
+    FR_ShowSymbol(psy, Image2);
+    UD := UniNamer.Data[psy.Code];
+    StatusBar1.Panels[2].Text := 'U+' + UD.U_plus + ' - ' + UD.Name;
+  end
+  else
+    StatusBar1.Panels[2].Text := '';
 end;
 
 procedure TForm1.TreeView1Deletion(Sender: TObject; Node: TTreeNode);
-var
-  psy: PSymb;
-  p: ^integer;
 begin
   if Node.Text[1] = '''' then
   begin
-    psy := Node.Data;
-    FR_FreeSymb(psy);
+    FR_FreeSymb(Node.Data);
   end
   else
   begin
-    p := Node.Data;
-    Dispose(p);
+    Dispose(Node.Data);
   end;
 end;
 
