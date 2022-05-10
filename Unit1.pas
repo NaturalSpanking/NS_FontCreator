@@ -46,15 +46,10 @@ type
     Renametable2: TMenuItem;
     Delete2: TMenuItem;
     Symbol1: TMenuItem;
-    Addrowattop1: TMenuItem;
-    Addrowatbottom1: TMenuItem;
-    Removerowattop1: TMenuItem;
-    Removerowatbottom1: TMenuItem;
     Addcolumnatleft1: TMenuItem;
     Addcolumnatright1: TMenuItem;
     Removecolumnatleft1: TMenuItem;
     Removecolumnatright1: TMenuItem;
-    N1: TMenuItem;
     N2: TMenuItem;
     Moveup1: TMenuItem;
     Movedown1: TMenuItem;
@@ -108,8 +103,8 @@ type
     procedure Removecolumnatleft1Click(Sender: TObject);
     procedure Removecolumnatright1Click(Sender: TObject);
     procedure New1Click(Sender: TObject);
-    procedure Addrowatbottom1Click(Sender: TObject);
   private
+    procedure ClearImg;
     procedure FR_Save(FName: string);
     procedure FR_Load(FName: string);
     procedure FR_GenerateNew;
@@ -144,7 +139,6 @@ end;
 
 procedure TForm1.FR_FullRepaint(Sender: TObject);
 var
-  psy: TSymbol;
   i: integer;
 begin
   if font_data = nil then
@@ -156,76 +150,12 @@ begin
   for i := 0 to TreeView1.Items.Count - 1 do
     if TreeView1.Items[i].Parent <> nil then
     begin
-      psy := TreeView1.Items[i].Data;
-      psy.Render;
-      if (TreeView1.Selected <> nil) and (i = TreeView1.Selected.AbsoluteIndex)
-      then
-        psy.Show(Image2);
+      TSymbol(TreeView1.Items[i].Data).Render;
     end;
+  if TreeView1.Selected.Parent <> nil then
+    TSymbol(TreeView1.Selected).Show(Image2);
   StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
     IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
-end;
-
-procedure TForm1.Addcolumnatleft1Click(Sender: TObject);
-var
-  psy: TSymbol;
-begin
-  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
-    exit;
-  psy := TreeView1.Selected.Data;
-  psy.AddColAtLeft;
-  psy.Show(Image2);
-end;
-
-procedure TForm1.Addcolumnatright1Click(Sender: TObject);
-var
-  psy: TSymbol;
-begin
-  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
-    exit;
-  psy := TreeView1.Selected.Data;
-  psy.AddColAtRight;
-  psy.Show(Image2);
-end;
-
-procedure TForm1.Addrowatbottom1Click(Sender: TObject);
-var
-  // psy: PSymb;
-  i, j, k: integer;
-  isIncBpc: Boolean;
-  p: PByte;
-begin
-  // isIncBpc := false;
-  // inc(font_data.Height);
-  // for i := 0 to TreeView1.Items.Count - 1 do
-  // begin
-  // if (TreeView1.Items[i].Text[1] <> '''') or (TreeView1.Items[i].Data = nil)
-  // then
-  // continue;
-  // psy := TreeView1.Items[i].Data;
-  // if psy.Buffer = nil then
-  // continue;
-  // if (font_data.Height div 8) > font_data.bpc then
-  // begin
-  // isIncBpc := true;
-  // p := AllocMem(psy.BufferSize + psy.Width);
-  // k := 0;
-  // for j := 0 to psy.BufferSize - 1 do
-  // begin
-  // p[k] := psy.Buffer[j];
-  // inc(k);
-  // if i mod font_data.bpc = font_data.bpc - 1 then
-  // inc(k);
-  // end;
-  // inc(psy.BufferSize, psy.Width);
-  // FreeMemory(psy.Buffer);
-  // psy.Buffer := p;
-  // end;
-  // end;
-  // if isIncBpc then
-  // inc(font_data.bpc);
-  // psy := TreeView1.Selected.Data;
-  // FR_ShowSymbol(psy, Image2);
 end;
 
 procedure TForm1.Autorepaint1Click(Sender: TObject);
@@ -292,48 +222,35 @@ begin
 end;
 
 procedure TForm1.Movedown1Click(Sender: TObject);
-var
-  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  psy := TreeView1.Selected.Data;
-  psy.MoveDown;
-  psy.Show(Image2);
+  TSymbol(TreeView1.Selected.Data).MoveDown;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
 procedure TForm1.Moveleft1Click(Sender: TObject);
-var
-  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  psy := TreeView1.Selected.Data;
-  psy.MoveLeft;
-  psy.Show(Image2);
-  psy.Show(Image2);
+  TSymbol(TreeView1.Selected.Data).MoveLeft;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
 procedure TForm1.Moveright1Click(Sender: TObject);
-var
-  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  psy := TreeView1.Selected.Data;
-  psy.MoveRight;
-  psy.Show(Image2);
+  TSymbol(TreeView1.Selected.Data).MoveRight;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
 procedure TForm1.Moveup1Click(Sender: TObject);
-var
-  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  psy := TreeView1.Selected.Data;
-  psy.MoveUp;
-  psy.Show(Image2);
+  TSymbol(TreeView1.Selected.Data).MoveUp;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
 function TForm1.mv_spaces(S: string): string;
@@ -351,7 +268,7 @@ end;
 procedure TForm1.New1Click(Sender: TObject);
 begin
   TreeView1.Items.Clear;
-//  psy.Show(Image2);
+  ClearImg;
   SaveDialog1.FileName := '';
   SaveDialog2.FileName := '';
   OpenDialog1.FileName := '';
@@ -410,6 +327,15 @@ begin
   FR_GenerateNew;
 end;
 
+procedure TForm1.ClearImg;
+begin
+  // очистка канвы
+  Image2.Picture.Bitmap.Width := Image2.Width;
+  Image2.Picture.Bitmap.Height := Image2.Height;
+  Image2.Canvas.Brush.Color := clGray;
+  Image2.Canvas.FillRect(Rect(0, 0, Image2.Width, Image2.Height));
+end;
+
 procedure TForm1.Exit1Click(Sender: TObject);
 begin
   Form1.Close;
@@ -432,7 +358,6 @@ begin
       else
         TreeView1.Items.AddObject(TreeView1.Selected, '''' + chr(psy.Code) +
           '''' + ' - ' + IntToStr(psy.Code), psy);
-
     end;
 end;
 
@@ -482,6 +407,7 @@ begin
     IntToStr(TFTManager.MinorVersion) + '.' + IntToStr(TFTManager.PatchVersion))
     + '       ';
   FR_CreateFont;
+  ClearImg;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -490,15 +416,12 @@ begin
 end;
 
 procedure TForm1.FormResize(Sender: TObject);
-var
-  psy: TSymbol;
 begin
   if TreeView1.Selected = nil then
     exit;
   if TreeView1.Selected.Parent <> nil then
   begin
-    psy := TreeView1.Selected.Data;
-    psy.Show(Image2);
+    TSymbol(TreeView1.Selected.Data).Show(Image2);
   end;
 
 end;
@@ -650,26 +573,37 @@ begin
   end;
 end;
 
-procedure TForm1.Removecolumnatleft1Click(Sender: TObject);
-var
-  psy: TSymbol;
+procedure TForm1.Addcolumnatleft1Click(Sender: TObject);
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  psy := TreeView1.Selected.Data;
-  psy.DelColAtLeft;
-  psy.Show(Image2);
+  TSymbol(TreeView1.Selected.Data).AddColAtLeft;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
+end;
+
+procedure TForm1.Addcolumnatright1Click(Sender: TObject);
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+  TSymbol(TreeView1.Selected.Data).AddColAtRight;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
+end;
+
+procedure TForm1.Removecolumnatleft1Click(Sender: TObject);
+
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+  TSymbol(TreeView1.Selected.Data).DelColAtLeft;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
 procedure TForm1.Removecolumnatright1Click(Sender: TObject);
-var
-  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  psy := TreeView1.Selected.Data;
-  psy.DelColAtRight;
-  psy.Show(Image2);
+  TSymbol(TreeView1.Selected.Data).DelColAtRight;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
 procedure TForm1.FR_RenameTable(Sender: TObject);
@@ -709,7 +643,6 @@ begin
 end;
 
 procedure TForm1.Saveas1Click(Sender: TObject);
-
 begin
   SaveDialog1.FileName := font_data.extended_font_name;
   if SaveDialog1.Execute then
@@ -725,7 +658,8 @@ var
   UD: PUniData;
   psy: TSymbol;
 begin
-  if (Node.getFirstChild = nil) and (Node.Parent <> nil) then
+  ClearImg;
+  if (Node.Parent <> nil) then
   begin
     psy := Node.Data;
     psy.Show(Image2);
@@ -734,16 +668,14 @@ begin
   end
   else
     StatusBar1.Panels[2].Text := '';
+
 end;
 
 procedure TForm1.TreeView1Deletion(Sender: TObject; Node: TTreeNode);
-var
-  psy: TSymbol;
 begin
   if Node.Text[1] = '''' then
   begin
-    psy := Node.Data;
-    psy.Free;
+    TSymbol(Node.Data).Free;
   end
   else
   begin

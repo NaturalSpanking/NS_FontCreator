@@ -308,13 +308,6 @@ object Form1: TForm1
       object N2: TMenuItem
         Caption = '-'
       end
-      object Addrowattop1: TMenuItem
-        Caption = 'Add row at top'
-      end
-      object Addrowatbottom1: TMenuItem
-        Caption = 'Add row at bottom'
-        OnClick = Addrowatbottom1Click
-      end
       object Addcolumnatleft1: TMenuItem
         Caption = 'Add column at left'
         OnClick = Addcolumnatleft1Click
@@ -322,15 +315,6 @@ object Form1: TForm1
       object Addcolumnatright1: TMenuItem
         Caption = 'Add column at right'
         OnClick = Addcolumnatright1Click
-      end
-      object N1: TMenuItem
-        Caption = '-'
-      end
-      object Removerowattop1: TMenuItem
-        Caption = 'Remove row at top'
-      end
-      object Removerowatbottom1: TMenuItem
-        Caption = 'Remove row at bottom'
       end
       object Removecolumnatleft1: TMenuItem
         Caption = 'Remove column at left'

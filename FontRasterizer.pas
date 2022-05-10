@@ -284,8 +284,8 @@ var
 begin
   for i := 0 to self.sData.BufferSize - 1 do
   begin
-    if ((self.Buffer[i + 1] and 1) <> 0) and
-      ((i + 1) mod font_data.bpc <> 0) then
+    if ((self.Buffer[i + 1] and 1) <> 0) and ((i + 1) mod font_data.bpc <> 0)
+    then
       b := 128
     else
       b := 0;
@@ -355,11 +355,7 @@ var
   bbox: TRect;
   R: TRect;
 begin
-  // очистка канвы
-  Image.Picture.Bitmap.Width := Image.Width;
-  Image.Picture.Bitmap.height := Image.height;
-  Image.Canvas.Brush.Color := clGray;
-  Image.Canvas.FillRect(Rect(0, 0, Image.Width, Image.height));
+
   if (self = nil) or (self.Buffer = nil) then
   begin
     Image.Canvas.Font.Name := 'Times New Roman';
@@ -477,3 +473,35 @@ begin
 end;
 
 end.
+
+// isIncBpc := false;
+// inc(font_data.Height);
+// for i := 0 to TreeView1.Items.Count - 1 do
+// begin
+// if (TreeView1.Items[i].Text[1] <> '''') or (TreeView1.Items[i].Data = nil)
+// then
+// continue;
+// psy := TreeView1.Items[i].Data;
+// if psy.Buffer = nil then
+// continue;
+// if (font_data.Height div 8) > font_data.bpc then
+// begin
+// isIncBpc := true;
+// p := AllocMem(psy.BufferSize + psy.Width);
+// k := 0;
+// for j := 0 to psy.BufferSize - 1 do
+// begin
+// p[k] := psy.Buffer[j];
+// inc(k);
+// if i mod font_data.bpc = font_data.bpc - 1 then
+// inc(k);
+// end;
+// inc(psy.BufferSize, psy.Width);
+// FreeMemory(psy.Buffer);
+// psy.Buffer := p;
+// end;
+// end;
+// if isIncBpc then
+// inc(font_data.bpc);
+// psy := TreeView1.Selected.Data;
+// FR_ShowSymbol(psy, Image2);
