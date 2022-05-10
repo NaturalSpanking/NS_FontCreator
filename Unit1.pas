@@ -144,7 +144,7 @@ end;
 
 procedure TForm1.FR_FullRepaint(Sender: TObject);
 var
-  psy: PSymb;
+  psy: TSymbol;
   i: integer;
 begin
   if font_data = nil then
@@ -157,69 +157,75 @@ begin
     if TreeView1.Items[i].Parent <> nil then
     begin
       psy := TreeView1.Items[i].Data;
-      FR_Render(psy);
+      psy.Render;
       if (TreeView1.Selected <> nil) and (i = TreeView1.Selected.AbsoluteIndex)
       then
-        FR_ShowSymbol(psy, Image2);
+        psy.Show(Image2);
     end;
   StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
     IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
 end;
 
 procedure TForm1.Addcolumnatleft1Click(Sender: TObject);
+var
+  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  FR_AddColAtLeft(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
+  psy := TreeView1.Selected.Data;
+  psy.AddColAtLeft;
+  psy.Show(Image2);
 end;
 
 procedure TForm1.Addcolumnatright1Click(Sender: TObject);
+var
+  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  FR_AddColAtRight(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
+  psy := TreeView1.Selected.Data;
+  psy.AddColAtRight;
+  psy.Show(Image2);
 end;
 
 procedure TForm1.Addrowatbottom1Click(Sender: TObject);
 var
-  psy: PSymb;
+  // psy: PSymb;
   i, j, k: integer;
   isIncBpc: Boolean;
   p: PByte;
 begin
-  isIncBpc := false;
-  inc(font_data.Height);
-  for i := 0 to TreeView1.Items.Count - 1 do
-  begin
-    if (TreeView1.Items[i].Text[1] <> '''') or (TreeView1.Items[i].Data = nil)
-    then
-      continue;
-    psy := TreeView1.Items[i].Data;
-    if psy.Buffer = nil then
-      continue;
-    if (font_data.Height div 8) > font_data.bpc then
-    begin
-      isIncBpc := true;
-      p := AllocMem(psy.BufferSize + psy.Width);
-      k := 0;
-      for j := 0 to psy.BufferSize - 1 do
-      begin
-        p[k] := psy.Buffer[j];
-        inc(k);
-        if i mod font_data.bpc = font_data.bpc - 1 then
-          inc(k);
-      end;
-      inc(psy.BufferSize, psy.Width);
-      FreeMemory(psy.Buffer);
-      psy.Buffer := p;
-    end;
-  end;
-  if isIncBpc then
-    inc(font_data.bpc);
-  psy := TreeView1.Selected.Data;
-  FR_ShowSymbol(psy, Image2);
+  // isIncBpc := false;
+  // inc(font_data.Height);
+  // for i := 0 to TreeView1.Items.Count - 1 do
+  // begin
+  // if (TreeView1.Items[i].Text[1] <> '''') or (TreeView1.Items[i].Data = nil)
+  // then
+  // continue;
+  // psy := TreeView1.Items[i].Data;
+  // if psy.Buffer = nil then
+  // continue;
+  // if (font_data.Height div 8) > font_data.bpc then
+  // begin
+  // isIncBpc := true;
+  // p := AllocMem(psy.BufferSize + psy.Width);
+  // k := 0;
+  // for j := 0 to psy.BufferSize - 1 do
+  // begin
+  // p[k] := psy.Buffer[j];
+  // inc(k);
+  // if i mod font_data.bpc = font_data.bpc - 1 then
+  // inc(k);
+  // end;
+  // inc(psy.BufferSize, psy.Width);
+  // FreeMemory(psy.Buffer);
+  // psy.Buffer := p;
+  // end;
+  // end;
+  // if isIncBpc then
+  // inc(font_data.bpc);
+  // psy := TreeView1.Selected.Data;
+  // FR_ShowSymbol(psy, Image2);
 end;
 
 procedure TForm1.Autorepaint1Click(Sender: TObject);
@@ -255,6 +261,7 @@ end;
 
 function TForm1.gen_table(var f: TextFile; table: TTreeNode): string;
 var
+  psy: TSymbol;
   tmp: TTreeNode;
   S: string;
   p: ^integer;
@@ -263,7 +270,8 @@ begin
   tmp := table.getFirstChild;
   while tmp <> nil do
   begin
-    S := S + FR_BuildSymb(tmp.Data, f) + ', ';
+    psy := tmp.Data;
+    S := S + psy.Build(f) + ', ';
     tmp := table.GetNextChild(tmp);
   end;
   writeln(f);
@@ -284,35 +292,48 @@ begin
 end;
 
 procedure TForm1.Movedown1Click(Sender: TObject);
+var
+  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  FR_MoveDown(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
+  psy := TreeView1.Selected.Data;
+  psy.MoveDown;
+  psy.Show(Image2);
 end;
 
 procedure TForm1.Moveleft1Click(Sender: TObject);
+var
+  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  FR_MoveLeft(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
+  psy := TreeView1.Selected.Data;
+  psy.MoveLeft;
+  psy.Show(Image2);
+  psy.Show(Image2);
 end;
 
 procedure TForm1.Moveright1Click(Sender: TObject);
+var
+  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  FR_MoveRight(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
+  psy := TreeView1.Selected.Data;
+  psy.MoveRight;
+  psy.Show(Image2);
 end;
 
 procedure TForm1.Moveup1Click(Sender: TObject);
+var
+  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  FR_MoveUp(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
+  psy := TreeView1.Selected.Data;
+  psy.MoveUp;
+  psy.Show(Image2);
 end;
 
 function TForm1.mv_spaces(S: string): string;
@@ -330,7 +351,7 @@ end;
 procedure TForm1.New1Click(Sender: TObject);
 begin
   TreeView1.Items.Clear;
-  FR_ShowSymbol(nil, Image2);
+//  psy.Show(Image2);
   SaveDialog1.FileName := '';
   SaveDialog2.FileName := '';
   OpenDialog1.FileName := '';
@@ -398,13 +419,13 @@ procedure TForm1.FR_AddRange(Sender: TObject);
 var
   i: integer;
   p: ^integer;
-  psy: PSymb;
+  psy: TSymbol;
 begin
   if Form2.Execute and (TreeView1.Selected <> nil) then
     for i := 0 to Form2.CharList.Count - 1 do
     begin
       p := Form2.CharList[i];
-      psy := FR_CreateSymb(p^);
+      psy := TSymbol.Create(p^);
       if TreeView1.Selected.Parent = nil then
         TreeView1.Items.AddChildObject(TreeView1.Selected,
           '''' + chr(psy.Code) + '''' + ' - ' + IntToStr(psy.Code), psy)
@@ -461,7 +482,6 @@ begin
     IntToStr(TFTManager.MinorVersion) + '.' + IntToStr(TFTManager.PatchVersion))
     + '       ';
   FR_CreateFont;
-  FR_ShowSymbol(nil, Image2);
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -471,14 +491,14 @@ end;
 
 procedure TForm1.FormResize(Sender: TObject);
 var
-  psy: PSymb;
+  psy: TSymbol;
 begin
   if TreeView1.Selected = nil then
     exit;
   if TreeView1.Selected.Parent <> nil then
   begin
     psy := TreeView1.Selected.Data;
-    FR_ShowSymbol(psy, Image2);
+    psy.Show(Image2);
   end;
 
 end;
@@ -489,7 +509,7 @@ var
   f: file;
   i: integer;
   b: byte;
-  psy: PSymb;
+  psy: TSymbol;
   p: ^integer;
 begin
   stream := TMemoryStream.Create; // соханение дерева
@@ -508,8 +528,9 @@ begin
       b := 1; // 1 - листочек
       BlockWrite(f, b, 1); // запись признака
       psy := TreeView1.Items[i].Data;
-      BlockWrite(f, psy^, sizeof(TSymb)); // запись структуры символа
-      BlockWrite(f, psy.Buffer^, psy.BufferSize); // запись массива пикселей
+      psy.WriteToFile(f);
+      // BlockWrite(f, psy, sizeof(TSymbol)); // запись структуры символа
+      // BlockWrite(f, psy.Buffer^, psy.BufferSize); // запись массива пикселей
     end
     else
     begin
@@ -557,7 +578,7 @@ var
   i: integer;
   b: byte;
   S: string;
-  psy: PSymb;
+  psy: TSymbol;
   p: ^integer;
 begin
 
@@ -575,13 +596,8 @@ begin
     BlockRead(f, b, 1); // чтение признака
     if b = 1 then // листочек
     begin
-      psy := FR_CreateSymb(0);
-      BlockRead(f, psy^, sizeof(TSymb));
-      if psy.BufferSize > 0 then
-      begin
-        psy.Buffer := GetMemory(psy.BufferSize);
-        BlockRead(f, psy.Buffer^, psy.BufferSize);
-      end;
+      psy := TSymbol.Create(0);
+      psy.ReadFromFile(f);
       TreeView1.Items[i].Data := psy;
       TreeView1.Items[i].Text := '''' + chr(psy.Code) + '''' + ' - ' +
         IntToStr(psy.Code);
@@ -635,19 +651,25 @@ begin
 end;
 
 procedure TForm1.Removecolumnatleft1Click(Sender: TObject);
+var
+  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  FR_DelColAtLeft(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
+  psy := TreeView1.Selected.Data;
+  psy.DelColAtLeft;
+  psy.Show(Image2);
 end;
 
 procedure TForm1.Removecolumnatright1Click(Sender: TObject);
+var
+  psy: TSymbol;
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
-  FR_DelColAtRight(TreeView1.Selected.Data);
-  FR_ShowSymbol(TreeView1.Selected.Data, Image2);
+  psy := TreeView1.Selected.Data;
+  psy.DelColAtRight;
+  psy.Show(Image2);
 end;
 
 procedure TForm1.FR_RenameTable(Sender: TObject);
@@ -701,12 +723,12 @@ end;
 procedure TForm1.TreeView1Change(Sender: TObject; Node: TTreeNode);
 var
   UD: PUniData;
-  psy: PSymb;
+  psy: TSymbol;
 begin
   if (Node.getFirstChild = nil) and (Node.Parent <> nil) then
   begin
     psy := Node.Data;
-    FR_ShowSymbol(psy, Image2);
+    psy.Show(Image2);
     UD := UniNamer.Data[psy.Code];
     StatusBar1.Panels[2].Text := 'U+' + UD.U_plus + ' - ' + UD.Name;
   end
@@ -715,10 +737,13 @@ begin
 end;
 
 procedure TForm1.TreeView1Deletion(Sender: TObject; Node: TTreeNode);
+var
+  psy: TSymbol;
 begin
   if Node.Text[1] = '''' then
   begin
-    FR_FreeSymb(Node.Data);
+    psy := Node.Data;
+    psy.Free;
   end
   else
   begin
