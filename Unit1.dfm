@@ -9,6 +9,7 @@ object Form1: TForm1
   Constraints.MaxWidth = 2560
   Constraints.MinHeight = 600
   Constraints.MinWidth = 800
+  DoubleBuffered = True
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
   Font.Height = -19

@@ -152,8 +152,9 @@ begin
     begin
       TSymbol(TreeView1.Items[i].Data).Render;
     end;
+  ClearImg;
   if TreeView1.Selected.Parent <> nil then
-    TSymbol(TreeView1.Selected).Show(Image2);
+    TSymbol(TreeView1.Selected.Data).Show(Image2);
   StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
     IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
 end;
@@ -417,6 +418,7 @@ end;
 
 procedure TForm1.FormResize(Sender: TObject);
 begin
+  ClearImg;
   if TreeView1.Selected = nil then
     exit;
   if TreeView1.Selected.Parent <> nil then
