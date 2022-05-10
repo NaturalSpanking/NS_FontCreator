@@ -153,8 +153,9 @@ begin
       TSymbol(TreeView1.Items[i].Data).Render;
     end;
   ClearImg;
-  if TreeView1.Selected.Parent <> nil then
+  if (TreeView1.Selected <> nil) and (TreeView1.Selected.Parent <> nil) then
     TSymbol(TreeView1.Selected.Data).Show(Image2);
+
   StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
     IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
 end;
@@ -555,7 +556,6 @@ begin
     SetLength(S, i);
     BlockRead(f, S[1], (i) * sizeof(char));
     FontDialog1.Font.Name := S;
-    FR_SetFont(FontDialog1.Font);
   end;
 
   // TreeView1.Select(TreeView1.Items[0]);
@@ -569,9 +569,10 @@ begin
     FR_Load(OpenDialog1.FileName);
     SaveDialog1.FileName := OpenDialog1.FileName;
     Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
-    StatusBar1.Panels[0].Text := font_data.extended_font_name;
-    StatusBar1.Panels[1].Text := IntToStr(font_data.Height div 64) + 'x' +
+    StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
       IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
+    FR_SetFont(FontDialog1.Font);
+    StatusBar1.Panels[0].Text := font_data.extended_font_name;
   end;
 end;
 

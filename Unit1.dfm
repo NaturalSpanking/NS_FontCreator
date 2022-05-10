@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 841
+  ClientHeight = 838
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -24,16 +24,17 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 717
+    Top = 714
     Width = 1424
     Height = 105
     Align = alBottom
     Constraints.MaxHeight = 300
     Constraints.MinHeight = 46
+    ExplicitTop = 717
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 714
+    Top = 711
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -47,7 +48,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 151
     Top = 0
-    Height = 714
+    Height = 711
     AutoSnap = False
     ExplicitLeft = 168
     ExplicitTop = 280
@@ -57,7 +58,7 @@ object Form1: TForm1
     Left = 154
     Top = 0
     Width = 1043
-    Height = 714
+    Height = 711
     Align = alClient
     ExplicitTop = 29
     ExplicitHeight = 660
@@ -66,7 +67,7 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 714
+    Height = 711
     Align = alRight
     TabOrder = 0
     ExplicitHeight = 694
@@ -157,7 +158,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 151
-    Height = 714
+    Height = 711
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
@@ -177,7 +178,7 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 822
+    Top = 819
     Width = 1424
     Height = 19
     Panels = <

@@ -115,6 +115,7 @@ begin
   fr_face.SetPixelSize(0, Font.Size);
   CancelDC(dc);
   DeleteDC(dc);
+
   font_data.extended_font_name := string(fr_face.FamilyName) + ' ' +
     string(fr_face.StyleName) + ' ' + FR_FontStyleToString(Font.style) +
     string(IntToStr(Font.Size));
@@ -473,35 +474,3 @@ begin
 end;
 
 end.
-
-// isIncBpc := false;
-// inc(font_data.Height);
-// for i := 0 to TreeView1.Items.Count - 1 do
-// begin
-// if (TreeView1.Items[i].Text[1] <> '''') or (TreeView1.Items[i].Data = nil)
-// then
-// continue;
-// psy := TreeView1.Items[i].Data;
-// if psy.Buffer = nil then
-// continue;
-// if (font_data.Height div 8) > font_data.bpc then
-// begin
-// isIncBpc := true;
-// p := AllocMem(psy.BufferSize + psy.Width);
-// k := 0;
-// for j := 0 to psy.BufferSize - 1 do
-// begin
-// p[k] := psy.Buffer[j];
-// inc(k);
-// if i mod font_data.bpc = font_data.bpc - 1 then
-// inc(k);
-// end;
-// inc(psy.BufferSize, psy.Width);
-// FreeMemory(psy.Buffer);
-// psy.Buffer := p;
-// end;
-// end;
-// if isIncBpc then
-// inc(font_data.bpc);
-// psy := TreeView1.Selected.Data;
-// FR_ShowSymbol(psy, Image2);
