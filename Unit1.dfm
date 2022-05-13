@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 838
+  ClientHeight = 841
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -24,17 +24,16 @@ object Form1: TForm1
   TextHeight = 21
   object Image1: TImage
     Left = 0
-    Top = 714
+    Top = 717
     Width = 1424
     Height = 105
     Align = alBottom
     Constraints.MaxHeight = 300
     Constraints.MinHeight = 46
-    ExplicitTop = 717
   end
   object Splitter1: TSplitter
     Left = 0
-    Top = 711
+    Top = 714
     Width = 1424
     Height = 3
     Cursor = crVSplit
@@ -48,7 +47,7 @@ object Form1: TForm1
   object Splitter2: TSplitter
     Left = 151
     Top = 0
-    Height = 711
+    Height = 714
     AutoSnap = False
     ExplicitLeft = 168
     ExplicitTop = 280
@@ -58,8 +57,9 @@ object Form1: TForm1
     Left = 154
     Top = 0
     Width = 1043
-    Height = 711
+    Height = 714
     Align = alClient
+    OnMouseDown = Image2MouseDown
     ExplicitTop = 29
     ExplicitHeight = 660
   end
@@ -67,10 +67,10 @@ object Form1: TForm1
     Left = 1197
     Top = 0
     Width = 227
-    Height = 711
+    Height = 714
     Align = alRight
     TabOrder = 0
-    ExplicitHeight = 694
+    ExplicitHeight = 691
     object Label1: TLabel
       Left = 6
       Top = 690
@@ -153,12 +153,21 @@ object Form1: TForm1
       TabOrder = 6
       OnClick = Button5Click
     end
+    object Memo1: TMemo
+      Left = 16
+      Top = 560
+      Width = 185
+      Height = 89
+      Lines.Strings = (
+        'Memo1')
+      TabOrder = 7
+    end
   end
   object TreeView1: TTreeView
     Left = 0
     Top = 0
     Width = 151
-    Height = 711
+    Height = 714
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
@@ -174,11 +183,11 @@ object Form1: TForm1
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
-    ExplicitHeight = 694
+    ExplicitHeight = 691
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 819
+    Top = 822
     Width = 1424
     Height = 19
     Panels = <
@@ -195,7 +204,7 @@ object Form1: TForm1
         Alignment = taRightJustify
         Width = 150
       end>
-    ExplicitTop = 802
+    ExplicitTop = 799
   end
   object FontDialog1: TFontDialog
     Ctl3D = False

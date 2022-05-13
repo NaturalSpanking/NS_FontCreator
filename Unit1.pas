@@ -67,6 +67,7 @@ type
     N3: TMenuItem;
     Button5: TButton;
     SaveDialog2: TSaveDialog;
+    Memo1: TMemo;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -103,6 +104,8 @@ type
     procedure Removecolumnatleft1Click(Sender: TObject);
     procedure Removecolumnatright1Click(Sender: TObject);
     procedure New1Click(Sender: TObject);
+    procedure Image2MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: integer);
   private
     procedure ClearImg;
     procedure FR_Save(FName: string);
@@ -141,7 +144,7 @@ procedure TForm1.FR_FullRepaint(Sender: TObject);
 var
   i: integer;
 begin
-  if font_data = nil then
+  if (font_data = nil) then
   begin
     // MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
     FR_SelectFont(Sender);
@@ -216,6 +219,18 @@ begin
   writeln(f);
 
   Result := '_' + copy(table.Text, 1, pos(':', table.Text) - 1);
+end;
+
+procedure TForm1.Image2MouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: integer);
+begin
+  if (TreeView1.Selected <> nil) and (TreeView1.Selected.Parent <> nil) then
+  begin
+    TSymbol(TreeView1.Selected.Data).ChangePixel(Image2, Button, Shift, X, Y);
+    TSymbol(TreeView1.Selected.Data).Show(Image2);
+  end;
+  if Button = mbLeft then
+  exit;
 end;
 
 procedure TForm1.Makesources1Click(Sender: TObject);

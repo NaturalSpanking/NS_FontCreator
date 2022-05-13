@@ -43,6 +43,9 @@ type
     procedure MoveDown;
     procedure MoveLeft;
     procedure MoveRight;
+
+    procedure ChangePixel(Image: TImage; Button: TMouseButton;
+      Shift: TShiftState; X, Y: integer);
   end;
 
   P_FR_Font = ^T_FR_Font;
@@ -302,7 +305,6 @@ var
 begin
   if self.Buffer <> nil then
     FreeMemory(self.Buffer);
-
   glyph_index := fr_face.GetCharIndex(self.sData.char_code);
   fr_face.LoadGlyph(glyph_index, [ftlfMonochrome, ftlfTargetMono, ftlfRender]);
   self.sData.BearingX := fr_face.glyph.Metrics.HorzBearingX div 64;
@@ -345,6 +347,44 @@ begin
       k := 0;
   end;
   fr_face.glyph.Bitmap.Done;
+end;
+
+procedure TSymbol.ChangePixel(Image: TImage; Button: TMouseButton;
+  Shift: TShiftState; X, Y: integer);
+var
+  i, j: integer;
+  grid_size: integer;
+  origin: TPoint;
+  bbox: TRect;
+  b: byte;
+begin
+  if (self = nil) or (self.Buffer = nil) then
+    exit;
+  // вычисление размера сетки
+  grid_size := round(Image.height * 7 / 10 / font_data.height);
+  i := round(Image.Width * 5 / 10 / self.sData.Width);
+  if i < grid_size then
+    grid_size := i;
+  // вычисление координат
+  origin.X := round(Image.Width / 8);
+  origin.Y := round(Image.height * 9 / 12);
+  bbox.Left := origin.X;
+  bbox.Right := origin.X + self.sData.Advance * grid_size;
+  bbox.Top := origin.Y - self.sData.Ascender * grid_size;
+  bbox.Bottom := origin.Y - self.sData.Descender * grid_size;
+  if (X < bbox.Left) or (X > bbox.Right) or (Y < bbox.Top) or
+    (Y > bbox.Top + font_data.height * grid_size)
+  // (Y > bbox.Bottom - self.sData.Descender*grid_size)
+  then
+    exit;
+  i := (X - bbox.Left) div grid_size - self.sData.BearingX;
+  j := (Y - bbox.Top) div grid_size;
+  b := self.Buffer[i * font_data.bpc + j div 8];
+  if Button = TMouseButton.mbLeft then
+    b := b or (1 shl (j mod 8));
+  if Button = TMouseButton.mbRight then
+    b := b and not(1 shl (j mod 8));
+  self.Buffer[i * font_data.bpc + j div 8] := b;
 end;
 
 procedure TSymbol.Show(var Image: TImage);
