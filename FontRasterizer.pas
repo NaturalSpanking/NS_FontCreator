@@ -44,6 +44,7 @@ type
     procedure MoveLeft;
     procedure MoveRight;
 
+    procedure CopyData(Source: TSymbol);
     procedure ChangePixel(Image: TImage; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
   end;
@@ -494,6 +495,18 @@ begin
     MoveTo(bbox.Right, 0);
     LineTo(bbox.Right, Image.height); // Advance
   end;
+end;
+
+procedure TSymbol.CopyData(Source: TSymbol);
+var
+  i: integer;
+begin
+//  i := self.sData.char_code;
+  self.sData := Source.sData;
+//  self.sData.char_code := i;
+  self.Buffer := AllocMem(self.sData.BufferSize);
+  for i := 0 to self.sData.BufferSize - 1 do
+    self.Buffer[i] := Source.Buffer[i];
 end;
 
 procedure TSymbol.WriteToFile(var f: &file);

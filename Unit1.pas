@@ -72,6 +72,8 @@ type
     SpeedButton6: TSpeedButton;
     SpeedButton7: TSpeedButton;
     SpeedButton8: TSpeedButton;
+    Clone1: TMenuItem;
+    Clone2: TMenuItem;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -107,6 +109,7 @@ type
     procedure New1Click(Sender: TObject);
     procedure Image2MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
+    procedure Clone1Click(Sender: TObject);
   private
     procedure ClearImg;
     procedure FR_Save(FName: string);
@@ -221,7 +224,7 @@ begin
     TSymbol(TreeView1.Selected.Data).Show(Image2);
   end;
   if Button = mbLeft then
-  exit;
+    exit;
 end;
 
 procedure TForm1.Makesources1Click(Sender: TObject);
@@ -337,6 +340,19 @@ begin
   Image2.Picture.Bitmap.Height := Image2.Height;
   Image2.Canvas.Brush.Color := clGray;
   Image2.Canvas.FillRect(Rect(0, 0, Image2.Width, Image2.Height));
+end;
+
+procedure TForm1.Clone1Click(Sender: TObject);
+var
+  psy: TSymbol;
+begin
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Parent = nil) then
+    exit;
+  psy := TSymbol.Create(TSymbol(TreeView1.Selected.Data).Code);
+  psy.CopyData(TSymbol(TreeView1.Selected.Data));
+
+  TreeView1.Items.AddObjectFirst(TreeView1.Selected, '''' + chr(psy.Code) + ''''
+    + ' - ' + IntToStr(psy.Code), psy);
 end;
 
 procedure TForm1.Exit1Click(Sender: TObject);
@@ -581,6 +597,7 @@ procedure TForm1.Addcolumnatleft1Click(Sender: TObject);
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
+  ClearImg;
   TSymbol(TreeView1.Selected.Data).AddColAtLeft;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
@@ -589,15 +606,16 @@ procedure TForm1.Addcolumnatright1Click(Sender: TObject);
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
+  ClearImg;
   TSymbol(TreeView1.Selected.Data).AddColAtRight;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
 procedure TForm1.Removecolumnatleft1Click(Sender: TObject);
-
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
+  ClearImg;
   TSymbol(TreeView1.Selected.Data).DelColAtLeft;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
@@ -606,6 +624,7 @@ procedure TForm1.Removecolumnatright1Click(Sender: TObject);
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
+  ClearImg;
   TSymbol(TreeView1.Selected.Data).DelColAtRight;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;

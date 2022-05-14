@@ -820,6 +820,10 @@ object Form1: TForm1
         Caption = 'Add symbols'
         OnClick = FR_AddRange
       end
+      object Clone1: TMenuItem
+        Caption = 'Clone'
+        OnClick = Clone1Click
+      end
       object Delete2: TMenuItem
         Caption = 'Delete'
         OnClick = FR_Delete
@@ -884,6 +888,10 @@ object Form1: TForm1
     object Addsymbols1: TMenuItem
       Caption = 'Add symbols'
       OnClick = FR_AddRange
+    end
+    object Clone2: TMenuItem
+      Caption = 'Clone'
+      OnClick = Clone1Click
     end
     object Delete1: TMenuItem
       Caption = 'Delete'
