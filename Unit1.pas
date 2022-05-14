@@ -7,27 +7,19 @@ uses
   System.Classes, System.UITypes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uFreeType, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.Imaging.jpeg, Vcl.Grids, Vcl.ComCtrls, Vcl.Menus, Vcl.ToolWin,
-  FontRasterizer, UnicodeNames;
+  FontRasterizer, UnicodeNames, Vcl.ButtonGroup, Vcl.Buttons;
 
 type
   TForm1 = class(TForm)
-    Button1: TButton;
-    Button2: TButton;
     FontDialog1: TFontDialog;
     Panel1: TPanel;
     TreeView1: TTreeView;
-    Image1: TImage;
-    Splitter1: TSplitter;
     Splitter2: TSplitter;
     MainMenu1: TMainMenu;
     File1: TMenuItem;
     StatusBar1: TStatusBar;
-    Button6: TButton;
-    Button7: TButton;
     Image2: TImage;
     Label1: TLabel;
-    Button3: TButton;
-    Button4: TButton;
     PopupMenu1: TPopupMenu;
     Addtable1: TMenuItem;
     Addsymbols1: TMenuItem;
@@ -65,9 +57,21 @@ type
     Increasesize1: TMenuItem;
     Decreasesize1: TMenuItem;
     N3: TMenuItem;
-    Button5: TButton;
     SaveDialog2: TSaveDialog;
-    Memo1: TMemo;
+    GroupBox1: TGroupBox;
+    GroupBox2: TGroupBox;
+    Button1: TButton;
+    Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
+    SpeedButton4: TSpeedButton;
+    SpeedButton5: TSpeedButton;
+    SpeedButton6: TSpeedButton;
+    SpeedButton7: TSpeedButton;
+    SpeedButton8: TSpeedButton;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -77,8 +81,6 @@ type
     procedure TreeView1Change(Sender: TObject; Node: TTreeNode);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
     procedure FR_Delete(Sender: TObject);
     procedure TreeView1Deletion(Sender: TObject; Node: TTreeNode);
     procedure FormResize(Sender: TObject);
@@ -92,7 +94,6 @@ type
     procedure Open1Click(Sender: TObject);
     procedure Saveas1Click(Sender: TObject);
     procedure Autorepaint1Click(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
     procedure Makesources1Click(Sender: TObject);
     procedure Exit1Click(Sender: TObject);
     procedure Moveup1Click(Sender: TObject);
@@ -182,16 +183,6 @@ begin
     if Autorepaint1.Checked then
       FR_FullRepaint(Sender);
   end;
-end;
-
-procedure TForm1.Button3Click(Sender: TObject);
-begin
-  FR_Save('saving.dat');
-end;
-
-procedure TForm1.Button4Click(Sender: TObject);
-begin
-  FR_Load('saving.dat');
 end;
 
 function TForm1.gen_table(var f: TextFile; table: TTreeNode): string;
@@ -337,11 +328,6 @@ begin
   writeln(f, 'const PFont ' + mv_spaces(font_data.extended_font_name) + ' = &_'
     + mv_spaces(font_data.extended_font_name) + ';');
   CloseFile(f);
-end;
-
-procedure TForm1.Button5Click(Sender: TObject);
-begin
-  FR_GenerateNew;
 end;
 
 procedure TForm1.ClearImg;
