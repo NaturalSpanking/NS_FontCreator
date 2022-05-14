@@ -356,7 +356,6 @@ var
   i, j: integer;
   grid_size: integer;
   origin: TPoint;
-  bbox: TRect;
   b: byte;
 begin
   if (self = nil) or (self.Buffer = nil) then
@@ -369,17 +368,16 @@ begin
   // вычисление координат
   origin.X := round(Image.Width / 8);
   origin.Y := round(Image.height * 9 / 12);
-  bbox.Left := origin.X;
-  bbox.Right := origin.X + self.sData.Advance * grid_size;
-  bbox.Top := origin.Y - self.sData.Ascender * grid_size;
-  bbox.Bottom := origin.Y - self.sData.Descender * grid_size;
-  if (X < bbox.Left) or (X > bbox.Right) or (Y < bbox.Top) or
-    (Y > bbox.Top + font_data.height * grid_size)
-  // (Y > bbox.Bottom - self.sData.Descender*grid_size)
+  if (X < origin.X + self.sData.BearingX * grid_size) or
+    (X > origin.X + (self.sData.BearingX + self.sData.Width) * grid_size) or
+    (Y < origin.Y - self.sData.Ascender * grid_size) or
+    (Y > origin.Y - self.sData.Ascender * grid_size + font_data.height *
+    grid_size)
   then
     exit;
-  i := (X - bbox.Left) div grid_size - self.sData.BearingX;
-  j := (Y - bbox.Top) div grid_size;
+  i := (X - origin.X - self.sData.BearingX * grid_size) div grid_size;
+  j := (Y - origin.Y + self.sData.Ascender * grid_size) div grid_size;
+
   b := self.Buffer[i * font_data.bpc + j div 8];
   if Button = TMouseButton.mbLeft then
     b := b or (1 shl (j mod 8));
@@ -501,9 +499,9 @@ procedure TSymbol.CopyData(Source: TSymbol);
 var
   i: integer;
 begin
-//  i := self.sData.char_code;
+  // i := self.sData.char_code;
   self.sData := Source.sData;
-//  self.sData.char_code := i;
+  // self.sData.char_code := i;
   self.Buffer := AllocMem(self.sData.BufferSize);
   for i := 0 to self.sData.BufferSize - 1 do
     self.Buffer[i] := Source.Buffer[i];
