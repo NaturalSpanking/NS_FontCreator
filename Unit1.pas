@@ -74,6 +74,7 @@ type
     SpeedButton8: TSpeedButton;
     Clone1: TMenuItem;
     Clone2: TMenuItem;
+    Button5: TButton;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -110,6 +111,7 @@ type
     procedure Image2MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
     procedure Clone1Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
   private
     procedure ClearImg;
     procedure FR_Save(FName: string);
@@ -170,6 +172,12 @@ end;
 procedure TForm1.Autorepaint1Click(Sender: TObject);
 begin
   Autorepaint1.Checked := not Autorepaint1.Checked;
+end;
+
+procedure TForm1.Button5Click(Sender: TObject);
+begin
+dec(font_data.height);
+
 end;
 
 procedure TForm1.FR_SelectFont(Sender: TObject);

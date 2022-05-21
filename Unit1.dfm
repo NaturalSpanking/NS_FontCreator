@@ -47,7 +47,7 @@ object Form1: TForm1
     Height = 822
     Align = alRight
     TabOrder = 0
-    ExplicitLeft = 1240
+    ExplicitHeight = 802
     object Label1: TLabel
       Left = 6
       Top = 795
@@ -64,7 +64,6 @@ object Form1: TForm1
       Align = alTop
       Caption = 'Font'
       TabOrder = 0
-      ExplicitWidth = 170
       object Button1: TButton
         Left = 96
         Top = 23
@@ -689,6 +688,15 @@ object Form1: TForm1
         OnClick = Movedown1Click
       end
     end
+    object Button5: TButton
+      Left = 80
+      Top = 416
+      Width = 75
+      Height = 25
+      Caption = 'Button5'
+      TabOrder = 2
+      OnClick = Button5Click
+    end
   end
   object TreeView1: TTreeView
     Left = 0
@@ -710,7 +718,7 @@ object Form1: TForm1
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
-    ExplicitHeight = 694
+    ExplicitHeight = 802
   end
   object StatusBar1: TStatusBar
     Left = 0

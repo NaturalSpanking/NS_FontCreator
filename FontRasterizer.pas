@@ -14,8 +14,6 @@ type
       char_code: integer;
       Width: integer;
       Advance: integer;
-      Ascender: integer;
-      Descender: integer;
       BearingX: integer;
       BearingY: integer;
       BufferSize: integer;
@@ -54,6 +52,8 @@ type
   T_FR_Font = record
     MaxAdvance: integer;
     height: integer;
+    Ascender: integer;
+    Descender: integer;
     bpc: integer;
     min_w: integer;
     max_w: integer;
@@ -124,6 +124,8 @@ begin
     string(fr_face.StyleName) + ' ' + FR_FontStyleToString(Font.style) +
     string(IntToStr(Font.Size));
   font_data.height := fr_face.Size.Metrics.height div 64;
+  font_data.Ascender := fr_face.Size.Metrics.Ascender div 64;
+  font_data.Descender := fr_face.Size.Metrics.Descender div 64;
   font_data.MaxAdvance := fr_face.Size.Metrics.MaxAdvance div 64;
   font_data.bpc := font_data.height div 8;
   if font_data.bpc * 8 < font_data.height then
@@ -139,8 +141,6 @@ begin
   sData.char_code := Code;
   sData.Width := 0;
   sData.Advance := 0;
-  sData.Ascender := 0;
-  sData.Descender := 0;
   sData.BearingX := 0;
   sData.BearingY := 0;
   sData.BufferSize := 0;
@@ -310,11 +310,7 @@ begin
   fr_face.LoadGlyph(glyph_index, [ftlfMonochrome, ftlfTargetMono, ftlfRender]);
   self.sData.BearingX := fr_face.glyph.Metrics.HorzBearingX div 64;
   self.sData.BearingY := fr_face.glyph.Metrics.HorzBearingY div 64;
-  font_data.height := fr_face.Size.Metrics.height div 64;
   self.sData.Width := fr_face.glyph.Bitmap.Width;
-  // это правильнее
-  self.sData.Ascender := fr_face.Size.Metrics.Ascender div 64;
-  self.sData.Descender := fr_face.Size.Metrics.Descender div 64;
   self.sData.Advance := fr_face.glyph.Metrics.HorzAdvance div 64;
   if self.sData.char_code = 32 then
     self.sData.Width := self.sData.Advance;
@@ -370,13 +366,13 @@ begin
   origin.Y := round(Image.height * 9 / 12);
   if (X < origin.X + self.sData.BearingX * grid_size) or
     (X > origin.X + (self.sData.BearingX + self.sData.Width) * grid_size) or
-    (Y < origin.Y - self.sData.Ascender * grid_size) or
-    (Y > origin.Y - self.sData.Ascender * grid_size + font_data.height *
+    (Y < origin.Y - font_data.Ascender * grid_size) or
+    (Y > origin.Y - font_data.Ascender * grid_size + font_data.height *
     grid_size)
   then
     exit;
   i := (X - origin.X - self.sData.BearingX * grid_size) div grid_size;
-  j := (Y - origin.Y + self.sData.Ascender * grid_size) div grid_size;
+  j := (Y - origin.Y + font_data.Ascender * grid_size) div grid_size;
 
   b := self.Buffer[i * font_data.bpc + j div 8];
   if Button = TMouseButton.mbLeft then
@@ -414,8 +410,8 @@ begin
   origin.Y := round(Image.height * 9 / 12);
   bbox.Left := origin.X;
   bbox.Right := origin.X + self.sData.Advance * grid_size;
-  bbox.Top := origin.Y - self.sData.Ascender * grid_size;
-  bbox.Bottom := origin.Y - self.sData.Descender * grid_size;
+  bbox.Top := origin.Y - font_data.Ascender * grid_size;
+  bbox.Bottom := origin.Y - font_data.Descender * grid_size;
   // заливка коробки белым
   Image.Canvas.Brush.Color := clWhite;
   for X := self.sData.BearingX to self.sData.Width - 1 + self.sData.BearingX do
@@ -499,9 +495,7 @@ procedure TSymbol.CopyData(Source: TSymbol);
 var
   i: integer;
 begin
-  // i := self.sData.char_code;
   self.sData := Source.sData;
-  // self.sData.char_code := i;
   self.Buffer := AllocMem(self.sData.BufferSize);
   for i := 0 to self.sData.BufferSize - 1 do
     self.Buffer[i] := Source.Buffer[i];
