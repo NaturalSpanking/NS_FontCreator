@@ -242,7 +242,7 @@ var
   j, k: integer;
   new_height: integer;
   new_bpc: integer;
-  mask: Byte;
+  mask: byte;
 begin
   if self.Buffer = nil then
     exit;
@@ -264,7 +264,7 @@ begin
     self.Buffer := p;
     dec(new_bpc);
   end;
-  mask := $FF shr (new_bpc*8 - new_height);
+  mask := $FF shr (new_bpc * 8 - new_height);
   j := new_bpc - 1;
   while j < self.sData.BufferSize do
   begin
@@ -466,13 +466,15 @@ begin
     exit;
   end;
   // вычисление размера сетки
-  grid_size := round(Image.height * 7 / 10 / font_data.height);
-  i := round(Image.Width * 5 / 10 / self.sData.Width);
+  grid_size := round((9 / 10) * (Image.height / font_data.height));
+  i := round((7 / 10) * (Image.Width / self.sData.Width));
   if i < grid_size then
     grid_size := i;
   // вычисление координат
-  origin.X := round(Image.Width / 8);
-  origin.Y := round(Image.height * 9 / 12);
+  origin.X := round(Image.Width / 8) - self.sData.BearingX * grid_size;
+  // origin.Y := round(Image.height * 9 / 12);
+  origin.Y := round((font_data.Ascender * grid_size * Image.height) /
+    ((font_data.Ascender - font_data.Descender + 1) * grid_size));
   bbox.Left := origin.X;
   bbox.Right := origin.X + self.sData.Advance * grid_size;
   bbox.Top := origin.Y - font_data.Ascender * grid_size;
