@@ -75,6 +75,15 @@ type
     Clone1: TMenuItem;
     Clone2: TMenuItem;
     Button5: TButton;
+    N1: TMenuItem;
+    Add1: TMenuItem;
+    Addrowatbottom1: TMenuItem;
+    Removerowattop1: TMenuItem;
+    Removerowattop2: TMenuItem;
+    SpeedButton9: TSpeedButton;
+    SpeedButton10: TSpeedButton;
+    SpeedButton11: TSpeedButton;
+    SpeedButton12: TSpeedButton;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -112,6 +121,10 @@ type
       Shift: TShiftState; X, Y: integer);
     procedure Clone1Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure Addrowatbottom1Click(Sender: TObject);
+    procedure Add1Click(Sender: TObject);
+    procedure Removerowattop2Click(Sender: TObject);
+    procedure Removerowattop1Click(Sender: TObject);
   private
     procedure ClearImg;
     procedure FR_Save(FName: string);
@@ -156,6 +169,7 @@ begin
     FR_SelectFont(Sender);
     exit;
   end;
+  FR_SetFont(FontDialog1.Font);
   for i := 0 to TreeView1.Items.Count - 1 do
     if TreeView1.Items[i].Parent <> nil then
     begin
@@ -176,8 +190,7 @@ end;
 
 procedure TForm1.Button5Click(Sender: TObject);
 begin
-dec(font_data.height);
-
+  Add1Click(Form1);
 end;
 
 procedure TForm1.FR_SelectFont(Sender: TObject);
@@ -479,9 +492,7 @@ begin
       b := 1; // 1 - листочек
       BlockWrite(f, b, 1); // запись признака
       psy := TreeView1.Items[i].Data;
-      psy.WriteToFile(f);
-      // BlockWrite(f, psy, sizeof(TSymbol)); // запись структуры символа
-      // BlockWrite(f, psy.Buffer^, psy.BufferSize); // запись массива пикселей
+      psy.WriteToFile(f); // запись структуры символа и массива пикселей
     end
     else
     begin
@@ -501,10 +512,10 @@ begin
   begin
     b := 1; // 1 - есть данные о шрифте
     BlockWrite(f, b, 1);
-    BlockWrite(f, font_data.Height, sizeof(integer)); // запись данных шрифта
-    BlockWrite(f, font_data.bpc, sizeof(integer)); // запись данных шрифта
-    BlockWrite(f, font_data.min_w, sizeof(integer)); // запись данных шрифта
-    BlockWrite(f, font_data.max_w, sizeof(integer)); // запись данных шрифта
+    BlockWrite(f, font_data^, sizeof(T_FR_Font) - sizeof(string));
+    b := length(font_data.extended_font_name);
+    BlockWrite(f, b, sizeof(integer));
+    BlockWrite(f, font_data.extended_font_name[1], b * sizeof(char));
 
     i := FontDialog1.Font.Charset;
     BlockWrite(f, i, sizeof(integer));
@@ -564,10 +575,10 @@ begin
   BlockRead(f, b, 1); // чтения наличия данных о шрифте
   if b = 1 then
   begin
-    BlockRead(f, font_data.Height, sizeof(integer)); // загрузка данных шрифта
-    BlockRead(f, font_data.bpc, sizeof(integer));
-    BlockRead(f, font_data.min_w, sizeof(integer));
-    BlockRead(f, font_data.max_w, sizeof(integer));
+    BlockRead(f, font_data^, sizeof(T_FR_Font) - sizeof(string));
+    BlockRead(f, b, sizeof(integer));
+    SetLength(font_data.extended_font_name, b);
+    BlockRead(f, font_data.extended_font_name[1], b * sizeof(char));
 
     BlockRead(f, i, sizeof(integer));
     FontDialog1.Font.Charset := TFontCharset(i);
@@ -582,8 +593,6 @@ begin
     BlockRead(f, S[1], (i) * sizeof(char));
     FontDialog1.Font.Name := S;
   end;
-
-  // TreeView1.Select(TreeView1.Items[0]);
   CloseFile(f);
 end;
 
@@ -596,9 +605,39 @@ begin
     Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
     StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
       IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
-    FR_SetFont(FontDialog1.Font);
+//    FR_SetFont(FontDialog1.Font);
     StatusBar1.Panels[0].Text := font_data.extended_font_name;
   end;
+end;
+
+procedure TForm1.Add1Click(Sender: TObject);
+var
+  i: integer;
+begin
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if TreeView1.Items[i].Parent <> nil then
+    begin
+      TSymbol(TreeView1.Items[i].Data).AddRowAtBottom;
+    end;
+
+  inc(font_data.Height);
+  inc(font_data.Ascender);
+  if font_data.Height > font_data.bpc * 8 then
+    inc(font_data.bpc);
+
+  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
+    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
+
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if TreeView1.Items[i].Parent <> nil then
+    begin
+      TSymbol(TreeView1.Items[i].Data).MoveDown;
+    end;
+
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+  ClearImg;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
 procedure TForm1.Addcolumnatleft1Click(Sender: TObject);
@@ -619,6 +658,30 @@ begin
   TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
+procedure TForm1.Addrowatbottom1Click(Sender: TObject);
+var
+  i: integer;
+begin
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if TreeView1.Items[i].Parent <> nil then
+    begin
+      TSymbol(TreeView1.Items[i].Data).AddRowAtBottom;
+    end;
+
+  inc(font_data.Height);
+  inc(font_data.Ascender);
+  if font_data.Height > font_data.bpc * 8 then
+    inc(font_data.bpc);
+
+  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
+    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
+
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+  ClearImg;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
+end;
+
 procedure TForm1.Removecolumnatleft1Click(Sender: TObject);
 begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
@@ -634,6 +697,55 @@ begin
     exit;
   ClearImg;
   TSymbol(TreeView1.Selected.Data).DelColAtRight;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
+end;
+
+procedure TForm1.Removerowattop1Click(Sender: TObject);
+var
+  i: integer;
+begin
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if TreeView1.Items[i].Parent <> nil then
+    begin
+      TSymbol(TreeView1.Items[i].Data).MoveUp;
+      TSymbol(TreeView1.Items[i].Data).DelRowAtBottom;
+    end;
+
+  dec(font_data.Height);
+  dec(font_data.Ascender);
+  if font_data.Height <= (font_data.bpc - 1) * 8 then
+    dec(font_data.bpc);
+
+  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
+    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
+
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+  ClearImg;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
+end;
+
+procedure TForm1.Removerowattop2Click(Sender: TObject);
+var
+  i: integer;
+begin
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if TreeView1.Items[i].Parent <> nil then
+    begin
+      TSymbol(TreeView1.Items[i].Data).DelRowAtBottom;
+    end;
+
+  dec(font_data.Height);
+  dec(font_data.Ascender);
+  if font_data.Height <= (font_data.bpc - 1) * 8 then
+    dec(font_data.bpc);
+
+  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
+    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
+
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+  ClearImg;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 

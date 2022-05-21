@@ -37,6 +37,9 @@ type
     procedure DelColAtLeft;
     procedure DelColAtRight;
 
+    procedure AddRowAtBottom;
+    procedure DelRowAtBottom;
+
     procedure MoveUp;
     procedure MoveDown;
     procedure MoveLeft;
@@ -233,6 +236,69 @@ begin
   dec(self.sData.BufferSize, font_data.bpc);
 end;
 
+procedure TSymbol.DelRowAtBottom;
+var
+  p: PByte;
+  j, k: integer;
+  new_height: integer;
+  new_bpc: integer;
+  mask: Byte;
+begin
+  if self.Buffer = nil then
+    exit;
+  new_height := font_data.height - 1;
+  new_bpc := font_data.bpc;
+  if new_height <= (font_data.bpc - 1) * 8 then // надо уменьшать BPC
+  begin
+    p := AllocMem(self.sData.BufferSize - self.sData.Width);
+    k := 0;
+    for j := 0 to self.sData.BufferSize - self.sData.Width - 1 do
+    begin
+      p[j] := self.Buffer[k];
+      inc(k);
+      if k mod font_data.bpc = font_data.bpc - 1 then
+        inc(k);
+    end;
+    dec(self.sData.BufferSize, self.sData.Width);
+    FreeMemory(self.Buffer);
+    self.Buffer := p;
+    dec(new_bpc);
+  end;
+  mask := $FF shr (new_bpc*8 - new_height);
+  j := new_bpc - 1;
+  while j < self.sData.BufferSize do
+  begin
+    self.Buffer[j] := self.Buffer[j] and mask;
+    inc(j, new_bpc);
+  end;
+end;
+
+procedure TSymbol.AddRowAtBottom;
+var
+  p: PByte;
+  j, k: integer;
+  new_height: integer;
+begin
+  if self.Buffer = nil then
+    exit;
+  new_height := font_data.height + 1;
+  if new_height > font_data.bpc * 8 then // надо увеличивать BPC
+  begin
+    p := AllocMem(self.sData.BufferSize + self.sData.Width);
+    k := 0;
+    for j := 0 to self.sData.BufferSize - 1 do
+    begin
+      p[k] := self.Buffer[j];
+      inc(k);
+      if j mod font_data.bpc = font_data.bpc - 1 then
+        inc(k);
+    end;
+    inc(self.sData.BufferSize, self.sData.Width);
+    FreeMemory(self.Buffer);
+    self.Buffer := p;
+  end;
+end;
+
 procedure TSymbol.MoveDown;
 var
   i: integer;
@@ -368,8 +434,7 @@ begin
     (X > origin.X + (self.sData.BearingX + self.sData.Width) * grid_size) or
     (Y < origin.Y - font_data.Ascender * grid_size) or
     (Y > origin.Y - font_data.Ascender * grid_size + font_data.height *
-    grid_size)
-  then
+    grid_size) then
     exit;
   i := (X - origin.X - self.sData.BearingX * grid_size) div grid_size;
   j := (Y - origin.Y + font_data.Ascender * grid_size) div grid_size;

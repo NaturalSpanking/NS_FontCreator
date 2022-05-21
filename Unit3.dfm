@@ -13,6 +13,7 @@ object Form3: TForm3
   Font.Name = 'Times New Roman'
   Font.Style = []
   OldCreateOrder = False
+  Position = poMainFormCenter
   PixelsPerInch = 96
   TextHeight = 21
   object Label1: TLabel
