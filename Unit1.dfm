@@ -34,21 +34,21 @@ object Form1: TForm1
   object Image2: TImage
     Left = 154
     Top = 0
-    Width = 1080
+    Width = 1081
     Height = 822
     Align = alClient
     OnMouseDown = Image2MouseDown
     ExplicitLeft = 157
     ExplicitTop = -6
+    ExplicitWidth = 1080
   end
   object Panel1: TPanel
-    Left = 1234
+    Left = 1235
     Top = 0
-    Width = 190
+    Width = 189
     Height = 822
     Align = alRight
     TabOrder = 0
-    ExplicitHeight = 802
     object Label1: TLabel
       Left = 6
       Top = 795
@@ -60,14 +60,15 @@ object Form1: TForm1
       AlignWithMargins = True
       Left = 4
       Top = 4
-      Width = 182
+      Width = 181
       Height = 133
       Align = alTop
       Caption = 'Font'
       TabOrder = 0
+      ExplicitWidth = 182
       object SpeedButton9: TSpeedButton
-        Left = 15
-        Top = 85
+        Left = 9
+        Top = 86
         Width = 36
         Height = 36
         Glyph.Data = {
@@ -138,8 +139,8 @@ object Form1: TForm1
         OnClick = Add1Click
       end
       object SpeedButton10: TSpeedButton
-        Left = 55
-        Top = 85
+        Left = 51
+        Top = 86
         Width = 36
         Height = 36
         Glyph.Data = {
@@ -210,8 +211,8 @@ object Form1: TForm1
         OnClick = Addrowatbottom1Click
       end
       object SpeedButton11: TSpeedButton
-        Left = 96
-        Top = 85
+        Left = 95
+        Top = 86
         Width = 36
         Height = 36
         Glyph.Data = {
@@ -282,8 +283,8 @@ object Form1: TForm1
         OnClick = Removerowattop1Click
       end
       object SpeedButton12: TSpeedButton
-        Left = 136
-        Top = 85
+        Left = 137
+        Top = 86
         Width = 36
         Height = 36
         Glyph.Data = {
@@ -354,9 +355,9 @@ object Form1: TForm1
         OnClick = Removerowattop2Click
       end
       object Button1: TButton
-        Left = 96
+        Left = 95
         Top = 23
-        Width = 75
+        Width = 78
         Height = 25
         Caption = 'Repaint'
         TabOrder = 0
@@ -365,7 +366,7 @@ object Form1: TForm1
       object Button2: TButton
         Left = 9
         Top = 23
-        Width = 75
+        Width = 78
         Height = 25
         Caption = 'Select'
         TabOrder = 1
@@ -374,16 +375,16 @@ object Form1: TForm1
       object Button3: TButton
         Left = 9
         Top = 54
-        Width = 75
+        Width = 78
         Height = 25
         Caption = 'Size--'
         TabOrder = 2
         OnClick = FR_DecFontSize
       end
       object Button4: TButton
-        Left = 96
+        Left = 95
         Top = 54
-        Width = 75
+        Width = 78
         Height = 25
         Caption = 'Size++'
         TabOrder = 3
@@ -394,14 +395,15 @@ object Form1: TForm1
       AlignWithMargins = True
       Left = 4
       Top = 143
-      Width = 182
+      Width = 181
       Height = 202
       Align = alTop
       Caption = 'Glyph'
       TabOrder = 1
       ExplicitTop = 103
+      ExplicitWidth = 182
       object SpeedButton1: TSpeedButton
-        Left = 15
+        Left = 9
         Top = 24
         Width = 36
         Height = 36
@@ -473,7 +475,7 @@ object Form1: TForm1
         OnClick = Addcolumnatleft1Click
       end
       object SpeedButton2: TSpeedButton
-        Left = 55
+        Left = 51
         Top = 24
         Width = 36
         Height = 36
@@ -545,7 +547,7 @@ object Form1: TForm1
         OnClick = Addcolumnatright1Click
       end
       object SpeedButton3: TSpeedButton
-        Left = 96
+        Left = 95
         Top = 24
         Width = 36
         Height = 36
@@ -617,7 +619,7 @@ object Form1: TForm1
         OnClick = Removecolumnatleft1Click
       end
       object SpeedButton4: TSpeedButton
-        Left = 136
+        Left = 137
         Top = 24
         Width = 36
         Height = 36
@@ -689,7 +691,7 @@ object Form1: TForm1
         OnClick = Removecolumnatright1Click
       end
       object SpeedButton5: TSpeedButton
-        Left = 76
+        Left = 74
         Top = 73
         Width = 36
         Height = 36
@@ -762,8 +764,8 @@ object Form1: TForm1
         OnClick = Moveup1Click
       end
       object SpeedButton6: TSpeedButton
-        Left = 34
-        Top = 112
+        Left = 35
+        Top = 113
         Width = 36
         Height = 36
         Glyph.Data = {
@@ -834,8 +836,8 @@ object Form1: TForm1
         OnClick = Moveleft1Click
       end
       object SpeedButton7: TSpeedButton
-        Left = 118
-        Top = 112
+        Left = 113
+        Top = 113
         Width = 36
         Height = 36
         Glyph.Data = {
@@ -906,7 +908,7 @@ object Form1: TForm1
         OnClick = Moveright1Click
       end
       object SpeedButton8: TSpeedButton
-        Left = 76
+        Left = 74
         Top = 154
         Width = 36
         Height = 36
@@ -977,15 +979,6 @@ object Form1: TForm1
           0707070707070707070707070707070707070707070707070000}
         OnClick = Movedown1Click
       end
-    end
-    object Button5: TButton
-      Left = 80
-      Top = 416
-      Width = 75
-      Height = 25
-      Caption = 'Button5'
-      TabOrder = 2
-      OnClick = Button5Click
     end
   end
   object TreeView1: TTreeView

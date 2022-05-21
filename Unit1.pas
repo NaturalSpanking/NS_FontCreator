@@ -74,7 +74,6 @@ type
     SpeedButton8: TSpeedButton;
     Clone1: TMenuItem;
     Clone2: TMenuItem;
-    Button5: TButton;
     N1: TMenuItem;
     Add1: TMenuItem;
     Addrowatbottom1: TMenuItem;
