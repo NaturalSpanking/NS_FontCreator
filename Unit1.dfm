@@ -1011,7 +1011,7 @@ object Form1: TForm1
         Width = 300
       end
       item
-        Width = 50
+        Width = 70
       end
       item
         Width = 550
