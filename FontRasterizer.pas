@@ -129,6 +129,8 @@ begin
   font_data.height := fr_face.Size.Metrics.height div 64;
   font_data.Ascender := fr_face.Size.Metrics.Ascender div 64;
   font_data.Descender := fr_face.Size.Metrics.Descender div 64;
+  if font_data.Ascender - font_data.Descender > font_data.height then
+    font_data.height := font_data.Ascender - font_data.Descender;
   font_data.MaxAdvance := fr_face.Size.Metrics.MaxAdvance div 64;
   font_data.bpc := font_data.height div 8;
   if font_data.bpc * 8 < font_data.height then
