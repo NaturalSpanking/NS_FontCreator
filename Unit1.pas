@@ -331,8 +331,8 @@ begin
   if not SaveDialog2.Execute then
     exit;
   if FileExists(SaveDialog2.FileName) then
-    if MessageDlg('File is exist. Rewrite?', mtConfirmation, [mbYes, mbCancel], 0) = mrCancel
-    then
+    if MessageDlg('File is exist. Rewrite?', mtConfirmation, [mbYes, mbCancel],
+      0) = mrCancel then
       exit;
 
   AssignFile(f, SaveDialog2.FileName);
@@ -453,6 +453,16 @@ begin
     + '       ';
   FR_CreateFont;
   ClearImg;
+  if ParamCount = 1 then
+  begin
+    OpenDialog1.FileName := ParamStr(1);
+    FR_Load(OpenDialog1.FileName);
+    SaveDialog1.FileName := OpenDialog1.FileName;
+    Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
+    StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
+      IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
+    StatusBar1.Panels[0].Text := font_data.extended_font_name;
+  end;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -797,8 +807,8 @@ begin
   if SaveDialog1.Execute then
     if not FileExists(SaveDialog1.FileName) then
       FR_Save(SaveDialog1.FileName)
-    else if MessageDlg('File is exist. Rewrite?', mtConfirmation, [mbYes, mbCancel],
-      0) = mrYes then
+    else if MessageDlg('File is exist. Rewrite?', mtConfirmation,
+      [mbYes, mbCancel], 0) = mrYes then
       FR_Save(SaveDialog1.FileName);
 end;
 

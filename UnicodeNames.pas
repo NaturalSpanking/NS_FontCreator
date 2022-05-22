@@ -3,7 +3,7 @@ unit UnicodeNames;
 interface
 
 uses
-  SysUtils, Classes;
+  System.SysUtils, System.Classes;
 
 type
   PUniData = ^TUniData;
@@ -17,10 +17,8 @@ type
   TUnicodeNamer = class
   private
     arr_size: integer;
-    // [0 .. 34627]
     glyph_names_arr: array of TUniData;
     empty_data: TUniData;
-    // glyph_names_arr: PUniData;
     function search_data(Code: integer): PUniData;
   public
     procedure Free;
@@ -42,14 +40,16 @@ var
   sl: TStringList;
   S: string;
   i: integer;
+  fname: string;
 begin
   inherited Create;
   arr_size := 0;
   empty_data.Code := 0;
-  empty_data.U_plus := '';
-  empty_data.Name := 'NO DATA';
+  empty_data.U_plus := '#';
+  empty_data.Name := 'UnicodeData.txt not found.';
 
-  if not FileExists('UnicodeData.txt') then
+  fname := ExtractFileDir(ParamStr(0)) + '\UnicodeData.txt';
+  if not FileExists(fname) then
   begin
     // raise Exception.Create('Missing UnicodeData.txt');
     // Assert(false, 'Missing UnicodeData.txt');
@@ -60,9 +60,9 @@ begin
   sl.Clear;
   sl.Delimiter := ';';
   sl.StrictDelimiter := true;
-  if FileExists('UnicodeData.txt') then
+  if FileExists(fname) then
   begin
-    AssignFile(f, 'UnicodeData.txt');
+    AssignFile(f, fname);
     reset(f);
     arr_size := 0;
     while not EOF(f) do

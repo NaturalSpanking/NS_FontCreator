@@ -81,10 +81,13 @@ end;
 procedure TForm2.FormCreate(Sender: TObject);
 var
   i: integer;
+  s: string;
 begin
+  s := ExtractFileDir(Application.ExeName);
+  s := s + '\Presets.txt';
   int_list := TList.Create;
   presets := TStringList.Create;
-  presets.LoadFromFile('Presets.txt');
+  presets.LoadFromFile(s);
   for i := 0 to presets.Count - 1 do
     ComboBox1.Items.Add(copy(presets[i], 1, pos(':', presets[i]) - 1));
   ComboBox1.ItemIndex := 0;
