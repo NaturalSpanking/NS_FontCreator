@@ -119,7 +119,6 @@ type
     procedure Image2MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
     procedure Clone1Click(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
     procedure Addrowatbottom1Click(Sender: TObject);
     procedure Add1Click(Sender: TObject);
     procedure Removerowattop2Click(Sender: TObject);
@@ -164,7 +163,6 @@ var
 begin
   if (font_data = nil) then
   begin
-    // MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
     FR_SelectFont(Sender);
     exit;
   end;
@@ -185,11 +183,6 @@ end;
 procedure TForm1.Autorepaint1Click(Sender: TObject);
 begin
   Autorepaint1.Checked := not Autorepaint1.Checked;
-end;
-
-procedure TForm1.Button5Click(Sender: TObject);
-begin
-  Add1Click(Form1);
 end;
 
 procedure TForm1.FR_SelectFont(Sender: TObject);
@@ -322,10 +315,25 @@ var
   f: TextFile;
   S: string;
 begin
-  S := '';
-  SaveDialog2.FileName := mv_spaces(font_data.extended_font_name) + '.c';
+  if OpenDialog1.FileName <> '' then
+  begin
+    S := OpenDialog1.FileName;
+    while pos('\', S) <> 0 do
+      delete(S, 1, pos('\', S));
+    delete(S, pos('.', S), length(S));
+    SaveDialog2.FileName := mv_spaces(S) + '.c';
+  end
+  else
+  begin
+    S := '';
+    SaveDialog2.FileName := mv_spaces(font_data.extended_font_name) + '.c';
+  end;
   if not SaveDialog2.Execute then
     exit;
+  if FileExists(SaveDialog2.FileName) then
+    if MessageDlg('File is exist. Rewrite?', mtConfirmation, [mbYes, mbCancel], 0) = mrCancel
+    then
+      exit;
 
   AssignFile(f, SaveDialog2.FileName);
   rewrite(f);
@@ -404,7 +412,6 @@ procedure TForm1.FR_DecFontSize(Sender: TObject);
 begin
   if font_data = nil then
   begin
-    // MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
     FR_SelectFont(Sender);
     exit;
   end;
@@ -421,7 +428,6 @@ procedure TForm1.FR_IncFontSize(Sender: TObject);
 begin
   if font_data = nil then
   begin
-    // MessageDlg('Font must be selected first', mtInformation, [mbOk], 0);
     FR_SelectFont(Sender);
     exit;
   end;
@@ -436,7 +442,7 @@ end;
 
 procedure TForm1.FR_Delete(Sender: TObject);
 begin
-  TreeView1.Selected.Delete;
+  TreeView1.Selected.delete;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -530,6 +536,7 @@ begin
   end;
   CloseFile(f);
   Form1.Caption := 'NS Font Creator' + ' - ' + SaveDialog1.FileName;
+  OpenDialog1.FileName := SaveDialog1.FileName;
 end;
 
 procedure TForm1.FR_Load(FName: string);
@@ -604,7 +611,7 @@ begin
     Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
     StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
       IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
-//    FR_SetFont(FontDialog1.Font);
+    // FR_SetFont(FontDialog1.Font);
     StatusBar1.Panels[0].Text := font_data.extended_font_name;
   end;
 end;
@@ -779,7 +786,7 @@ begin
       if not FileExists(SaveDialog1.FileName) then
         FR_Save(SaveDialog1.FileName)
       else if MessageDlg('File is exist. Rewrite?', mtConfirmation,
-        [mbYes, mbNo], 0) = mrYes then
+        [mbYes, mbCancel], 0) = mrYes then
         FR_Save(SaveDialog1.FileName);
   end;
 end;
@@ -790,7 +797,7 @@ begin
   if SaveDialog1.Execute then
     if not FileExists(SaveDialog1.FileName) then
       FR_Save(SaveDialog1.FileName)
-    else if MessageDlg('File is exist. Rewrite?', mtConfirmation, [mbYes, mbNo],
+    else if MessageDlg('File is exist. Rewrite?', mtConfirmation, [mbYes, mbCancel],
       0) = mrYes then
       FR_Save(SaveDialog1.FileName);
 end;
@@ -863,7 +870,7 @@ procedure TForm1.TreeView1KeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (Key = VK_DELETE) and (TreeView1.Selected <> nil) then
-    TreeView1.Selected.Delete;
+    TreeView1.Selected.delete;
   // if (Key = VK_UP) and (ssShift in Shift) then
   // TreeView1.Selected.MoveTo(TreeView1.Items[TreeView1.Selected.Index-1],naInsert);
 end;

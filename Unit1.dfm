@@ -49,6 +49,7 @@ object Form1: TForm1
     Height = 822
     Align = alRight
     TabOrder = 0
+    ExplicitHeight = 802
     object Label1: TLabel
       Left = 6
       Top = 795
@@ -65,7 +66,6 @@ object Form1: TForm1
       Align = alTop
       Caption = 'Font'
       TabOrder = 0
-      ExplicitWidth = 182
       object SpeedButton9: TSpeedButton
         Left = 9
         Top = 86
@@ -400,8 +400,6 @@ object Form1: TForm1
       Align = alTop
       Caption = 'Glyph'
       TabOrder = 1
-      ExplicitTop = 103
-      ExplicitWidth = 182
       object SpeedButton1: TSpeedButton
         Left = 9
         Top = 24
