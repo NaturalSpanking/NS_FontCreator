@@ -19,6 +19,7 @@ type
     arr_size: integer;
     // [0 .. 34627]
     glyph_names_arr: array of TUniData;
+    empty_data: TUniData;
     // glyph_names_arr: PUniData;
     function search_data(Code: integer): PUniData;
   public
@@ -43,35 +44,47 @@ var
   i: integer;
 begin
   inherited Create;
-  if not FileExists('UnicodeData.txt') then
-    raise Exception.Create('Missing UnicodeData.txt');
+  arr_size := 0;
+  empty_data.Code := 0;
+  empty_data.U_plus := '';
+  empty_data.Name := 'NO DATA';
 
+  if not FileExists('UnicodeData.txt') then
+  begin
+    // raise Exception.Create('Missing UnicodeData.txt');
+    // Assert(false, 'Missing UnicodeData.txt');
+    // что-то это ничего не работает
+    // halt;
+  end;
   sl := TStringList.Create;
   sl.Clear;
   sl.Delimiter := ';';
   sl.StrictDelimiter := true;
-  AssignFile(f, 'UnicodeData.txt');
-  reset(f);
-  arr_size := 0;
-  while not EOF(f) do
+  if FileExists('UnicodeData.txt') then
   begin
-    readln(f);
-    inc(arr_size);
+    AssignFile(f, 'UnicodeData.txt');
+    reset(f);
+    arr_size := 0;
+    while not EOF(f) do
+    begin
+      readln(f);
+      inc(arr_size);
+    end;
+    SetLength(glyph_names_arr, arr_size + 1);
+    CloseFile(f);
+    reset(f);
+    i := 0;
+    repeat
+      readln(f, S);
+      sl.DelimitedText := S;
+      glyph_names_arr[i].Code := StrToInt('$' + sl[0]);
+      glyph_names_arr[i].Name := sl[1];
+      glyph_names_arr[i].U_plus := sl[0];
+      inc(i);
+    until EOF(f);
+    CloseFile(f);
   end;
-  SetLength(glyph_names_arr, arr_size + 1);
-  CloseFile(f);
-  reset(f);
-  i := 0;
-  repeat
-    readln(f, S);
-    sl.DelimitedText := S;
-    glyph_names_arr[i].Code := StrToInt('$' + sl[0]);
-    glyph_names_arr[i].Name := sl[1];
-    glyph_names_arr[i].U_plus := sl[0];
-    inc(i);
-  until EOF(f);
   sl.Free;
-  CloseFile(f);
 end;
 
 destructor TUnicodeNamer.Destroy;
@@ -90,9 +103,11 @@ function TUnicodeNamer.search_data(Code: integer): PUniData;
 var
   a, b, i: integer;
 begin
-  Result := nil;
   if arr_size = 0 then
+  begin
+    Result := @empty_data;
     exit;
+  end;
 
   b := arr_size;
   a := 0;
@@ -104,7 +119,6 @@ begin
       b := i;
   until glyph_names_arr[i].Code = Code;
   Result := @glyph_names_arr[i];
-  // Result := glyph_names_arr[i].U_plus + ' - ' + glyph_names_arr[i].Name;
 end;
 
 initialization
