@@ -45,7 +45,7 @@ type
     procedure MoveLeft;
     procedure MoveRight;
 
-    function GetFreeSpaceTop: integer;
+    function GetFreeLinesTop: integer;
     function GetFreeLinesBottom: integer;
     procedure CopyData(Source: TSymbol);
     procedure ChangePixel(Image: TImage; Button: TMouseButton;
@@ -202,9 +202,39 @@ begin
   until mark;
 end;
 
-function TSymbol.GetFreeSpaceTop: integer;
+function TSymbol.GetFreeLinesTop: integer;
+var
+  i, j, k, X: integer;
+  mark: boolean;
+  min: integer;
 begin
-
+  Result := font_data.height;
+  mark := false;
+  k := 0;
+  repeat
+    i := k;
+    while i < self.sData.BufferSize do
+    begin
+      if self.Buffer[i] <> 0 then
+      begin
+        mark := true;
+        min := 8 * k;
+        X := 0;
+        for j := 0 to 7 do
+        begin
+          if (self.Buffer[i] and (1 shl j)) <> 0 then
+          begin
+            min := min + j;
+            break;
+          end;
+        end;
+        if min < Result then
+          Result := min;
+      end;
+      inc(i, font_data.bpc);
+    end;
+    inc(k);
+  until mark;
 end;
 
 procedure TSymbol.AddColAtLeft;
