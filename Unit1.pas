@@ -346,7 +346,6 @@ begin
     if TreeView1.Items[i].Parent = nil then
       S := S + '&' + gen_table(f, TreeView1.Items[i]) + ', ';
 
-  writeln(f);
   writeln(f, 'const TFont ' + mv_spaces(font_data.extended_font_name) + ' = {');
   write(f, #9);
   if font_data <> nil then
@@ -355,16 +354,21 @@ begin
 
   writeln(f, #9, '{' + S + '}');
   writeln(f, '};');
+  writeln(f, '//const PFont p' + mv_spaces(font_data.extended_font_name) +
+    ' = &' + mv_spaces(font_data.extended_font_name) + ';');
+  writeln(f, '#endif');
   writeln(f);
-  writeln(f, '//const PFont ' + mv_spaces(font_data.extended_font_name) +
-    ' = &_' + mv_spaces(font_data.extended_font_name) + ';');
-  writeln(f);
+  writeln(f, '//Copy this to "NS_fonts.h"');
+  writeln(f, '#ifndef ' + UpperCase(mv_spaces(font_data.extended_font_name)));
+  writeln(f, '#define ' + UpperCase(mv_spaces(font_data.extended_font_name)) +
+    #9 + '1');
+
   writeln(f, '#endif ');
   writeln(f);
-  writeln(f, '#define ' + UpperCase(mv_spaces(font_data.extended_font_name))
-    + #9 + '1');
+  writeln(f, '#ifdef ' + UpperCase(mv_spaces(font_data.extended_font_name)));
   writeln(f, 'extern const TFont ' +
     mv_spaces(font_data.extended_font_name) + ';');
+  writeln(f, '#endif ');
   CloseFile(f);
 end;
 
