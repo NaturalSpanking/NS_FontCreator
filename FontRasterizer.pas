@@ -505,6 +505,8 @@ begin
   if (self = nil) or (self.Buffer = nil) then
     exit;
   // вычисление размера сетки
+  if font_data.height = 0 then
+    exit;
   grid_size := round((9 / 10) * (Image.height / font_data.height));
   i := round((7 / 10) * (Image.Width / self.sData.Width));
   if i < grid_size then
@@ -549,6 +551,8 @@ begin
     exit;
   end;
   // вычисление размера сетки
+  if font_data.height = 0 then
+    exit;
   grid_size := round((9 / 10) * (Image.height / font_data.height));
   i := round((7 / 10) * (Image.Width / self.sData.Width));
   if i < grid_size then
