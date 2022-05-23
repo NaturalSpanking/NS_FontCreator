@@ -474,9 +474,8 @@ begin
     grid_size := i;
   // вычисление координат
   origin.X := round(Image.Width / 8) - self.sData.BearingX * grid_size;
-  // origin.Y := round(Image.height * 9 / 12);
-  origin.Y := round((font_data.Ascender * grid_size * Image.height) /
-    ((font_data.Ascender - font_data.Descender + 1) * grid_size));
+  origin.Y := round(font_data.Ascender * grid_size +
+    (Image.height - font_data.height * grid_size) / 2);
   bbox.Left := origin.X;
   bbox.Right := origin.X + self.sData.Advance * grid_size;
   bbox.Top := origin.Y - font_data.Ascender * grid_size;
