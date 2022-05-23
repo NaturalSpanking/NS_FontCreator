@@ -20,6 +20,8 @@ type
     end;
 
     Buffer: PByte;
+    function GetFreeLinesTop: integer;
+    function GetFreeLinesBottom: integer;
   public
     property Code: integer read sData.char_code;
 
@@ -44,12 +46,15 @@ type
     procedure MoveDown;
     procedure MoveLeft;
     procedure MoveRight;
-
-    function GetFreeLinesTop: integer;
-    function GetFreeLinesBottom: integer;
     procedure CopyData(Source: TSymbol);
     procedure ChangePixel(Image: TImage; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
+    property FreeTop: integer read GetFreeLinesTop;
+    property FreeBottom: integer read GetFreeLinesBottom;
+    property Advance: integer read sData.Advance;
+    property BearingX: integer read sData.BearingX;
+    property BearingY: integer read sData.BearingY;
+    property Width: integer read sData.Width;
   end;
 
   P_FR_Font = ^T_FR_Font;
@@ -87,6 +92,7 @@ end;
 
 procedure FR_FreeFont;
 begin
+  font_data.height := 0;
   if font_mem_size = 0 then
     exit;
   fr_face.glyph.Bitmap.Done;
@@ -169,11 +175,13 @@ end;
 
 function TSymbol.GetFreeLinesBottom: integer;
 var
-  i, j, k, X: integer;
+  i, j, k: integer;
   mark: boolean;
   min: integer;
 begin
   Result := font_data.height;
+  if self.Buffer = nil then
+    exit;
   mark := false;
   k := font_data.bpc;
   repeat
@@ -185,7 +193,6 @@ begin
       begin
         mark := true;
         min := 8 * (font_data.bpc - k - 1);
-        X := 0;
         for j := 0 to 7 do
         begin
           if (self.Buffer[i] and (128 shr j)) <> 0 then
@@ -199,16 +206,18 @@ begin
       end;
       inc(i, font_data.bpc);
     end;
-  until mark;
+  until mark or (k = 0);
 end;
 
 function TSymbol.GetFreeLinesTop: integer;
 var
-  i, j, k, X: integer;
+  i, j, k: integer;
   mark: boolean;
   min: integer;
 begin
   Result := font_data.height;
+  if self.Buffer = nil then
+    exit;
   mark := false;
   k := 0;
   repeat
@@ -219,7 +228,6 @@ begin
       begin
         mark := true;
         min := 8 * k;
-        X := 0;
         for j := 0 to 7 do
         begin
           if (self.Buffer[i] and (1 shl j)) <> 0 then
@@ -234,7 +242,7 @@ begin
       inc(i, font_data.bpc);
     end;
     inc(k);
-  until mark;
+  until mark or (k = font_data.bpc - 1);
 end;
 
 procedure TSymbol.AddColAtLeft;

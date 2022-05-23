@@ -7,7 +7,7 @@ uses
   System.Classes, System.UITypes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uFreeType, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.Imaging.jpeg, Vcl.Grids, Vcl.ComCtrls, Vcl.Menus, Vcl.ToolWin,
-  FontRasterizer, UnicodeNames, Vcl.ButtonGroup, Vcl.Buttons;
+  FontRasterizer, UnicodeNames, Vcl.ButtonGroup, Vcl.Buttons, Vcl.ValEdit;
 
 type
   TForm1 = class(TForm)
@@ -83,6 +83,7 @@ type
     SpeedButton10: TSpeedButton;
     SpeedButton11: TSpeedButton;
     SpeedButton12: TSpeedButton;
+    ValueListEditor1: TValueListEditor;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -130,6 +131,7 @@ type
     procedure FR_GenerateNew;
     function gen_table(var f: TextFile; table: TTreeNode): string;
     function mv_spaces(S: string): string;
+    procedure UpdateInfo;
 
   public
     { Public declarations }
@@ -175,9 +177,7 @@ begin
   ClearImg;
   if (TreeView1.Selected <> nil) and (TreeView1.Selected.Parent <> nil) then
     TSymbol(TreeView1.Selected.Data).Show(Image2);
-
-  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
-    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
+  UpdateInfo;
 end;
 
 procedure TForm1.Autorepaint1Click(Sender: TObject);
@@ -190,14 +190,9 @@ begin
   if FontDialog1.Execute(Application.Handle) then
   begin
     FR_SetFont(FontDialog1.Font);
-    StatusBar1.Panels[0].Text := font_data.extended_font_name;
-    StatusBar1.Panels[1].Text := IntToStr(font_data.Height div 64) + 'x' +
-      IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
-    // else
-    // StatusBar1.Panels[1].Text :=
-    // IntToStr(face.Size.Metrics.Height div 64) + 'x??';
     if Autorepaint1.Checked then
       FR_FullRepaint(Sender);
+    UpdateInfo;
   end;
 end;
 
@@ -304,6 +299,19 @@ begin
   StatusBar1.Panels[0].Text := '';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := '';
+  ValueListEditor1.Values['Height'] := '';
+  ValueListEditor1.Values['Ascender'] := '';
+  ValueListEditor1.Values['Descender'] := '';
+  ValueListEditor1.Values['MaxAdvance'] := '';
+  ValueListEditor1.Values['BPC'] := '';
+  ValueListEditor1.Values['Advance'] := '';
+  ValueListEditor1.Values['BearingX'] := '';
+  ValueListEditor1.Values['BearingY'] := '';
+  ValueListEditor1.Values['FreeTop'] := '';
+  ValueListEditor1.Values['FreeBottom'] := '';
+  ValueListEditor1.Values['GlyphHeight'] := '';
+  ValueListEditor1.Values['GlyphWidth'] := '';
+
   FontDialog1.Font.Name := 'Times New Roman';
   FontDialog1.Font.Size := 14;
   FontDialog1.Font.style := [];
@@ -428,11 +436,9 @@ begin
   end;
   FontDialog1.Font.Size := FontDialog1.Font.Size - 1;
   FR_SetFont(FontDialog1.Font);
-  StatusBar1.Panels[0].Text := font_data.extended_font_name;
-  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
-    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
   if Autorepaint1.Checked then
     FR_FullRepaint(Sender);
+  UpdateInfo;
 end;
 
 procedure TForm1.FR_IncFontSize(Sender: TObject);
@@ -444,11 +450,9 @@ begin
   end;
   FontDialog1.Font.Size := FontDialog1.Font.Size + 1;
   FR_SetFont(FontDialog1.Font);
-  StatusBar1.Panels[0].Text := font_data.extended_font_name;
-  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
-    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
   if Autorepaint1.Checked then
     FR_FullRepaint(Sender);
+  UpdateInfo;
 end;
 
 procedure TForm1.FR_Delete(Sender: TObject);
@@ -470,9 +474,7 @@ begin
     FR_Load(OpenDialog1.FileName);
     SaveDialog1.FileName := OpenDialog1.FileName;
     Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
-    StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
-      IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
-    StatusBar1.Panels[0].Text := font_data.extended_font_name;
+    UpdateInfo;
   end;
 end;
 
@@ -630,10 +632,7 @@ begin
     FR_Load(OpenDialog1.FileName);
     SaveDialog1.FileName := OpenDialog1.FileName;
     Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
-    StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
-      IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
-    // FR_SetFont(FontDialog1.Font);
-    StatusBar1.Panels[0].Text := font_data.extended_font_name;
+    UpdateInfo;
   end;
 end;
 
@@ -652,19 +651,17 @@ begin
   if font_data.Height > font_data.bpc * 8 then
     inc(font_data.bpc);
 
-  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
-    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
-
   for i := 0 to TreeView1.Items.Count - 1 do
     if TreeView1.Items[i].Parent <> nil then
     begin
       TSymbol(TreeView1.Items[i].Data).MoveDown;
     end;
-
+  UpdateInfo;
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   ClearImg;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
+
 end;
 
 procedure TForm1.Addcolumnatleft1Click(Sender: TObject);
@@ -674,6 +671,7 @@ begin
   ClearImg;
   TSymbol(TreeView1.Selected.Data).AddColAtLeft;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
+  UpdateInfo;
 end;
 
 procedure TForm1.Addcolumnatright1Click(Sender: TObject);
@@ -683,6 +681,7 @@ begin
   ClearImg;
   TSymbol(TreeView1.Selected.Data).AddColAtRight;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
+  UpdateInfo;
 end;
 
 procedure TForm1.Addrowatbottom1Click(Sender: TObject);
@@ -699,14 +698,12 @@ begin
   inc(font_data.Ascender);
   if font_data.Height > font_data.bpc * 8 then
     inc(font_data.bpc);
-
-  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
-    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
-
+  UpdateInfo;
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   ClearImg;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
+
 end;
 
 procedure TForm1.Removecolumnatleft1Click(Sender: TObject);
@@ -716,6 +713,7 @@ begin
   ClearImg;
   TSymbol(TreeView1.Selected.Data).DelColAtLeft;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
+  UpdateInfo;
 end;
 
 procedure TForm1.Removecolumnatright1Click(Sender: TObject);
@@ -725,6 +723,7 @@ begin
   ClearImg;
   TSymbol(TreeView1.Selected.Data).DelColAtRight;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
+  UpdateInfo;
 end;
 
 procedure TForm1.Removerowattop1Click(Sender: TObject);
@@ -742,10 +741,7 @@ begin
   dec(font_data.Ascender);
   if font_data.Height <= (font_data.bpc - 1) * 8 then
     dec(font_data.bpc);
-
-  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
-    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
-
+  UpdateInfo;
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   ClearImg;
@@ -766,10 +762,7 @@ begin
   dec(font_data.Ascender);
   if font_data.Height <= (font_data.bpc - 1) * 8 then
     dec(font_data.bpc);
-
-  StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
-    IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
-
+  UpdateInfo;
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   ClearImg;
@@ -825,7 +818,6 @@ end;
 
 procedure TForm1.TreeView1Change(Sender: TObject; Node: TTreeNode);
 var
-  UD: PUniData;
   psy: TSymbol;
 begin
   ClearImg;
@@ -833,12 +825,8 @@ begin
   begin
     psy := Node.Data;
     psy.Show(Image2);
-    UD := UniNamer.Data[psy.Code];
-    StatusBar1.Panels[2].Text := 'U+' + UD.U_plus + ' - ' + UD.Name;
-  end
-  else
-    StatusBar1.Panels[2].Text := '';
-
+  end;
+  UpdateInfo;
 end;
 
 procedure TForm1.TreeView1Deletion(Sender: TObject; Node: TTreeNode);
@@ -894,6 +882,49 @@ begin
     TreeView1.Selected.delete;
   // if (Key = VK_UP) and (ssShift in Shift) then
   // TreeView1.Selected.MoveTo(TreeView1.Items[TreeView1.Selected.Index-1],naInsert);
+end;
+
+procedure TForm1.UpdateInfo;
+var
+  UD: PUniData;
+  psy: TSymbol;
+  a, b: integer;
+begin
+  if (font_data <> nil) and (font_data.Height <> 0) then
+  begin
+    StatusBar1.Panels[0].Text := font_data.extended_font_name;
+    StatusBar1.Panels[1].Text := IntToStr(font_data.Height) + 'x' +
+      IntToStr(font_data.min_w) + '..' + IntToStr(font_data.max_w);
+
+    ValueListEditor1.Values['Height'] := IntToStr(font_data.Height);
+    ValueListEditor1.Values['Ascender'] := IntToStr(font_data.Ascender);
+    ValueListEditor1.Values['Descender'] := IntToStr(font_data.Descender);
+    ValueListEditor1.Values['MaxAdvance'] := IntToStr(font_data.MaxAdvance);
+    ValueListEditor1.Values['BPC'] := IntToStr(font_data.bpc);
+  end;
+
+  if (TreeView1.Selected <> nil) and (TreeView1.Selected.Parent <> nil) then
+  begin
+    if (TreeView1.Selected.Data <> nil) then
+    begin
+      psy := TSymbol(TreeView1.Selected.Data);
+      ValueListEditor1.Values['Advance'] := IntToStr(psy.Advance);
+      ValueListEditor1.Values['BearingX'] := IntToStr(psy.BearingX);
+      ValueListEditor1.Values['BearingY'] := IntToStr(psy.BearingY);
+      a := psy.FreeTop;
+      b := psy.FreeBottom;
+      ValueListEditor1.Values['FreeTop'] := IntToStr(a);
+      ValueListEditor1.Values['FreeBottom'] := IntToStr(b);
+      ValueListEditor1.Values['GlyphHeight'] :=
+        IntToStr(font_data.Height - a - b);
+      ValueListEditor1.Values['GlyphWidth'] := IntToStr(psy.Width);
+      UD := UniNamer.Data[psy.Code];
+      StatusBar1.Panels[2].Text := 'U+' + UD.U_plus + ' - ' + UD.Name;
+    end;
+  end
+  else
+    StatusBar1.Panels[2].Text := '';
+
 end;
 
 end.
