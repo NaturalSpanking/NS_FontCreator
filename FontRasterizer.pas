@@ -425,13 +425,14 @@ begin
   if (self = nil) or (self.Buffer = nil) then
     exit;
   // вычисление размера сетки
-  grid_size := round(Image.height * 7 / 10 / font_data.height);
-  i := round(Image.Width * 5 / 10 / self.sData.Width);
+  grid_size := round((9 / 10) * (Image.height / font_data.height));
+  i := round((7 / 10) * (Image.Width / self.sData.Width));
   if i < grid_size then
     grid_size := i;
   // вычисление координат
-  origin.X := round(Image.Width / 8);
-  origin.Y := round(Image.height * 9 / 12);
+  origin.X := round(Image.Width / 8) - self.sData.BearingX * grid_size;
+  origin.Y := round(font_data.Ascender * grid_size +
+    (Image.height - font_data.height * grid_size) / 2);
   if (X < origin.X + self.sData.BearingX * grid_size) or
     (X > origin.X + (self.sData.BearingX + self.sData.Width) * grid_size) or
     (Y < origin.Y - font_data.Ascender * grid_size) or
