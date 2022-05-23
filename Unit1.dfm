@@ -12,7 +12,7 @@ object Form1: TForm1
   DoubleBuffered = True
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
-  Font.Height = -19
+  Font.Height = -16
   Font.Name = 'Times New Roman'
   Font.Style = []
   Menu = MainMenu1
@@ -21,7 +21,7 @@ object Form1: TForm1
   OnDestroy = FormDestroy
   OnResize = FormResize
   PixelsPerInch = 96
-  TextHeight = 21
+  TextHeight = 19
   object Splitter2: TSplitter
     Left = 151
     Top = 0
@@ -53,8 +53,8 @@ object Form1: TForm1
     object Label1: TLabel
       Left = 6
       Top = 795
-      Width = 72
-      Height = 21
+      Width = 63
+      Height = 19
       Caption = '1440x900'
     end
     object GroupBox1: TGroupBox

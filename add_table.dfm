@@ -9,7 +9,7 @@ object Form2: TForm2
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
-  Font.Height = -19
+  Font.Height = -16
   Font.Name = 'Times New Roman'
   Font.Style = []
   OldCreateOrder = False
@@ -17,26 +17,26 @@ object Form2: TForm2
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
-  TextHeight = 21
+  TextHeight = 19
   object Label1: TLabel
     Left = 8
     Top = 11
-    Width = 50
-    Height = 21
+    Width = 41
+    Height = 19
     Caption = 'Preset:'
   end
   object Label2: TLabel
     Left = 8
     Top = 46
-    Width = 71
-    Height = 21
+    Width = 57
+    Height = 19
     Caption = 'Elements:'
   end
   object Edit1: TEdit
     Left = 87
     Top = 43
     Width = 313
-    Height = 29
+    Height = 27
     TabOrder = 0
   end
   object Button1: TButton
@@ -61,7 +61,7 @@ object Form2: TForm2
     Left = 87
     Top = 8
     Width = 313
-    Height = 29
+    Height = 27
     TabOrder = 3
     OnSelect = ComboBox1Select
   end

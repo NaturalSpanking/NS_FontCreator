@@ -9,32 +9,32 @@ object Form3: TForm3
   Color = clBtnFace
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
-  Font.Height = -19
+  Font.Height = -16
   Font.Name = 'Times New Roman'
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
   PixelsPerInch = 96
-  TextHeight = 21
+  TextHeight = 19
   object Label1: TLabel
     Left = 8
     Top = 11
-    Width = 89
-    Height = 21
+    Width = 72
+    Height = 19
     Caption = 'Table name:'
   end
   object Label2: TLabel
     Left = 8
     Top = 59
-    Width = 75
-    Height = 21
+    Width = 60
+    Height = 19
     Caption = 'First char:'
   end
   object Edit1: TEdit
     Left = 103
     Top = 8
     Width = 402
-    Height = 29
+    Height = 27
     TabOrder = 0
     Text = 'Table1'
   end
@@ -42,7 +42,7 @@ object Form3: TForm3
     Left = 103
     Top = 56
     Width = 26
-    Height = 29
+    Height = 27
     TabOrder = 1
   end
   object Button1: TButton
