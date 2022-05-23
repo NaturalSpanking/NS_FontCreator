@@ -45,6 +45,8 @@ type
     procedure MoveLeft;
     procedure MoveRight;
 
+    function GetFreeSpaceTop: integer;
+    function GetFreeLinesBottom: integer;
     procedure CopyData(Source: TSymbol);
     procedure ChangePixel(Image: TImage; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
@@ -163,6 +165,46 @@ procedure TSymbol.Free;
 begin
   if self <> nil then
     Destroy;
+end;
+
+function TSymbol.GetFreeLinesBottom: integer;
+var
+  i, j, k, X: integer;
+  mark: boolean;
+  min: integer;
+begin
+  Result := font_data.height;
+  mark := false;
+  k := font_data.bpc;
+  repeat
+    dec(k);
+    i := k;
+    while i < self.sData.BufferSize do
+    begin
+      if self.Buffer[i] <> 0 then
+      begin
+        mark := true;
+        min := 8 * (font_data.bpc - k - 1);
+        X := 0;
+        for j := 0 to 7 do
+        begin
+          if (self.Buffer[i] and (128 shr j)) <> 0 then
+          begin
+            min := min + j - (font_data.bpc * 8 - font_data.height);
+            break;
+          end;
+        end;
+        if min < Result then
+          Result := min;
+      end;
+      inc(i, font_data.bpc);
+    end;
+  until mark;
+end;
+
+function TSymbol.GetFreeSpaceTop: integer;
+begin
+
 end;
 
 procedure TSymbol.AddColAtLeft;
