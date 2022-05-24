@@ -40,6 +40,8 @@ object Form1: TForm1
     Height = 822
     Align = alClient
     OnMouseDown = Image2MouseDown
+    OnMouseMove = Image2MouseMove
+    OnMouseUp = Image2MouseUp
     ExplicitLeft = 157
     ExplicitTop = -6
     ExplicitWidth = 1080

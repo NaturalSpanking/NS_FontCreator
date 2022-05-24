@@ -126,7 +126,13 @@ type
     procedure Removerowattop1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
+    procedure Image2MouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Image2MouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
   private
+    move_btn: TMouseButton;
+    isDown: Boolean;
     procedure ClearImg;
     procedure FR_Save(FName: string);
     procedure FR_Load(FName: string);
@@ -233,8 +239,26 @@ begin
     TSymbol(TreeView1.Selected.Data).ChangePixel(Image2, Button, Shift, X, Y);
     TSymbol(TreeView1.Selected.Data).Show(Image2);
   end;
-  if Button = mbLeft then
-    exit;
+  move_btn := Button;
+  isDown := true;
+end;
+
+procedure TForm1.Image2MouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  if not isDown then
+  exit;
+  if (TreeView1.Selected <> nil) and (TreeView1.Selected.Parent <> nil) then
+  begin
+    TSymbol(TreeView1.Selected.Data).ChangePixel(Image2, move_btn, Shift, X, Y);
+    TSymbol(TreeView1.Selected.Data).Show(Image2);
+  end;
+end;
+
+procedure TForm1.Image2MouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  isDown := false;
 end;
 
 procedure TForm1.Makesources1Click(Sender: TObject);
