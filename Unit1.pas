@@ -84,6 +84,8 @@ type
     SpeedButton11: TSpeedButton;
     SpeedButton12: TSpeedButton;
     ValueListEditor1: TValueListEditor;
+    N4: TMenuItem;
+    Cropheight1: TMenuItem;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -127,9 +129,10 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormShow(Sender: TObject);
     procedure Image2MouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure Image2MouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
+      Shift: TShiftState; X, Y: integer);
+    procedure Image2MouseMove(Sender: TObject; Shift: TShiftState;
+      X, Y: integer);
+    procedure Cropheight1Click(Sender: TObject);
   private
     move_btn: TMouseButton;
     isDown: Boolean;
@@ -243,11 +246,11 @@ begin
   isDown := true;
 end;
 
-procedure TForm1.Image2MouseMove(Sender: TObject; Shift: TShiftState; X,
-  Y: Integer);
+procedure TForm1.Image2MouseMove(Sender: TObject; Shift: TShiftState;
+  X, Y: integer);
 begin
   if not isDown then
-  exit;
+    exit;
   if (TreeView1.Selected <> nil) and (TreeView1.Selected.Parent <> nil) then
   begin
     TSymbol(TreeView1.Selected.Data).ChangePixel(Image2, move_btn, Shift, X, Y);
@@ -256,7 +259,7 @@ begin
 end;
 
 procedure TForm1.Image2MouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+  Shift: TShiftState; X, Y: integer);
 begin
   isDown := false;
 end;
@@ -427,6 +430,32 @@ begin
 
   TreeView1.Items.AddObjectFirst(TreeView1.Selected, '''' + chr(psy.Code) + ''''
     + ' - ' + IntToStr(psy.Code), psy);
+end;
+
+procedure TForm1.Cropheight1Click(Sender: TObject);
+var
+  i, X: integer;
+  min_top, min_bot: integer;
+begin
+  if font_data.Height = 0 then
+    exit;
+  min_top := font_data.Height;
+  min_bot := font_data.Height;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i] <> nil) and (TreeView1.Items[i].Parent <> nil) and
+      (TreeView1.Items[i].Data <> nil) then
+    begin
+      X := TSymbol(TreeView1.Items[i].Data).FreeTop;
+      if X < min_top then
+        min_top := X;
+      X := TSymbol(TreeView1.Items[i].Data).FreeBottom;
+      if X < min_bot then
+        min_bot := X;
+    end;
+  for i := 1 to min_top do
+    Removerowattop1Click(Form1);
+  for i := 1 to min_bot do
+    Removerowattop2Click(Form1);
 end;
 
 procedure TForm1.Exit1Click(Sender: TObject);

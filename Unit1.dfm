@@ -1171,6 +1171,13 @@ object Form1: TForm1
         Caption = 'Remove row at bottom'
         OnClick = Removerowattop2Click
       end
+      object N4: TMenuItem
+        Caption = '-'
+      end
+      object Cropheight1: TMenuItem
+        Caption = 'Crop height'
+        OnClick = Cropheight1Click
+      end
     end
     object Charset1: TMenuItem
       Caption = 'Charset'
