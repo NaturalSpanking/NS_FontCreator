@@ -7,8 +7,8 @@ object Form1: TForm1
   Color = clBtnFace
   Constraints.MaxHeight = 1440
   Constraints.MaxWidth = 2560
-  Constraints.MinHeight = 600
-  Constraints.MinWidth = 800
+  Constraints.MinHeight = 427
+  Constraints.MinWidth = 600
   DoubleBuffered = True
   Font.Charset = RUSSIAN_CHARSET
   Font.Color = clWindowText
