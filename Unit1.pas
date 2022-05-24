@@ -124,6 +124,8 @@ type
     procedure Add1Click(Sender: TObject);
     procedure Removerowattop2Click(Sender: TObject);
     procedure Removerowattop1Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormShow(Sender: TObject);
   private
     procedure ClearImg;
     procedure FR_Save(FName: string);
@@ -460,6 +462,20 @@ begin
   TreeView1.Selected.delete;
 end;
 
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+var
+  f: file of Byte;
+  Wp: TWindowPlacement;
+begin
+  AssignFile(f, ExtractFileDir(Application.ExeName) + '\params.dat');
+  if GetWindowPlacement(Form1.Handle, @Wp) then
+  begin
+    rewrite(f);
+    BlockWrite(f, Wp, sizeof(TWindowPlacement));
+    CloseFile(f);
+  end;
+end;
+
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   StatusBar1.Panels[3].Text :=
@@ -495,12 +511,27 @@ begin
 
 end;
 
+procedure TForm1.FormShow(Sender: TObject);
+var
+  f: file of Byte;
+  Wp: TWindowPlacement;
+begin
+  AssignFile(f, ExtractFileDir(Application.ExeName) + '\params.dat');
+  if FileExists(ExtractFileDir(Application.ExeName) + '\params.dat') then
+  begin
+    reset(f);
+    BlockRead(f, Wp, sizeof(TWindowPlacement));
+    CloseFile(f);
+    SetWindowPlacement(Form1.Handle, @Wp);
+  end;
+end;
+
 procedure TForm1.FR_Save(FName: string);
 var
   stream: TMemoryStream;
   f: file;
   i: integer;
-  b: byte;
+  b: Byte;
   psy: TSymbol;
   p: ^integer;
 begin
@@ -551,7 +582,7 @@ begin
     BlockWrite(f, i, sizeof(integer));
     i := FontDialog1.Font.Size;
     BlockWrite(f, i, sizeof(integer));
-    i := byte(FontDialog1.Font.style);
+    i := Byte(FontDialog1.Font.style);
     BlockWrite(f, i, sizeof(integer));
     i := length(FontDialog1.Font.Name);
     BlockWrite(f, i, sizeof(integer));
@@ -567,7 +598,7 @@ var
   stream: TMemoryStream;
   f: file;
   i: integer;
-  b: byte;
+  b: Byte;
   S: string;
   psy: TSymbol;
   p: ^integer;
@@ -616,7 +647,7 @@ begin
     BlockRead(f, i, sizeof(integer));
     FontDialog1.Font.Size := i;
     BlockRead(f, i, sizeof(integer));
-    FontDialog1.Font.style := TFontStyles(byte(i));
+    FontDialog1.Font.style := TFontStyles(Byte(i));
     BlockRead(f, i, sizeof(integer));
     SetLength(S, i);
     BlockRead(f, S[1], (i) * sizeof(char));

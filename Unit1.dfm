@@ -17,9 +17,11 @@ object Form1: TForm1
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = False
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 19
   object Splitter2: TSplitter
@@ -1012,9 +1014,25 @@ object Form1: TForm1
       TitleCaptions.Strings = (
         'Metric'
         'Value')
+      ExplicitHeight = 453
       ColWidths = (
         117
         64)
+      RowHeights = (
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18)
     end
   end
   object TreeView1: TTreeView
