@@ -1247,6 +1247,25 @@ object Form1: TForm1
         Caption = 'Remove column at right'
         OnClick = Removecolumnatright1Click
       end
+      object N5: TMenuItem
+        Caption = '-'
+      end
+      object Findhighest1: TMenuItem
+        Caption = 'Find highest'
+        OnClick = Findhighest1Click
+      end
+      object Findlowest1: TMenuItem
+        Caption = 'Find lowest'
+        OnClick = Findlowest1Click
+      end
+      object Findwidest1: TMenuItem
+        Caption = 'Find widest'
+        OnClick = Findwidest1Click
+      end
+      object Findnarrowest1: TMenuItem
+        Caption = 'Find narrowest'
+        OnClick = Findnarrowest1Click
+      end
     end
     object Help1: TMenuItem
       Caption = 'Help'

@@ -88,6 +88,11 @@ type
     Cropheight1: TMenuItem;
     Adjustdigitwidth1: TMenuItem;
     Makemonospace1: TMenuItem;
+    N5: TMenuItem;
+    Findhighest1: TMenuItem;
+    Findlowest1: TMenuItem;
+    Findwidest1: TMenuItem;
+    Findnarrowest1: TMenuItem;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -137,6 +142,10 @@ type
     procedure Cropheight1Click(Sender: TObject);
     procedure Adjustdigitwidth1Click(Sender: TObject);
     procedure Makemonospace1Click(Sender: TObject);
+    procedure Findhighest1Click(Sender: TObject);
+    procedure Findlowest1Click(Sender: TObject);
+    procedure Findwidest1Click(Sender: TObject);
+    procedure Findnarrowest1Click(Sender: TObject);
   private
     move_btn: TMouseButton;
     isDown: Boolean;
@@ -562,6 +571,118 @@ end;
 procedure TForm1.FR_Delete(Sender: TObject);
 begin
   TreeView1.Selected.delete;
+end;
+
+procedure TForm1.Findhighest1Click(Sender: TObject);
+var
+  i, X: integer;
+  min, Count, idx: integer;
+begin
+  if font_data.Height = 0 then
+    exit;
+  min := font_data.Height;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      X := TSymbol(TreeView1.Items[i].Data).FreeTop;
+      if X = min then
+        inc(Count);
+      if X < min then
+      begin
+        min := X;
+        Count := 1;
+        idx := i;
+      end;
+    end;
+  if Count > 1 then
+    MessageDlg('More than 1 result. The first will shown.', mtInformation,
+      [mbOK], 0);
+  TreeView1.Select(TreeView1.Items[idx]);
+end;
+
+procedure TForm1.Findlowest1Click(Sender: TObject);
+var
+  i, X: integer;
+  min, Count, idx: integer;
+begin
+  if font_data.Height = 0 then
+    exit;
+  min := font_data.Height;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      X := TSymbol(TreeView1.Items[i].Data).FreeBottom;
+      if X = min then
+        inc(Count);
+      if X < min then
+      begin
+        min := X;
+        Count := 1;
+        idx := i;
+      end;
+    end;
+  if Count > 1 then
+    MessageDlg('More than 1 result. The first will shown.', mtInformation,
+      [mbOK], 0);
+  TreeView1.Select(TreeView1.Items[idx]);
+end;
+
+procedure TForm1.Findnarrowest1Click(Sender: TObject);
+var
+  i, X: integer;
+  min, Count, idx: integer;
+begin
+  if font_data.Height = 0 then
+    exit;
+  min := font_data.MaxAdvance + 1;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      X := TSymbol(TreeView1.Items[i].Data).Width;
+      if X = min then
+        inc(Count);
+      if X < min then
+      begin
+        min := X;
+        Count := 1;
+        idx := i;
+      end;
+    end;
+  if Count > 1 then
+    MessageDlg('More than 1 result. The first will shown.', mtInformation,
+      [mbOK], 0);
+  TreeView1.Select(TreeView1.Items[idx]);
+end;
+
+procedure TForm1.Findwidest1Click(Sender: TObject);
+var
+  i, X: integer;
+  max, Count, idx: integer;
+begin
+  if font_data.Height = 0 then
+    exit;
+  max := 0;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      X := TSymbol(TreeView1.Items[i].Data).Width;
+      if X = max then
+        inc(Count);
+      if X > max then
+      begin
+        max := X;
+        Count := 1;
+        idx := i;
+      end;
+    end;
+  if Count > 1 then
+    MessageDlg('More than 1 result. The first will shown.', mtInformation,
+      [mbOK], 0);
+  TreeView1.Select(TreeView1.Items[idx]);
 end;
 
 procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
