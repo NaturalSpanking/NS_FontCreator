@@ -157,6 +157,16 @@ implementation
 
 uses add_table, Unit3;
 
+function GetEntryCount(C: char; S: string): integer;
+var
+  i: integer;
+begin
+  Result := 0;
+  for i := 1 to Length(S) do
+    if S[i] = C then
+      inc(Result);
+end;
+
 procedure TForm1.FR_AddTable(Sender: TObject);
 var
   p: ^integer;
@@ -306,7 +316,7 @@ var
   i: integer;
 begin
   Result := '';
-  for i := 1 to length(S) do
+  for i := 1 to Length(S) do
     if S[i] = ' ' then
       Result := Result + '_'
     else
@@ -357,7 +367,7 @@ begin
     S := OpenDialog1.FileName;
     while pos('\', S) <> 0 do
       delete(S, 1, pos('\', S));
-    delete(S, pos('.', S), length(S));
+    delete(S, pos('.', S), Length(S));
     SaveDialog2.FileName := mv_spaces(S) + '.c';
   end
   else
@@ -382,7 +392,8 @@ begin
   for i := 0 to TreeView1.Items.Count - 1 do
     if TreeView1.Items[i].Parent = nil then
       S := S + '&' + gen_table(f, TreeView1.Items[i]) + ', ';
-
+  if GetEntryCount(',', S) = 1 then
+    S := S + S;
   writeln(f, 'const TFont ' + mv_spaces(font_data.extended_font_name) + ' = {');
   write(f, #9);
   if font_data <> nil then
@@ -626,7 +637,7 @@ begin
     b := 1; // 1 - וסעü האםםûו מ רנטפעו
     BlockWrite(f, b, 1);
     BlockWrite(f, font_data^, sizeof(T_FR_Font) - sizeof(string));
-    b := length(font_data.extended_font_name);
+    b := Length(font_data.extended_font_name);
     BlockWrite(f, b, sizeof(integer));
     BlockWrite(f, font_data.extended_font_name[1], b * sizeof(char));
 
@@ -638,7 +649,7 @@ begin
     BlockWrite(f, i, sizeof(integer));
     i := Byte(FontDialog1.Font.style);
     BlockWrite(f, i, sizeof(integer));
-    i := length(FontDialog1.Font.Name);
+    i := Length(FontDialog1.Font.Name);
     BlockWrite(f, i, sizeof(integer));
     BlockWrite(f, FontDialog1.Font.Name[1], i * sizeof(char));
   end;
@@ -862,7 +873,7 @@ begin
   if TreeView1.Selected.Parent <> nil then
     TreeView1.Selected := TreeView1.Selected.Parent;
   S := TreeView1.Selected.Text;
-  X := copy(S, pos(':', S), length(S));
+  X := copy(S, pos(':', S), Length(S));
   S := copy(S, 1, pos(':', S) - 1);
   p := TreeView1.Selected.Data;
   Form3.TableName := S;
