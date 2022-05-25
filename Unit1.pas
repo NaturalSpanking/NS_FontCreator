@@ -578,6 +578,8 @@ var
   i, X: integer;
   min, Count, idx: integer;
 begin
+  Count := 0;
+  idx := -1;
   if font_data.Height = 0 then
     exit;
   min := font_data.Height;
@@ -606,6 +608,8 @@ var
   i, X: integer;
   min, Count, idx: integer;
 begin
+  Count := 0;
+  idx := -1;
   if font_data.Height = 0 then
     exit;
   min := font_data.Height;
@@ -634,6 +638,8 @@ var
   i, X: integer;
   min, Count, idx: integer;
 begin
+  Count := 0;
+  idx := -1;
   if font_data.Height = 0 then
     exit;
   min := font_data.MaxAdvance + 1;
@@ -662,6 +668,8 @@ var
   i, X: integer;
   max, Count, idx: integer;
 begin
+  Count := 0;
+  idx := -1;
   if font_data.Height = 0 then
     exit;
   max := 0;
