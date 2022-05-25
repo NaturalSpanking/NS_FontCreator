@@ -86,6 +86,7 @@ type
     ValueListEditor1: TValueListEditor;
     N4: TMenuItem;
     Cropheight1: TMenuItem;
+    Adjustdigitwidth1: TMenuItem;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -133,6 +134,7 @@ type
     procedure Image2MouseMove(Sender: TObject; Shift: TShiftState;
       X, Y: integer);
     procedure Cropheight1Click(Sender: TObject);
+    procedure Adjustdigitwidth1Click(Sender: TObject);
   private
     move_btn: TMouseButton;
     isDown: Boolean;
@@ -800,6 +802,49 @@ begin
   ClearImg;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
 
+end;
+
+procedure TForm1.Adjustdigitwidth1Click(Sender: TObject);
+var
+  i, j: integer;
+  max, X: integer;
+  b: Boolean;
+begin
+  if font_data.Height = 0 then
+    exit;
+  max := 0;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      b := (TSymbol(TreeView1.Items[i].Data).Code in [48 .. 57]) or
+        (TSymbol(TreeView1.Items[i].Data).Code = 32) or
+        (TSymbol(TreeView1.Items[i].Data).Code = 43) or
+        (TSymbol(TreeView1.Items[i].Data).Code = 45);
+      if b then
+        if TSymbol(TreeView1.Items[i].Data).Width > max then
+          max := TSymbol(TreeView1.Items[i].Data).Width;
+    end;
+  // второй проход
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      b := (TSymbol(TreeView1.Items[i].Data).Code in [48 .. 57]) or
+        (TSymbol(TreeView1.Items[i].Data).Code = 32) or
+        (TSymbol(TreeView1.Items[i].Data).Code = 43) or
+        (TSymbol(TreeView1.Items[i].Data).Code = 45);
+      if b then
+      begin
+        X := max - TSymbol(TreeView1.Items[i].Data).Width;
+        for j := 1 to X div 2 do
+          TSymbol(TreeView1.Items[i].Data).AddColAtLeft;
+        for j := 1 to X - X div 2 do
+          TSymbol(TreeView1.Items[i].Data).AddColAtRight;
+      end;
+    end;
+  if (TreeView1.Selected <> nil) and (TreeView1.Selected.Parent <> nil) then
+    TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
 procedure TForm1.Removecolumnatleft1Click(Sender: TObject);

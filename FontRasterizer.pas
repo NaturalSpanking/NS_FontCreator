@@ -541,7 +541,6 @@ var
   bbox: TRect;
   R: TRect;
 begin
-
   if (self = nil) or (self.Buffer = nil) then
   begin
     Image.Canvas.Font.Name := 'Times New Roman';

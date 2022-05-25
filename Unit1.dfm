@@ -1178,6 +1178,10 @@ object Form1: TForm1
         Caption = 'Crop height'
         OnClick = Cropheight1Click
       end
+      object Adjustdigitwidth1: TMenuItem
+        Caption = 'Adjust digit width'
+        OnClick = Adjustdigitwidth1Click
+      end
     end
     object Charset1: TMenuItem
       Caption = 'Charset'
