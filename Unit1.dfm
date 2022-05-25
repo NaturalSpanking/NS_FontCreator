@@ -1182,6 +1182,10 @@ object Form1: TForm1
         Caption = 'Adjust digit width'
         OnClick = Adjustdigitwidth1Click
       end
+      object Makemonospace1: TMenuItem
+        Caption = 'Make monospace'
+        OnClick = Makemonospace1Click
+      end
     end
     object Charset1: TMenuItem
       Caption = 'Charset'

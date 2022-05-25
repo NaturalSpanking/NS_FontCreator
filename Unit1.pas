@@ -87,6 +87,7 @@ type
     N4: TMenuItem;
     Cropheight1: TMenuItem;
     Adjustdigitwidth1: TMenuItem;
+    Makemonospace1: TMenuItem;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -135,6 +136,7 @@ type
       X, Y: integer);
     procedure Cropheight1Click(Sender: TObject);
     procedure Adjustdigitwidth1Click(Sender: TObject);
+    procedure Makemonospace1Click(Sender: TObject);
   private
     move_btn: TMouseButton;
     isDown: Boolean;
@@ -274,6 +276,39 @@ procedure TForm1.Image2MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
 begin
   isDown := false;
+end;
+
+procedure TForm1.Makemonospace1Click(Sender: TObject);
+var
+  i, j: integer;
+  max, X: integer;
+begin
+  if font_data.Height = 0 then
+    exit;
+  max := 0;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      if TSymbol(TreeView1.Items[i].Data).Width > max then
+        max := TSymbol(TreeView1.Items[i].Data).Width;
+    end;
+  // второй проход
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      X := max - TSymbol(TreeView1.Items[i].Data).Width;
+      for j := 1 to X div 2 do
+        TSymbol(TreeView1.Items[i].Data).AddColAtLeft;
+      for j := 1 to X - X div 2 do
+        TSymbol(TreeView1.Items[i].Data).AddColAtRight;
+    end;
+  font_data.min_w := max;
+  font_data.max_w := max;
+  UpdateInfo;
+  if (TreeView1.Selected <> nil) and (TreeView1.Selected.Parent <> nil) then
+    TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
 procedure TForm1.Makesources1Click(Sender: TObject);
