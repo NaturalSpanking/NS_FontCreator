@@ -404,7 +404,7 @@ object Form1: TForm1
       Align = alTop
       Caption = 'Glyph'
       TabOrder = 1
-      object SpeedButton1: TSpeedButton
+      object SpeedAddColLeft: TSpeedButton
         Left = 9
         Top = 24
         Width = 36
@@ -474,9 +474,9 @@ object Form1: TForm1
           7171710700000000000000000000000000000000000000070000070707070707
           0707070707070707070707070707070707070707070707070000070707070707
           0707070707070707070707070707070707070707070707070000}
-        OnClick = Addcolumnatleft1Click
+        OnClick = SymbolModify
       end
-      object SpeedButton2: TSpeedButton
+      object SpeedAddColRight: TSpeedButton
         Left = 51
         Top = 24
         Width = 36
@@ -546,9 +546,9 @@ object Form1: TForm1
           0000000000000000000000000000077171717171717107070000070707070707
           0707070707070707070707070707070707070707070707070000070707070707
           0707070707070707070707070707070707070707070707070000}
-        OnClick = Addcolumnatright1Click
+        OnClick = SymbolModify
       end
-      object SpeedButton3: TSpeedButton
+      object SpeedDelColLeft: TSpeedButton
         Left = 95
         Top = 24
         Width = 36
@@ -618,9 +618,9 @@ object Form1: TForm1
           4F4F4F0700000000000000000000000000000000000000070000070707070707
           0707070707070707070707070707070707070707070707070000070707070707
           0707070707070707070707070707070707070707070707070000}
-        OnClick = Removecolumnatleft1Click
+        OnClick = SymbolModify
       end
-      object SpeedButton4: TSpeedButton
+      object SpeedDelColRight: TSpeedButton
         Left = 137
         Top = 24
         Width = 36
@@ -690,9 +690,9 @@ object Form1: TForm1
           0000000000000000000000000000074F4F4F4F4F4F4F07070000070707070707
           0707070707070707070707070707070707070707070707070000070707070707
           0707070707070707070707070707070707070707070707070000}
-        OnClick = Removecolumnatright1Click
+        OnClick = SymbolModify
       end
-      object SpeedButton5: TSpeedButton
+      object SpeedUp: TSpeedButton
         Left = 74
         Top = 73
         Width = 36
@@ -763,9 +763,9 @@ object Form1: TForm1
           0707070707070707070707070707070707070707070707070000070707070707
           0707070707070707070707070707070707070707070707070000}
         Margin = 0
-        OnClick = Moveup1Click
+        OnClick = SymbolModify
       end
-      object SpeedButton6: TSpeedButton
+      object SpeedLeft: TSpeedButton
         Left = 35
         Top = 113
         Width = 36
@@ -835,9 +835,9 @@ object Form1: TForm1
           0707070707070707070707070707070707070707070707070000070707070707
           0707070707070707070707070707070707070707070707070000070707070707
           0707070707070707070707070707070707070707070707070000}
-        OnClick = Moveleft1Click
+        OnClick = SymbolModify
       end
-      object SpeedButton7: TSpeedButton
+      object SpeedRight: TSpeedButton
         Left = 113
         Top = 113
         Width = 36
@@ -907,9 +907,9 @@ object Form1: TForm1
           0707070707070707070707070707070707070707070707070000070707070707
           0707070707070707070707070707070707070707070707070000070707070707
           0707070707070707070707070707070707070707070707070000}
-        OnClick = Moveright1Click
+        OnClick = SymbolModify
       end
-      object SpeedButton8: TSpeedButton
+      object SpeedDown: TSpeedButton
         Left = 74
         Top = 154
         Width = 36
@@ -979,7 +979,7 @@ object Form1: TForm1
           0707070707070707070707070707070707070707070707070000070707070707
           0707070707070707070707070707070707070707070707070000070707070707
           0707070707070707070707070707070707070707070707070000}
-        OnClick = Movedown1Click
+        OnClick = SymbolModify
       end
     end
     object ValueListEditor1: TValueListEditor
@@ -1214,38 +1214,38 @@ object Form1: TForm1
       Caption = 'Glyph'
       object Moveup1: TMenuItem
         Caption = 'Move up'
-        OnClick = Moveup1Click
+        OnClick = SymbolModify
       end
       object Movedown1: TMenuItem
         Caption = 'Move down'
-        OnClick = Movedown1Click
+        OnClick = SymbolModify
       end
       object Moveleft1: TMenuItem
         Caption = 'Move left'
-        OnClick = Moveleft1Click
+        OnClick = SymbolModify
       end
       object Moveright1: TMenuItem
         Caption = 'Move right'
-        OnClick = Moveright1Click
+        OnClick = SymbolModify
       end
       object N2: TMenuItem
         Caption = '-'
       end
       object Addcolumnatleft1: TMenuItem
         Caption = 'Add column at left'
-        OnClick = Addcolumnatleft1Click
+        OnClick = SymbolModify
       end
       object Addcolumnatright1: TMenuItem
         Caption = 'Add column at right'
-        OnClick = Addcolumnatright1Click
+        OnClick = SymbolModify
       end
       object Removecolumnatleft1: TMenuItem
         Caption = 'Remove column at left'
-        OnClick = Removecolumnatleft1Click
+        OnClick = SymbolModify
       end
       object Removecolumnatright1: TMenuItem
         Caption = 'Remove column at right'
-        OnClick = Removecolumnatright1Click
+        OnClick = SymbolModify
       end
       object N5: TMenuItem
         Caption = '-'

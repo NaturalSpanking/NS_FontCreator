@@ -106,7 +106,7 @@
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppEnableHighDPI>true</AppEnableHighDPI>
-        <Debugger_RunParams>&quot;D:\Projects\Delphi\XE\Delphi\NS_FontCreator\Win64\Debug\big_dig.nsfont&quot;</Debugger_RunParams>
+        <Debugger_RunParams>&quot;D:\Projects\Delphi\XE\Delphi\NS_FontCreator\Win64\Debug\Times New Roman Regular 14.nsfont&quot;</Debugger_RunParams>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
