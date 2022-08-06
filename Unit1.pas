@@ -8,15 +8,19 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uFreeType, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.Imaging.jpeg, Vcl.Grids, Vcl.ComCtrls, Vcl.Menus, Vcl.ToolWin,
   FontRasterizer, UnicodeNames, Vcl.ButtonGroup, Vcl.Buttons, Vcl.ValEdit,
-  System.Actions, Vcl.ActnList, IniFiles, SHFolder, sSkinProvider, sSkinManager,
-  acImage, sDialogs, sSpeedButton, sGroupBox, sPanel, sSplitter, sStatusBar,
-  sTreeView;
+  System.Actions, Vcl.ActnList, IniFiles, SHFolder;
 
 type
   TForm1 = class(TForm)
     FontDialog1: TFontDialog;
+    Panel1: TPanel;
+    TreeView1: TTreeView;
+    Splitter2: TSplitter;
     MainMenu1: TMainMenu;
     File1: TMenuItem;
+    StatusBar1: TStatusBar;
+    Image2: TImage;
+    Label1: TLabel;
     PopupMenu1: TPopupMenu;
     Addtable1: TMenuItem;
     Addsymbols1: TMenuItem;
@@ -25,6 +29,8 @@ type
     Open1: TMenuItem;
     Save1: TMenuItem;
     Saveas1: TMenuItem;
+    OpenDialog1: TOpenDialog;
+    SaveDialog1: TSaveDialog;
     Help1: TMenuItem;
     Charset1: TMenuItem;
     Exit1: TMenuItem;
@@ -52,6 +58,21 @@ type
     Increasesize1: TMenuItem;
     Decreasesize1: TMenuItem;
     N3: TMenuItem;
+    SaveDialog2: TSaveDialog;
+    GroupBox1: TGroupBox;
+    GroupBox2: TGroupBox;
+    Button1: TButton;
+    Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
+    SpeedAddColLeft: TSpeedButton;
+    SpeedAddColRight: TSpeedButton;
+    SpeedDelColLeft: TSpeedButton;
+    SpeedDelColRight: TSpeedButton;
+    SpeedUp: TSpeedButton;
+    SpeedLeft: TSpeedButton;
+    SpeedRight: TSpeedButton;
+    SpeedDown: TSpeedButton;
     Clone1: TMenuItem;
     Clone2: TMenuItem;
     N1: TMenuItem;
@@ -59,6 +80,11 @@ type
     Addrowatbottom1: TMenuItem;
     Removerowattop1: TMenuItem;
     Removerowattop2: TMenuItem;
+    SpeedButton9: TSpeedButton;
+    SpeedButton10: TSpeedButton;
+    SpeedButton11: TSpeedButton;
+    SpeedButton12: TSpeedButton;
+    ValueListEditor1: TValueListEditor;
     N4: TMenuItem;
     Cropheight1: TMenuItem;
     Adjustdigitwidth1: TMenuItem;
@@ -98,35 +124,6 @@ type
     AGlyphFindLowest: TAction;
     AGlyphFindWidest: TAction;
     AGlyphFindNarrowest: TAction;
-    sSkinManager1: TsSkinManager;
-    sSkinProvider1: TsSkinProvider;
-    Image2: TsImage;
-    OpenDialog1: TsOpenDialog;
-    sPanel1: TsPanel;
-    sGroupBox1: TsGroupBox;
-    sGroupBox2: TsGroupBox;
-    ValueListEditor1: TValueListEditor;
-    sSpeedButton1: TsSpeedButton;
-    sSpeedButton2: TsSpeedButton;
-    sSpeedButton3: TsSpeedButton;
-    sSpeedButton4: TsSpeedButton;
-    sSpeedButton5: TsSpeedButton;
-    sSpeedButton6: TsSpeedButton;
-    sSpeedButton7: TsSpeedButton;
-    sSpeedButton8: TsSpeedButton;
-    sSpeedButton9: TsSpeedButton;
-    sSpeedButton10: TsSpeedButton;
-    sSpeedButton11: TsSpeedButton;
-    sSpeedButton12: TsSpeedButton;
-    sSpeedButton13: TsSpeedButton;
-    sSpeedButton14: TsSpeedButton;
-    sSpeedButton15: TsSpeedButton;
-    sSpeedButton16: TsSpeedButton;
-    SaveDialog1: TsSaveDialog;
-    SaveDialog2: TsSaveDialog;
-    Splitter1: TsSplitter;
-    StatusBar1: TsStatusBar;
-    TreeView1: TsTreeView;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
