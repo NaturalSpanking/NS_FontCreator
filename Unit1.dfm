@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 781
+  ClientHeight = 761
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -22,38 +22,36 @@ object Form1: TForm1
   OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 19
-  object Image2: TsImage
-    Left = 157
-    Top = 0
-    Width = 1078
-    Height = 762
-    Align = alClient
-    Picture.Data = {07544269746D617000000000}
-    OnMouseDown = Image2MouseDown
-    OnMouseMove = Image2MouseMove
-    OnMouseUp = Image2MouseUp
-    ExplicitLeft = 155
-    ExplicitTop = -6
-    ExplicitWidth = 1081
-  end
   object Splitter1: TsSplitter
     Left = 151
     Top = 0
-    Height = 762
+    Height = 742
     AutoSnap = False
     ExplicitLeft = 248
     ExplicitTop = 400
     ExplicitHeight = 100
   end
+  object Image2: TImage
+    Left = 157
+    Top = 0
+    Width = 1078
+    Height = 742
+    Align = alClient
+    OnMouseDown = Image2MouseDown
+    OnMouseMove = Image2MouseMove
+    OnMouseUp = Image2MouseUp
+    ExplicitLeft = 624
+    ExplicitTop = 368
+    ExplicitWidth = 105
+    ExplicitHeight = 105
+  end
   object sPanel1: TsPanel
     Left = 1235
     Top = 0
     Width = 189
-    Height = 762
+    Height = 742
     Align = alRight
     TabOrder = 0
-    ExplicitLeft = 867
-    ExplicitTop = -6
     object sGroupBox1: TsGroupBox
       AlignWithMargins = True
       Left = 4
@@ -63,9 +61,6 @@ object Form1: TForm1
       Align = alTop
       Caption = 'Font'
       TabOrder = 0
-      ExplicitLeft = 1
-      ExplicitTop = 1
-      ExplicitWidth = 187
       object sSpeedButton1: TsSpeedButton
         Left = 3
         Top = 23
@@ -132,9 +127,6 @@ object Form1: TForm1
       Align = alTop
       Caption = 'Glyph'
       TabOrder = 1
-      ExplicitLeft = 1
-      ExplicitTop = 140
-      ExplicitWidth = 187
       object sSpeedButton9: TsSpeedButton
         Left = 3
         Top = 24
@@ -196,7 +188,7 @@ object Form1: TForm1
       Left = 1
       Top = 348
       Width = 187
-      Height = 413
+      Height = 393
       Align = alClient
       Font.Charset = RUSSIAN_CHARSET
       Font.Color = clWindowText
@@ -226,11 +218,26 @@ object Form1: TForm1
       ColWidths = (
         115
         66)
+      RowHeights = (
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18
+        18)
     end
   end
   object StatusBar1: TsStatusBar
     Left = 0
-    Top = 762
+    Top = 742
     Width = 1424
     Height = 19
     Panels = <
@@ -252,7 +259,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 151
-    Height = 762
+    Height = 742
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
@@ -266,7 +273,6 @@ object Form1: TForm1
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
-    ExplicitLeft = 151
   end
   object FontDialog1: TFontDialog
     Ctl3D = False
@@ -579,7 +585,6 @@ object Form1: TForm1
   end
   object sSkinManager1: TsSkinManager
     ButtonsOptions.OldGlyphsMode = False
-    Active = False
     InternalSkins = <
       item
         Name = 'Aluminium (internal)'
@@ -25015,8 +25020,9 @@ object Form1: TForm1
           4E44AE426082}
         OriginName = 'Vienna Ext.asz'
       end>
+    SkinDirectory = 'c:\Skins'
     SkinName = 'Topaz (internal)'
-    SkinInfo = 'N/A'
+    SkinInfo = '15'
     ThirdParty.ThirdEdits = 
       'TEdit'#13#10'TMemo'#13#10'TMaskEdit'#13#10'TLabeledEdit'#13#10'THotKey'#13#10'TListBox'#13#10'TCheck' +
       'ListBox'#13#10'TRichEdit'#13#10'TDateTimePicker'

@@ -100,7 +100,6 @@ type
     AGlyphFindNarrowest: TAction;
     sSkinManager1: TsSkinManager;
     sSkinProvider1: TsSkinProvider;
-    Image2: TsImage;
     OpenDialog1: TsOpenDialog;
     sPanel1: TsPanel;
     sGroupBox1: TsGroupBox;
@@ -127,6 +126,7 @@ type
     Splitter1: TsSplitter;
     StatusBar1: TsStatusBar;
     TreeView1: TsTreeView;
+    Image2: TImage;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
