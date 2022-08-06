@@ -3,7 +3,7 @@ unit FontRasterizer;
 interface
 
 uses
-  SysUtils, Classes, Windows, Graphics, UITypes, ExtCtrls, UnicodeNames,
+  SysUtils, Classes, Windows, Graphics, UITypes, ExtCtrls, acImage, UnicodeNames,
   uFreeType;
 
 type
@@ -29,7 +29,7 @@ type
     destructor Destroy; override;
     procedure Free;
     procedure Render;
-    procedure Show(var Image: TImage);
+    procedure Show(var Image: TsImage);
     function Build(var f: TextFile): string;
     procedure WriteToFile(var f: file);
     procedure ReadFromFile(var f: file);
@@ -532,7 +532,7 @@ begin
   self.Buffer[i * font_data.bpc + j div 8] := b;
 end;
 
-procedure TSymbol.Show(var Image: TImage);
+procedure TSymbol.Show(var Image: TsImage);
 var
   i, j: integer;
   X, Y: integer;

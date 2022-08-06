@@ -7,19 +7,16 @@ uses
   System.Classes, System.UITypes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uFreeType, Vcl.StdCtrls, Vcl.ExtCtrls,
   Vcl.Imaging.jpeg, Vcl.Grids, Vcl.ComCtrls, Vcl.Menus, Vcl.ToolWin,
-  FontRasterizer, UnicodeNames, Vcl.ButtonGroup, Vcl.Buttons, Vcl.ValEdit;
+  FontRasterizer, UnicodeNames, Vcl.ButtonGroup, Vcl.Buttons, Vcl.ValEdit,
+  System.Actions, Vcl.ActnList, IniFiles, SHFolder, sSkinProvider, sSkinManager,
+  acImage, sDialogs, sSpeedButton, sGroupBox, sPanel, sSplitter, sStatusBar,
+  sTreeView;
 
 type
   TForm1 = class(TForm)
     FontDialog1: TFontDialog;
-    Panel1: TPanel;
-    TreeView1: TTreeView;
-    Splitter2: TSplitter;
     MainMenu1: TMainMenu;
     File1: TMenuItem;
-    StatusBar1: TStatusBar;
-    Image2: TImage;
-    Label1: TLabel;
     PopupMenu1: TPopupMenu;
     Addtable1: TMenuItem;
     Addsymbols1: TMenuItem;
@@ -28,8 +25,6 @@ type
     Open1: TMenuItem;
     Save1: TMenuItem;
     Saveas1: TMenuItem;
-    OpenDialog1: TOpenDialog;
-    SaveDialog1: TSaveDialog;
     Help1: TMenuItem;
     Charset1: TMenuItem;
     Exit1: TMenuItem;
@@ -57,21 +52,6 @@ type
     Increasesize1: TMenuItem;
     Decreasesize1: TMenuItem;
     N3: TMenuItem;
-    SaveDialog2: TSaveDialog;
-    GroupBox1: TGroupBox;
-    GroupBox2: TGroupBox;
-    Button1: TButton;
-    Button2: TButton;
-    Button3: TButton;
-    Button4: TButton;
-    SpeedAddColLeft: TSpeedButton;
-    SpeedAddColRight: TSpeedButton;
-    SpeedDelColLeft: TSpeedButton;
-    SpeedDelColRight: TSpeedButton;
-    SpeedUp: TSpeedButton;
-    SpeedLeft: TSpeedButton;
-    SpeedRight: TSpeedButton;
-    SpeedDown: TSpeedButton;
     Clone1: TMenuItem;
     Clone2: TMenuItem;
     N1: TMenuItem;
@@ -79,11 +59,6 @@ type
     Addrowatbottom1: TMenuItem;
     Removerowattop1: TMenuItem;
     Removerowattop2: TMenuItem;
-    SpeedButton9: TSpeedButton;
-    SpeedButton10: TSpeedButton;
-    SpeedButton11: TSpeedButton;
-    SpeedButton12: TSpeedButton;
-    ValueListEditor1: TValueListEditor;
     N4: TMenuItem;
     Cropheight1: TMenuItem;
     Adjustdigitwidth1: TMenuItem;
@@ -93,6 +68,65 @@ type
     Findlowest1: TMenuItem;
     Findwidest1: TMenuItem;
     Findnarrowest1: TMenuItem;
+    ActionList1: TActionList;
+    ABuild: TAction;
+    ANewFile: TAction;
+    AOpenFile: TAction;
+    ASaveFile: TAction;
+    ASaveFileAs: TAction;
+    AExit: TAction;
+    AFullRepaint: TAction;
+    AFontSelect: TAction;
+    AFontIncSize: TAction;
+    AFontDecSize: TAction;
+    AFontAddRowTop: TAction;
+    AFontAddRowBot: TAction;
+    AFontRemRowTop: TAction;
+    AFontRemRowBot: TAction;
+    AFontCropHeight: TAction;
+    AFontAdjDigitW: TAction;
+    AFontMakeMono: TAction;
+    AGlyphMoveUp: TAction;
+    AGlyphMoveDown: TAction;
+    AGlyphMoveLeft: TAction;
+    AGlyphMoveRight: TAction;
+    AGlyphAddColLeft: TAction;
+    AGlyphAddColRight: TAction;
+    AGlyphRemColLeft: TAction;
+    AGlyphRemColRight: TAction;
+    AGlyphFindHighest: TAction;
+    AGlyphFindLowest: TAction;
+    AGlyphFindWidest: TAction;
+    AGlyphFindNarrowest: TAction;
+    sSkinManager1: TsSkinManager;
+    sSkinProvider1: TsSkinProvider;
+    Image2: TsImage;
+    OpenDialog1: TsOpenDialog;
+    sPanel1: TsPanel;
+    sGroupBox1: TsGroupBox;
+    sGroupBox2: TsGroupBox;
+    ValueListEditor1: TValueListEditor;
+    sSpeedButton1: TsSpeedButton;
+    sSpeedButton2: TsSpeedButton;
+    sSpeedButton3: TsSpeedButton;
+    sSpeedButton4: TsSpeedButton;
+    sSpeedButton5: TsSpeedButton;
+    sSpeedButton6: TsSpeedButton;
+    sSpeedButton7: TsSpeedButton;
+    sSpeedButton8: TsSpeedButton;
+    sSpeedButton9: TsSpeedButton;
+    sSpeedButton10: TsSpeedButton;
+    sSpeedButton11: TsSpeedButton;
+    sSpeedButton12: TsSpeedButton;
+    sSpeedButton13: TsSpeedButton;
+    sSpeedButton14: TsSpeedButton;
+    sSpeedButton15: TsSpeedButton;
+    sSpeedButton16: TsSpeedButton;
+    SaveDialog1: TsSaveDialog;
+    SaveDialog2: TsSaveDialog;
+    Splitter1: TsSplitter;
+    StatusBar1: TsStatusBar;
+    TreeView1: TsTreeView;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -111,34 +145,32 @@ type
       State: TDragState; var Accept: Boolean);
     procedure TreeView1KeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure Save1Click(Sender: TObject);
-    procedure Open1Click(Sender: TObject);
-    procedure Saveas1Click(Sender: TObject);
     procedure Autorepaint1Click(Sender: TObject);
-    procedure Makesources1Click(Sender: TObject);
-    procedure Exit1Click(Sender: TObject);
-    procedure New1Click(Sender: TObject);
     procedure Image2MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
     procedure Clone1Click(Sender: TObject);
-    procedure Addrowatbottom1Click(Sender: TObject);
-    procedure Add1Click(Sender: TObject);
-    procedure Removerowattop2Click(Sender: TObject);
-    procedure Removerowattop1Click(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormShow(Sender: TObject);
     procedure Image2MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
     procedure Image2MouseMove(Sender: TObject; Shift: TShiftState;
       X, Y: integer);
-    procedure Cropheight1Click(Sender: TObject);
-    procedure Adjustdigitwidth1Click(Sender: TObject);
-    procedure Makemonospace1Click(Sender: TObject);
-    procedure Findhighest1Click(Sender: TObject);
-    procedure Findlowest1Click(Sender: TObject);
-    procedure Findwidest1Click(Sender: TObject);
-    procedure Findnarrowest1Click(Sender: TObject);
     procedure SymbolModify(Sender: TObject);
+    procedure ABuildExecute(Sender: TObject);
+    procedure ANewFileExecute(Sender: TObject);
+    procedure AOpenFileExecute(Sender: TObject);
+    procedure ASaveFileExecute(Sender: TObject);
+    procedure ASaveFileAsExecute(Sender: TObject);
+    procedure AExitExecute(Sender: TObject);
+    procedure AFontAddRowTopExecute(Sender: TObject);
+    procedure AFontAddRowBotExecute(Sender: TObject);
+    procedure AFontRemRowTopExecute(Sender: TObject);
+    procedure AFontRemRowBotExecute(Sender: TObject);
+    procedure AFontCropHeightExecute(Sender: TObject);
+    procedure AFontAdjDigitWExecute(Sender: TObject);
+    procedure AFontMakeMonoExecute(Sender: TObject);
+    procedure AGlyphFindHighestExecute(Sender: TObject);
+    procedure AGlyphFindLowestExecute(Sender: TObject);
+    procedure AGlyphFindWidestExecute(Sender: TObject);
+    procedure AGlyphFindNarrowestExecute(Sender: TObject);
   private
     move_btn: TMouseButton;
     isDown: Boolean;
@@ -149,7 +181,8 @@ type
     function gen_table(var f: TextFile; table: TTreeNode): string;
     function mv_spaces(S: string): string;
     procedure UpdateInfo;
-
+    procedure SaveConfig;
+    procedure LoadConfig;
   public
     { Public declarations }
   end;
@@ -159,9 +192,12 @@ var
 
 implementation
 
-{$R *.dfm}
+uses Unit3, add_table;
 
-uses add_table, Unit3;
+const
+  ConfigName = 'NS_FontCreator.ini';
+
+{$R *.dfm}
 
 function GetEntryCount(C: char; S: string): integer;
 var
@@ -280,44 +316,6 @@ begin
   isDown := false;
 end;
 
-procedure TForm1.Makemonospace1Click(Sender: TObject);
-var
-  i, j: integer;
-  max, X: integer;
-begin
-  if font_data.Height = 0 then
-    exit;
-  max := 0;
-  for i := 0 to TreeView1.Items.Count - 1 do
-    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
-    then
-    begin
-      if TSymbol(TreeView1.Items[i].Data).Width > max then
-        max := TSymbol(TreeView1.Items[i].Data).Width;
-    end;
-  // второй проход
-  for i := 0 to TreeView1.Items.Count - 1 do
-    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
-    then
-    begin
-      X := max - TSymbol(TreeView1.Items[i].Data).Width;
-      for j := 1 to X div 2 do
-        TSymbol(TreeView1.Items[i].Data).AddColAtLeft;
-      for j := 1 to X - X div 2 do
-        TSymbol(TreeView1.Items[i].Data).AddColAtRight;
-    end;
-  font_data.min_w := max;
-  font_data.max_w := max;
-  UpdateInfo;
-  if (TreeView1.Selected <> nil) and (TreeView1.Selected.Parent <> nil) then
-    TSymbol(TreeView1.Selected.Data).Show(Image2);
-end;
-
-procedure TForm1.Makesources1Click(Sender: TObject);
-begin
-  FR_GenerateNew;
-end;
-
 function TForm1.mv_spaces(S: string): string;
 var
   i: integer;
@@ -328,39 +326,6 @@ begin
       Result := Result + '_'
     else
       Result := Result + S[i];
-end;
-
-procedure TForm1.New1Click(Sender: TObject);
-begin
-  TreeView1.Items.Clear;
-  ClearImg;
-  SaveDialog1.FileName := '';
-  SaveDialog2.FileName := '';
-  OpenDialog1.FileName := '';
-  font_data.extended_font_name := '';
-  Form1.Caption := 'NS Font Creator';
-
-  FR_FreeFont;
-
-  StatusBar1.Panels[0].Text := '';
-  StatusBar1.Panels[1].Text := '';
-  StatusBar1.Panels[2].Text := '';
-  ValueListEditor1.Values['Height'] := '';
-  ValueListEditor1.Values['Ascender'] := '';
-  ValueListEditor1.Values['Descender'] := '';
-  ValueListEditor1.Values['MaxAdvance'] := '';
-  ValueListEditor1.Values['BPC'] := '';
-  ValueListEditor1.Values['Advance'] := '';
-  ValueListEditor1.Values['BearingX'] := '';
-  ValueListEditor1.Values['BearingY'] := '';
-  ValueListEditor1.Values['FreeTop'] := '';
-  ValueListEditor1.Values['FreeBottom'] := '';
-  ValueListEditor1.Values['GlyphHeight'] := '';
-  ValueListEditor1.Values['GlyphWidth'] := '';
-
-  FontDialog1.Font.Name := 'Times New Roman';
-  FontDialog1.Font.Size := 14;
-  FontDialog1.Font.style := [];
 end;
 
 procedure TForm1.FR_GenerateNew;
@@ -450,37 +415,6 @@ begin
     + ' - ' + IntToStr(psy.Code), psy);
 end;
 
-procedure TForm1.Cropheight1Click(Sender: TObject);
-var
-  i, X: integer;
-  min_top, min_bot: integer;
-begin
-  if font_data.Height = 0 then
-    exit;
-  min_top := font_data.Height;
-  min_bot := font_data.Height;
-  for i := 0 to TreeView1.Items.Count - 1 do
-    if (TreeView1.Items[i] <> nil) and (TreeView1.Items[i].Parent <> nil) and
-      (TreeView1.Items[i].Data <> nil) then
-    begin
-      X := TSymbol(TreeView1.Items[i].Data).FreeTop;
-      if X < min_top then
-        min_top := X;
-      X := TSymbol(TreeView1.Items[i].Data).FreeBottom;
-      if X < min_bot then
-        min_bot := X;
-    end;
-  for i := 1 to min_top do
-    Removerowattop1Click(Form1);
-  for i := 1 to min_bot do
-    Removerowattop2Click(Form1);
-end;
-
-procedure TForm1.Exit1Click(Sender: TObject);
-begin
-  Form1.Close;
-end;
-
 procedure TForm1.FR_AddRange(Sender: TObject);
 var
   i: integer;
@@ -534,140 +468,6 @@ begin
   TreeView1.Selected.delete;
 end;
 
-procedure TForm1.Findhighest1Click(Sender: TObject);
-var
-  i, X: integer;
-  min, Count, idx: integer;
-begin
-  Count := 0;
-  idx := -1;
-  if font_data.Height = 0 then
-    exit;
-  min := font_data.Height;
-  for i := 0 to TreeView1.Items.Count - 1 do
-    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
-    then
-    begin
-      X := TSymbol(TreeView1.Items[i].Data).FreeTop;
-      if X = min then
-        inc(Count);
-      if X < min then
-      begin
-        min := X;
-        Count := 1;
-        idx := i;
-      end;
-    end;
-  if Count > 1 then
-    MessageDlg('More than 1 result. The first will shown.', mtInformation,
-      [mbOK], 0);
-  TreeView1.Select(TreeView1.Items[idx]);
-end;
-
-procedure TForm1.Findlowest1Click(Sender: TObject);
-var
-  i, X: integer;
-  min, Count, idx: integer;
-begin
-  Count := 0;
-  idx := -1;
-  if font_data.Height = 0 then
-    exit;
-  min := font_data.Height;
-  for i := 0 to TreeView1.Items.Count - 1 do
-    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
-    then
-    begin
-      X := TSymbol(TreeView1.Items[i].Data).FreeBottom;
-      if X = min then
-        inc(Count);
-      if X < min then
-      begin
-        min := X;
-        Count := 1;
-        idx := i;
-      end;
-    end;
-  if Count > 1 then
-    MessageDlg('More than 1 result. The first will shown.', mtInformation,
-      [mbOK], 0);
-  TreeView1.Select(TreeView1.Items[idx]);
-end;
-
-procedure TForm1.Findnarrowest1Click(Sender: TObject);
-var
-  i, X: integer;
-  min, Count, idx: integer;
-begin
-  Count := 0;
-  idx := -1;
-  if font_data.Height = 0 then
-    exit;
-  min := font_data.MaxAdvance + 1;
-  for i := 0 to TreeView1.Items.Count - 1 do
-    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
-    then
-    begin
-      X := TSymbol(TreeView1.Items[i].Data).Width;
-      if X = min then
-        inc(Count);
-      if X < min then
-      begin
-        min := X;
-        Count := 1;
-        idx := i;
-      end;
-    end;
-  if Count > 1 then
-    MessageDlg('More than 1 result. The first will shown.', mtInformation,
-      [mbOK], 0);
-  TreeView1.Select(TreeView1.Items[idx]);
-end;
-
-procedure TForm1.Findwidest1Click(Sender: TObject);
-var
-  i, X: integer;
-  max, Count, idx: integer;
-begin
-  Count := 0;
-  idx := -1;
-  if font_data.Height = 0 then
-    exit;
-  max := 0;
-  for i := 0 to TreeView1.Items.Count - 1 do
-    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
-    then
-    begin
-      X := TSymbol(TreeView1.Items[i].Data).Width;
-      if X = max then
-        inc(Count);
-      if X > max then
-      begin
-        max := X;
-        Count := 1;
-        idx := i;
-      end;
-    end;
-  if Count > 1 then
-    MessageDlg('More than 1 result. The first will shown.', mtInformation,
-      [mbOK], 0);
-  TreeView1.Select(TreeView1.Items[idx]);
-end;
-
-procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
-var
-  f: file of Byte;
-  Wp: TWindowPlacement;
-begin
-  AssignFile(f, ExtractFileDir(Application.ExeName) + '\params.dat');
-  if GetWindowPlacement(Form1.Handle, @Wp) then
-  begin
-    rewrite(f);
-    BlockWrite(f, Wp, sizeof(TWindowPlacement));
-    CloseFile(f);
-  end;
-end;
-
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   StatusBar1.Panels[3].Text :=
@@ -676,6 +476,7 @@ begin
     + '       ';
   FR_CreateFont;
   ClearImg;
+  LoadConfig;
   if ParamCount = 1 then
   begin
     OpenDialog1.FileName := ParamStr(1);
@@ -689,6 +490,7 @@ end;
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
   FR_FreeFont;
+  SaveConfig;
 end;
 
 procedure TForm1.FormResize(Sender: TObject);
@@ -699,22 +501,6 @@ begin
   if TreeView1.Selected.Parent <> nil then
   begin
     TSymbol(TreeView1.Selected.Data).Show(Image2);
-  end;
-
-end;
-
-procedure TForm1.FormShow(Sender: TObject);
-var
-  f: file of Byte;
-  Wp: TWindowPlacement;
-begin
-  AssignFile(f, ExtractFileDir(Application.ExeName) + '\params.dat');
-  if FileExists(ExtractFileDir(Application.ExeName) + '\params.dat') then
-  begin
-    reset(f);
-    BlockRead(f, Wp, sizeof(TWindowPlacement));
-    CloseFile(f);
-    SetWindowPlacement(Form1.Handle, @Wp);
   end;
 end;
 
@@ -848,18 +634,38 @@ begin
   CloseFile(f);
 end;
 
-procedure TForm1.Open1Click(Sender: TObject);
+procedure TForm1.ABuildExecute(Sender: TObject);
 begin
-  if OpenDialog1.Execute then
-  begin
-    FR_Load(OpenDialog1.FileName);
-    SaveDialog1.FileName := OpenDialog1.FileName;
-    Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
-    UpdateInfo;
-  end;
+  FR_GenerateNew;
 end;
 
-procedure TForm1.Add1Click(Sender: TObject);
+procedure TForm1.AExitExecute(Sender: TObject);
+begin
+  Form1.Close;
+end;
+
+procedure TForm1.AFontAddRowBotExecute(Sender: TObject);
+var
+  i: integer;
+begin
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if TreeView1.Items[i].Parent <> nil then
+    begin
+      TSymbol(TreeView1.Items[i].Data).AddRowAtBottom;
+    end;
+
+  inc(font_data.Height);
+  inc(font_data.Ascender);
+  if font_data.Height > font_data.bpc * 8 then
+    inc(font_data.bpc);
+  UpdateInfo;
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+  ClearImg;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
+end;
+
+procedure TForm1.AFontAddRowTopExecute(Sender: TObject);
 var
   i: integer;
 begin
@@ -884,32 +690,9 @@ begin
     exit;
   ClearImg;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
-
 end;
 
-procedure TForm1.Addrowatbottom1Click(Sender: TObject);
-var
-  i: integer;
-begin
-  for i := 0 to TreeView1.Items.Count - 1 do
-    if TreeView1.Items[i].Parent <> nil then
-    begin
-      TSymbol(TreeView1.Items[i].Data).AddRowAtBottom;
-    end;
-
-  inc(font_data.Height);
-  inc(font_data.Ascender);
-  if font_data.Height > font_data.bpc * 8 then
-    inc(font_data.bpc);
-  UpdateInfo;
-  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
-    exit;
-  ClearImg;
-  TSymbol(TreeView1.Selected.Data).Show(Image2);
-
-end;
-
-procedure TForm1.Adjustdigitwidth1Click(Sender: TObject);
+procedure TForm1.AFontAdjDigitWExecute(Sender: TObject);
 var
   i, j: integer;
   max, X: integer;
@@ -952,7 +735,87 @@ begin
     TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
-procedure TForm1.Removerowattop1Click(Sender: TObject);
+procedure TForm1.AFontCropHeightExecute(Sender: TObject);
+var
+  i, X: integer;
+  min_top, min_bot: integer;
+begin
+  if font_data.Height = 0 then
+    exit;
+  min_top := font_data.Height;
+  min_bot := font_data.Height;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i] <> nil) and (TreeView1.Items[i].Parent <> nil) and
+      (TreeView1.Items[i].Data <> nil) then
+    begin
+      X := TSymbol(TreeView1.Items[i].Data).FreeTop;
+      if X < min_top then
+        min_top := X;
+      X := TSymbol(TreeView1.Items[i].Data).FreeBottom;
+      if X < min_bot then
+        min_bot := X;
+    end;
+  for i := 1 to min_top do
+    AFontRemRowTopExecute(Form1);
+  for i := 1 to min_bot do
+    AFontRemRowBotExecute(Form1);
+end;
+
+procedure TForm1.AFontMakeMonoExecute(Sender: TObject);
+var
+  i, j: integer;
+  max, X: integer;
+begin
+  if font_data.Height = 0 then
+    exit;
+  max := 0;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      if TSymbol(TreeView1.Items[i].Data).Width > max then
+        max := TSymbol(TreeView1.Items[i].Data).Width;
+    end;
+  // второй проход
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      X := max - TSymbol(TreeView1.Items[i].Data).Width;
+      for j := 1 to X div 2 do
+        TSymbol(TreeView1.Items[i].Data).AddColAtLeft;
+      for j := 1 to X - X div 2 do
+        TSymbol(TreeView1.Items[i].Data).AddColAtRight;
+    end;
+  font_data.min_w := max;
+  font_data.max_w := max;
+  UpdateInfo;
+  if (TreeView1.Selected <> nil) and (TreeView1.Selected.Parent <> nil) then
+    TSymbol(TreeView1.Selected.Data).Show(Image2);
+end;
+
+procedure TForm1.AFontRemRowBotExecute(Sender: TObject);
+var
+  i: integer;
+begin
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if TreeView1.Items[i].Parent <> nil then
+    begin
+      TSymbol(TreeView1.Items[i].Data).DelRowAtBottom;
+    end;
+
+  dec(font_data.Height);
+  dec(font_data.Ascender);
+  if font_data.Height <= (font_data.bpc - 1) * 8 then
+    dec(font_data.bpc);
+  UpdateInfo;
+  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+    exit;
+  ClearImg;
+  TSymbol(TreeView1.Selected.Data).Show(Image2);
+end;
+
+procedure TForm1.AFontRemRowTopExecute(Sender: TObject);
 var
   i: integer;
 begin
@@ -974,25 +837,195 @@ begin
   TSymbol(TreeView1.Selected.Data).Show(Image2);
 end;
 
-procedure TForm1.Removerowattop2Click(Sender: TObject);
+procedure TForm1.AGlyphFindHighestExecute(Sender: TObject);
 var
-  i: integer;
+  i, X: integer;
+  min, Count, idx: integer;
 begin
-  for i := 0 to TreeView1.Items.Count - 1 do
-    if TreeView1.Items[i].Parent <> nil then
-    begin
-      TSymbol(TreeView1.Items[i].Data).DelRowAtBottom;
-    end;
-
-  dec(font_data.Height);
-  dec(font_data.Ascender);
-  if font_data.Height <= (font_data.bpc - 1) * 8 then
-    dec(font_data.bpc);
-  UpdateInfo;
-  if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
+  Count := 0;
+  idx := -1;
+  if font_data.Height = 0 then
     exit;
+  min := font_data.Height;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      X := TSymbol(TreeView1.Items[i].Data).FreeTop;
+      if X = min then
+        inc(Count);
+      if X < min then
+      begin
+        min := X;
+        Count := 1;
+        idx := i;
+      end;
+    end;
+  if Count > 1 then
+    MessageDlg('More than 1 result. The first will shown.', mtInformation,
+      [mbOK], 0);
+  TreeView1.Select(TreeView1.Items[idx]);
+end;
+
+procedure TForm1.AGlyphFindLowestExecute(Sender: TObject);
+var
+  i, X: integer;
+  min, Count, idx: integer;
+begin
+  Count := 0;
+  idx := -1;
+  if font_data.Height = 0 then
+    exit;
+  min := font_data.Height;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      X := TSymbol(TreeView1.Items[i].Data).FreeBottom;
+      if X = min then
+        inc(Count);
+      if X < min then
+      begin
+        min := X;
+        Count := 1;
+        idx := i;
+      end;
+    end;
+  if Count > 1 then
+    MessageDlg('More than 1 result. The first will shown.', mtInformation,
+      [mbOK], 0);
+  TreeView1.Select(TreeView1.Items[idx]);
+end;
+
+procedure TForm1.AGlyphFindNarrowestExecute(Sender: TObject);
+var
+  i, X: integer;
+  min, Count, idx: integer;
+begin
+  Count := 0;
+  idx := -1;
+  if font_data.Height = 0 then
+    exit;
+  min := font_data.MaxAdvance + 1;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      X := TSymbol(TreeView1.Items[i].Data).Width;
+      if X = min then
+        inc(Count);
+      if X < min then
+      begin
+        min := X;
+        Count := 1;
+        idx := i;
+      end;
+    end;
+  if Count > 1 then
+    MessageDlg('More than 1 result. The first will shown.', mtInformation,
+      [mbOK], 0);
+  TreeView1.Select(TreeView1.Items[idx]);
+end;
+
+procedure TForm1.AGlyphFindWidestExecute(Sender: TObject);
+var
+  i, X: integer;
+  max, Count, idx: integer;
+begin
+  Count := 0;
+  idx := -1;
+  if font_data.Height = 0 then
+    exit;
+  max := 0;
+  for i := 0 to TreeView1.Items.Count - 1 do
+    if (TreeView1.Items[i].Parent <> nil) and (TreeView1.Items[i].Data <> nil)
+    then
+    begin
+      X := TSymbol(TreeView1.Items[i].Data).Width;
+      if X = max then
+        inc(Count);
+      if X > max then
+      begin
+        max := X;
+        Count := 1;
+        idx := i;
+      end;
+    end;
+  if Count > 1 then
+    MessageDlg('More than 1 result. The first will shown.', mtInformation,
+      [mbOK], 0);
+  TreeView1.Select(TreeView1.Items[idx]);
+end;
+
+procedure TForm1.ANewFileExecute(Sender: TObject);
+begin
+  TreeView1.Items.Clear;
   ClearImg;
-  TSymbol(TreeView1.Selected.Data).Show(Image2);
+  SaveDialog1.FileName := '';
+  SaveDialog2.FileName := '';
+  OpenDialog1.FileName := '';
+  font_data.extended_font_name := '';
+  Form1.Caption := 'NS Font Creator';
+
+  FR_FreeFont;
+
+  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := '';
+  ValueListEditor1.Values['Height'] := '';
+  ValueListEditor1.Values['Ascender'] := '';
+  ValueListEditor1.Values['Descender'] := '';
+  ValueListEditor1.Values['MaxAdvance'] := '';
+  ValueListEditor1.Values['BPC'] := '';
+  ValueListEditor1.Values['Advance'] := '';
+  ValueListEditor1.Values['BearingX'] := '';
+  ValueListEditor1.Values['BearingY'] := '';
+  ValueListEditor1.Values['FreeTop'] := '';
+  ValueListEditor1.Values['FreeBottom'] := '';
+  ValueListEditor1.Values['GlyphHeight'] := '';
+  ValueListEditor1.Values['GlyphWidth'] := '';
+
+  FontDialog1.Font.Name := 'Times New Roman';
+  FontDialog1.Font.Size := 14;
+  FontDialog1.Font.style := [];
+end;
+
+procedure TForm1.AOpenFileExecute(Sender: TObject);
+begin
+  if OpenDialog1.Execute then
+  begin
+    FR_Load(OpenDialog1.FileName);
+    SaveDialog1.FileName := OpenDialog1.FileName;
+    Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
+    UpdateInfo;
+  end;
+end;
+
+procedure TForm1.ASaveFileAsExecute(Sender: TObject);
+begin
+  SaveDialog1.FileName := font_data.extended_font_name;
+  if SaveDialog1.Execute then
+    if not FileExists(SaveDialog1.FileName) then
+      FR_Save(SaveDialog1.FileName)
+    else if MessageDlg('File is exist. Rewrite?', mtConfirmation,
+      [mbYes, mbCancel], 0) = mrYes then
+      FR_Save(SaveDialog1.FileName);
+end;
+
+procedure TForm1.ASaveFileExecute(Sender: TObject);
+begin
+  if OpenDialog1.FileName <> '' then
+    FR_Save(OpenDialog1.FileName)
+  else
+  begin
+    SaveDialog1.FileName := font_data.extended_font_name;
+    if SaveDialog1.Execute then
+      if not FileExists(SaveDialog1.FileName) then
+        FR_Save(SaveDialog1.FileName)
+      else if MessageDlg('File is exist. Rewrite?', mtConfirmation,
+        [mbYes, mbCancel], 0) = mrYes then
+        FR_Save(SaveDialog1.FileName);
+  end;
 end;
 
 procedure TForm1.FR_RenameTable(Sender: TObject);
@@ -1015,31 +1048,48 @@ begin
   end;
 end;
 
-procedure TForm1.Save1Click(Sender: TObject);
+procedure TForm1.SaveConfig;
+var
+  ini: TIniFile;
+  buf: array [1 .. MAX_PATH] of widechar;
+  S: string;
+  Wp: TWindowPlacement;
+  MS: TMemoryStream;
 begin
-  if OpenDialog1.FileName <> '' then
-    FR_Save(OpenDialog1.FileName)
-  else
-  begin
-    SaveDialog1.FileName := font_data.extended_font_name;
-    if SaveDialog1.Execute then
-      if not FileExists(SaveDialog1.FileName) then
-        FR_Save(SaveDialog1.FileName)
-      else if MessageDlg('File is exist. Rewrite?', mtConfirmation,
-        [mbYes, mbCancel], 0) = mrYes then
-        FR_Save(SaveDialog1.FileName);
-  end;
+  SHGetFolderPath(0, CSIDL_APPDATA, 0, SHGFP_TYPE_CURRENT, @buf);
+  S := string(buf);
+  delete(S, pos(#0, S), Length(S));
+  ini := TIniFile.Create(S + '\' + ConfigName);
+  MS := TMemoryStream.Create;
+  if GetWindowPlacement(Form1.Handle, @Wp) then
+    MS.Write(Wp, sizeof(TWindowPlacement));
+  MS.Position := 0;
+  ini.WriteBinaryStream('GUI', 'WindowPos', MS);
+  MS.Free;
+  ini.Free;
 end;
 
-procedure TForm1.Saveas1Click(Sender: TObject);
+procedure TForm1.LoadConfig;
+var
+  ini: TIniFile;
+  buf: array [1 .. MAX_PATH] of widechar;
+  S: string;
+  Wp: TWindowPlacement;
+  MS: TMemoryStream;
 begin
-  SaveDialog1.FileName := font_data.extended_font_name;
-  if SaveDialog1.Execute then
-    if not FileExists(SaveDialog1.FileName) then
-      FR_Save(SaveDialog1.FileName)
-    else if MessageDlg('File is exist. Rewrite?', mtConfirmation,
-      [mbYes, mbCancel], 0) = mrYes then
-      FR_Save(SaveDialog1.FileName);
+  SHGetFolderPath(0, CSIDL_APPDATA, 0, SHGFP_TYPE_CURRENT, @buf);
+  S := string(buf);
+  delete(S, pos(#0, S), Length(S));
+  if not FileExists(S + '\' + ConfigName) then
+    exit;
+  ini := TIniFile.Create(S + '\' + ConfigName);
+  MS := TMemoryStream.Create;
+  ini.ReadBinaryStream('GUI', 'WindowPos', MS);
+  MS.Position := 0;
+  MS.Read(Wp, sizeof(TWindowPlacement));
+  SetWindowPlacement(Form1.Handle, @Wp);
+  MS.Free;
+  ini.Free;
 end;
 
 procedure TForm1.SymbolModify(Sender: TObject);
@@ -1049,47 +1099,25 @@ begin
   if (TreeView1.Selected = nil) or (TreeView1.Selected.Text[1] <> '''') then
     exit;
   ClearImg;
-  if Sender is TMenuItem then
+  if Sender is TAction then
   begin
-    S := (Sender as TMenuItem).Name;
-    if S = 'Movedown1' then
+    S := (Sender as TAction).Name;
+    if S = 'AGlyphMoveDown' then
       TSymbol(TreeView1.Selected.Data).MoveDown;
-    if S = 'Moveup1' then
+    if S = 'AGlyphMoveUp' then
       TSymbol(TreeView1.Selected.Data).MoveUp;
-    if S = 'Moveleft1' then
+    if S = 'AGlyphMoveLeft' then
       TSymbol(TreeView1.Selected.Data).MoveLeft;
-    if S = 'Moveright1' then
+    if S = 'AGlyphMoveRight' then
       TSymbol(TreeView1.Selected.Data).MoveRight;
 
-    if S = 'Addcolumnatleft1' then
+    if S = 'AGlyphAddColLeft' then
       TSymbol(TreeView1.Selected.Data).AddColAtLeft;
-    if S = 'Addcolumnatright1' then
+    if S = 'AGlyphAddColRight' then
       TSymbol(TreeView1.Selected.Data).AddColAtRight;
-    if S = 'Removecolumnatleft1' then
+    if S = 'AGlyphRemColLeft' then
       TSymbol(TreeView1.Selected.Data).DelColAtLeft;
-    if S = 'Removecolumnatright1' then
-      TSymbol(TreeView1.Selected.Data).DelColAtRight;
-  end;
-
-  if Sender is TSpeedButton then
-  begin
-    S := (Sender as TSpeedButton).Name;
-    if S = 'SpeedDown' then
-      TSymbol(TreeView1.Selected.Data).MoveDown;
-    if S = 'SpeedUp' then
-      TSymbol(TreeView1.Selected.Data).MoveUp;
-    if S = 'SpeedLeft' then
-      TSymbol(TreeView1.Selected.Data).MoveLeft;
-    if S = 'SpeedRight' then
-      TSymbol(TreeView1.Selected.Data).MoveRight;
-
-    if S = 'SpeedAddColLeft' then
-      TSymbol(TreeView1.Selected.Data).AddColAtLeft;
-    if S = 'SpeedAddColRight' then
-      TSymbol(TreeView1.Selected.Data).AddColAtRight;
-    if S = 'SpeedDelColLeft' then
-      TSymbol(TreeView1.Selected.Data).DelColAtLeft;
-    if S = 'SpeedDelColRight' then
+    if S = 'AGlyphRemColRight' then
       TSymbol(TreeView1.Selected.Data).DelColAtRight;
   end;
   TSymbol(TreeView1.Selected.Data).Show(Image2);
