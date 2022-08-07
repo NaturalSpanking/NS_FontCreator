@@ -10,7 +10,7 @@ uses
   FontRasterizer, UnicodeNames, Vcl.ButtonGroup, Vcl.Buttons, Vcl.ValEdit,
   System.Actions, Vcl.ActnList, IniFiles, SHFolder, sSkinProvider, sSkinManager,
   acImage, sDialogs, sSpeedButton, sGroupBox, sPanel, sSplitter, sStatusBar,
-  sTreeView;
+  sTreeView, acAlphaImageList, System.ImageList, Vcl.ImgList;
 
 type
   TForm1 = class(TForm)
@@ -127,6 +127,8 @@ type
     StatusBar1: TsStatusBar;
     TreeView1: TsTreeView;
     Image2: TImage;
+    sAlphaImageList1: TsAlphaImageList;
+    sVirtualImageList1: TsVirtualImageList;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
