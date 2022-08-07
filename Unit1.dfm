@@ -240,6 +240,7 @@ object Form1: TForm1
       Height = 332
       TabStop = False
       Align = alClient
+      DrawingStyle = gdsGradient
       Font.Charset = RUSSIAN_CHARSET
       Font.Color = clWindowText
       Font.Height = -13
@@ -324,6 +325,7 @@ object Form1: TForm1
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
+    ExplicitTop = -6
   end
   object sSkinSelector1: TsSkinSelector
     Left = 157

@@ -1037,7 +1037,7 @@ end;
 
 procedure TForm1.AShowAppearanceExecute(Sender: TObject);
 begin
-sSkinSelector1.PopupWindowShow;
+  sSkinSelector1.PopupWindowShow;
 end;
 
 procedure TForm1.FR_RenameTable(Sender: TObject);
@@ -1072,14 +1072,15 @@ begin
   S := string(buf);
   delete(S, pos(#0, S), Length(S));
   ini := TIniFile.Create(S + '\' + ConfigName);
+  ini.WriteBool('Cfg', 'AutoRepaint', Autorepaint1.Checked);
+  ini.WriteString('GUI', 'SkinName', sSkinManager1.SkinName);
+  ini.WriteBool('GUI', 'isUseSkin', sSkinManager1.Active);
   MS := TMemoryStream.Create;
   if GetWindowPlacement(Form1.Handle, @Wp) then
     MS.Write(Wp, sizeof(TWindowPlacement));
   MS.Position := 0;
   ini.WriteBinaryStream('GUI', 'WindowPos', MS);
   MS.Free;
-  ini.WriteString('GUI','SkinName', sSkinManager1.SkinName);
-  ini.WriteBool('GUI', 'isUseSkin', sSkinManager1.Active);
   ini.Free;
 end;
 
@@ -1097,14 +1098,18 @@ begin
   if not FileExists(S + '\' + ConfigName) then
     exit;
   ini := TIniFile.Create(S + '\' + ConfigName);
+  Autorepaint1.Checked := ini.ReadBool('Cfg', 'AutoRepaint',
+    Autorepaint1.Checked);
+  sSkinManager1.Active := ini.ReadBool('GUI', 'isUseSkin',
+    sSkinManager1.Active);
+  sSkinManager1.SkinName := ini.ReadString('GUI', 'SkinName',
+    sSkinManager1.SkinName);
   MS := TMemoryStream.Create;
   ini.ReadBinaryStream('GUI', 'WindowPos', MS);
   MS.Position := 0;
   MS.Read(Wp, sizeof(TWindowPlacement));
   SetWindowPlacement(Form1.Handle, @Wp);
   MS.Free;
-  ini.ReadString('GUI','SkinName', sSkinManager1.SkinName);
-  ini.ReadBool('GUI', 'isUseSkin', sSkinManager1.Active);
   ini.Free;
 end;
 
