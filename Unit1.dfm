@@ -17,6 +17,7 @@ object Form1: TForm1
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = False
+  ShowHint = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
@@ -524,156 +525,186 @@ object Form1: TForm1
     Top = 128
     object ABuild: TAction
       Caption = 'Build'
+      Hint = 'Build C code'
       ShortCut = 16450
       OnExecute = ABuildExecute
     end
     object ANewFile: TAction
       Caption = 'New'
+      Hint = 'New file'
       ShortCut = 16462
       OnExecute = ANewFileExecute
     end
     object AOpenFile: TAction
       Caption = 'Open'
+      Hint = 'Open file'
       ShortCut = 16463
       OnExecute = AOpenFileExecute
     end
     object ASaveFile: TAction
       Caption = 'Save'
+      Hint = 'Save file'
       ShortCut = 16467
       OnExecute = ASaveFileExecute
     end
     object ASaveFileAs: TAction
       Caption = 'Save as...'
+      Hint = 'Save file as...'
       OnExecute = ASaveFileAsExecute
     end
     object AExit: TAction
       Caption = 'Exit'
+      Hint = 'Exit'
       ShortCut = 32883
       OnExecute = AExitExecute
     end
     object AFullRepaint: TAction
       Caption = 'Repaint All'
+      Hint = 'Repaint All'
       ImageIndex = 15
       ShortCut = 16466
       OnExecute = FR_FullRepaint
     end
     object AFontSelect: TAction
       Caption = 'Select'
+      Hint = 'Select font'
       ImageIndex = 12
       OnExecute = FR_SelectFont
     end
     object AFontIncSize: TAction
       Caption = 'Increase size'
+      Hint = 'Increase font size'
       ImageIndex = 14
       OnExecute = FR_IncFontSize
     end
     object AFontDecSize: TAction
       Caption = 'Decrease size'
+      Hint = 'Decrease font size'
       ImageIndex = 13
       OnExecute = FR_DecFontSize
     end
     object AFontAddRowTop: TAction
       Caption = 'Add row at top'
+      Hint = 'Add row at top'
       ImageIndex = 3
       ShortCut = 16422
       OnExecute = AFontAddRowTopExecute
     end
     object AFontAddRowBot: TAction
       Caption = 'Add row at bottom'
+      Hint = 'Add row at bottom'
       ImageIndex = 2
       ShortCut = 16424
       OnExecute = AFontAddRowBotExecute
     end
     object AFontRemRowTop: TAction
       Caption = 'Remove row at top'
+      Hint = 'Remove row at top'
       ImageIndex = 7
       ShortCut = 8230
       OnExecute = AFontRemRowTopExecute
     end
     object AFontRemRowBot: TAction
       Caption = 'Remove row at bottom'
+      Hint = 'Remove row at bottom'
       ImageIndex = 6
       ShortCut = 8232
       OnExecute = AFontRemRowBotExecute
     end
     object AFontCropHeight: TAction
       Caption = 'Crop height'
+      Hint = 'Crop height'
       OnExecute = AFontCropHeightExecute
     end
     object AFontAdjDigitW: TAction
       Caption = 'Adjust digit width'
+      Hint = 'Adjust digit width'
       OnExecute = AFontAdjDigitWExecute
     end
     object AFontMakeMono: TAction
       Caption = 'Make monospace'
+      Hint = 'Make monospace'
       OnExecute = AFontMakeMonoExecute
     end
     object AGlyphMoveUp: TAction
       Caption = 'Move up'
+      Hint = 'Move glyph up'
       ImageIndex = 11
       ShortCut = 32806
       OnExecute = SymbolModify
     end
     object AGlyphMoveDown: TAction
       Caption = 'Move down'
+      Hint = 'Move glyph down'
       ImageIndex = 8
       ShortCut = 32808
       OnExecute = SymbolModify
     end
     object AGlyphMoveLeft: TAction
       Caption = 'Move left'
+      Hint = 'Move glyph left'
       ImageIndex = 9
       ShortCut = 32805
       OnExecute = SymbolModify
     end
     object AGlyphMoveRight: TAction
       Caption = 'Move right'
+      Hint = 'Move glyph right'
       ImageIndex = 10
       ShortCut = 32807
       OnExecute = SymbolModify
     end
     object AGlyphAddColLeft: TAction
       Caption = 'Add column at left'
+      Hint = 'Add column at left'
       ImageIndex = 0
       ShortCut = 16421
       OnExecute = SymbolModify
     end
     object AGlyphAddColRight: TAction
       Caption = 'Add column at right'
+      Hint = 'Add column at right'
       ImageIndex = 1
       ShortCut = 16423
       OnExecute = SymbolModify
     end
     object AGlyphRemColLeft: TAction
       Caption = 'Remove column at left'
+      Hint = 'Remove column at left'
       ImageIndex = 4
       ShortCut = 8229
       OnExecute = SymbolModify
     end
     object AGlyphRemColRight: TAction
       Caption = 'Remove column at right'
+      Hint = 'Remove column at right'
       ImageIndex = 5
       ShortCut = 8231
       OnExecute = SymbolModify
     end
     object AGlyphFindHighest: TAction
       Caption = 'Find highest'
+      Hint = 'Find highest glyph'
       OnExecute = AGlyphFindHighestExecute
     end
     object AGlyphFindLowest: TAction
       Caption = 'Find lowest'
+      Hint = 'Find lowest glyph'
       OnExecute = AGlyphFindLowestExecute
     end
     object AGlyphFindWidest: TAction
       Caption = 'Find widest'
+      Hint = 'Find widest glyph'
       OnExecute = AGlyphFindWidestExecute
     end
     object AGlyphFindNarrowest: TAction
       Caption = 'Find narrowest'
+      Hint = 'Find narrowest glyph'
       OnExecute = AGlyphFindNarrowestExecute
     end
     object AShowAppearance: TAction
       Caption = 'Appearance'
+      Hint = 'Show appearance'
       OnExecute = AShowAppearanceExecute
     end
   end
