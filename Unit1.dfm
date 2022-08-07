@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 681
+  ClientHeight = 661
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -25,7 +25,7 @@ object Form1: TForm1
   object Splitter1: TsSplitter
     Left = 151
     Top = 0
-    Height = 662
+    Height = 642
     AutoSnap = False
     ExplicitLeft = 248
     ExplicitTop = 400
@@ -35,7 +35,7 @@ object Form1: TForm1
     Left = 157
     Top = 0
     Width = 1083
-    Height = 662
+    Height = 642
     Align = alClient
     OnMouseDown = Image2MouseDown
     OnMouseMove = Image2MouseMove
@@ -49,7 +49,7 @@ object Form1: TForm1
     Left = 1240
     Top = 0
     Width = 184
-    Height = 662
+    Height = 642
     Align = alRight
     TabOrder = 0
     object sGroupBox1: TsGroupBox
@@ -236,7 +236,7 @@ object Form1: TForm1
       Left = 1
       Top = 309
       Width = 182
-      Height = 352
+      Height = 332
       TabStop = False
       Align = alClient
       Font.Charset = RUSSIAN_CHARSET
@@ -287,7 +287,7 @@ object Form1: TForm1
   end
   object StatusBar1: TsStatusBar
     Left = 0
-    Top = 662
+    Top = 642
     Width = 1424
     Height = 19
     Panels = <
@@ -309,7 +309,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 151
-    Height = 662
+    Height = 642
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
@@ -575,21 +575,25 @@ object Form1: TForm1
     object AFontAddRowTop: TAction
       Caption = 'Add row at top'
       ImageIndex = 3
+      ShortCut = 16422
       OnExecute = AFontAddRowTopExecute
     end
     object AFontAddRowBot: TAction
       Caption = 'Add row at bottom'
       ImageIndex = 2
+      ShortCut = 16424
       OnExecute = AFontAddRowBotExecute
     end
     object AFontRemRowTop: TAction
       Caption = 'Remove row at top'
       ImageIndex = 7
+      ShortCut = 8230
       OnExecute = AFontRemRowTopExecute
     end
     object AFontRemRowBot: TAction
       Caption = 'Remove row at bottom'
       ImageIndex = 6
+      ShortCut = 8232
       OnExecute = AFontRemRowBotExecute
     end
     object AFontCropHeight: TAction
@@ -607,41 +611,49 @@ object Form1: TForm1
     object AGlyphMoveUp: TAction
       Caption = 'Move up'
       ImageIndex = 11
+      ShortCut = 32806
       OnExecute = SymbolModify
     end
     object AGlyphMoveDown: TAction
       Caption = 'Move down'
       ImageIndex = 8
+      ShortCut = 32808
       OnExecute = SymbolModify
     end
     object AGlyphMoveLeft: TAction
       Caption = 'Move left'
       ImageIndex = 9
+      ShortCut = 32805
       OnExecute = SymbolModify
     end
     object AGlyphMoveRight: TAction
       Caption = 'Move right'
       ImageIndex = 10
+      ShortCut = 32807
       OnExecute = SymbolModify
     end
     object AGlyphAddColLeft: TAction
       Caption = 'Add column at left'
       ImageIndex = 0
+      ShortCut = 16421
       OnExecute = SymbolModify
     end
     object AGlyphAddColRight: TAction
       Caption = 'Add column at right'
       ImageIndex = 1
+      ShortCut = 16423
       OnExecute = SymbolModify
     end
     object AGlyphRemColLeft: TAction
       Caption = 'Remove column at left'
       ImageIndex = 4
+      ShortCut = 8229
       OnExecute = SymbolModify
     end
     object AGlyphRemColRight: TAction
       Caption = 'Remove column at right'
       ImageIndex = 5
+      ShortCut = 8231
       OnExecute = SymbolModify
     end
     object AGlyphFindHighest: TAction
