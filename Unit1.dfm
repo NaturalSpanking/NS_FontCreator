@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 701
+  ClientHeight = 681
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -25,7 +25,7 @@ object Form1: TForm1
   object Splitter1: TsSplitter
     Left = 151
     Top = 0
-    Height = 682
+    Height = 662
     AutoSnap = False
     ExplicitLeft = 248
     ExplicitTop = 400
@@ -35,7 +35,7 @@ object Form1: TForm1
     Left = 157
     Top = 0
     Width = 1083
-    Height = 682
+    Height = 662
     Align = alClient
     OnMouseDown = Image2MouseDown
     OnMouseMove = Image2MouseMove
@@ -49,7 +49,7 @@ object Form1: TForm1
     Left = 1240
     Top = 0
     Width = 184
-    Height = 682
+    Height = 662
     Align = alRight
     TabOrder = 0
     object sGroupBox1: TsGroupBox
@@ -236,7 +236,7 @@ object Form1: TForm1
       Left = 1
       Top = 309
       Width = 182
-      Height = 372
+      Height = 352
       TabStop = False
       Align = alClient
       Font.Charset = RUSSIAN_CHARSET
@@ -287,7 +287,7 @@ object Form1: TForm1
   end
   object StatusBar1: TsStatusBar
     Left = 0
-    Top = 682
+    Top = 662
     Width = 1424
     Height = 19
     Panels = <
@@ -309,7 +309,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 151
-    Height = 682
+    Height = 662
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
@@ -667,6 +667,7 @@ object Form1: TForm1
   end
   object sSkinManager1: TsSkinManager
     ButtonsOptions.OldGlyphsMode = False
+    Active = False
     InternalSkins = <
       item
         Name = 'Aluminium (internal)'
@@ -25102,9 +25103,9 @@ object Form1: TForm1
           4E44AE426082}
         OriginName = 'Vienna Ext.asz'
       end>
-    SkinDirectory = 'c:\Skins'
-    SkinName = 'Topaz (internal)'
-    SkinInfo = '15'
+    SkinDirectory = 'D:\Projects\Delphi\Library\AlphaControls\Skins'
+    SkinName = 'Steam2'
+    SkinInfo = 'N/A'
     ThirdParty.ThirdEdits = 
       'TEdit'#13#10'TMemo'#13#10'TMaskEdit'#13#10'TLabeledEdit'#13#10'THotKey'#13#10'TListBox'#13#10'TCheck' +
       'ListBox'#13#10'TRichEdit'#13#10'TDateTimePicker'#13#10
@@ -25115,7 +25116,7 @@ object Form1: TForm1
     ThirdParty.ThirdListViews = 'TListView'#13#10
     ThirdParty.ThirdPanels = 'TPanel'#13#10
     ThirdParty.ThirdGrids = 'TStringGrid'#13#10'TDrawGrid'#13#10
-    ThirdParty.ThirdTreeViews = 'TTreeView'#13#10
+    ThirdParty.ThirdTreeViews = 'TTreeView'#13#10'TValueListEditor'#13#10
     ThirdParty.ThirdComboBoxes = 'TComboBox'#13#10'TColorBox'#13#10
     ThirdParty.ThirdWWEdits = ' '#13#10
     ThirdParty.ThirdVirtualTrees = ' '#13#10
