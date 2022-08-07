@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 721
+  ClientHeight = 701
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -25,7 +25,7 @@ object Form1: TForm1
   object Splitter1: TsSplitter
     Left = 151
     Top = 0
-    Height = 702
+    Height = 682
     AutoSnap = False
     ExplicitLeft = 248
     ExplicitTop = 400
@@ -35,7 +35,7 @@ object Form1: TForm1
     Left = 157
     Top = 0
     Width = 1083
-    Height = 702
+    Height = 682
     Align = alClient
     OnMouseDown = Image2MouseDown
     OnMouseMove = Image2MouseMove
@@ -49,7 +49,7 @@ object Form1: TForm1
     Left = 1240
     Top = 0
     Width = 184
-    Height = 702
+    Height = 682
     Align = alRight
     TabOrder = 0
     object sGroupBox1: TsGroupBox
@@ -236,7 +236,7 @@ object Form1: TForm1
       Left = 1
       Top = 309
       Width = 182
-      Height = 392
+      Height = 372
       TabStop = False
       Align = alClient
       Font.Charset = RUSSIAN_CHARSET
@@ -265,9 +265,6 @@ object Form1: TForm1
       TitleCaptions.Strings = (
         'Metric'
         'Value')
-      ExplicitTop = 348
-      ExplicitWidth = 187
-      ExplicitHeight = 353
       ColWidths = (
         115
         61)
@@ -290,7 +287,7 @@ object Form1: TForm1
   end
   object StatusBar1: TsStatusBar
     Left = 0
-    Top = 702
+    Top = 682
     Width = 1424
     Height = 19
     Panels = <
@@ -312,7 +309,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 151
-    Height = 702
+    Height = 682
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
@@ -326,6 +323,14 @@ object Form1: TForm1
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
+  end
+  object sSkinSelector1: TsSkinSelector
+    Left = 157
+    Top = -24
+    Width = 121
+    Height = 27
+    TabOrder = 3
+    Visible = False
   end
   object FontDialog1: TFontDialog
     Ctl3D = False
@@ -478,6 +483,9 @@ object Form1: TForm1
       object Findnarrowest1: TMenuItem
         Action = AGlyphFindNarrowest
       end
+    end
+    object appearance1: TMenuItem
+      Action = AShowAppearance
     end
     object Help1: TMenuItem
       Caption = 'Help'
@@ -651,6 +659,10 @@ object Form1: TForm1
     object AGlyphFindNarrowest: TAction
       Caption = 'Find narrowest'
       OnExecute = AGlyphFindNarrowestExecute
+    end
+    object AShowAppearance: TAction
+      Caption = 'Appearance'
+      OnExecute = AShowAppearanceExecute
     end
   end
   object sSkinManager1: TsSkinManager
@@ -25095,29 +25107,29 @@ object Form1: TForm1
     SkinInfo = '15'
     ThirdParty.ThirdEdits = 
       'TEdit'#13#10'TMemo'#13#10'TMaskEdit'#13#10'TLabeledEdit'#13#10'THotKey'#13#10'TListBox'#13#10'TCheck' +
-      'ListBox'#13#10'TRichEdit'#13#10'TDateTimePicker'
-    ThirdParty.ThirdButtons = 'TButton'
-    ThirdParty.ThirdBitBtns = 'TBitBtn'
-    ThirdParty.ThirdCheckBoxes = 'TCheckBox'#13#10'TRadioButton'#13#10'TGroupButton'
-    ThirdParty.ThirdGroupBoxes = 'TGroupBox'#13#10'TRadioGroup'
-    ThirdParty.ThirdListViews = 'TListView'
-    ThirdParty.ThirdPanels = 'TPanel'
-    ThirdParty.ThirdGrids = 'TStringGrid'#13#10'TDrawGrid'
-    ThirdParty.ThirdTreeViews = 'TTreeView'
-    ThirdParty.ThirdComboBoxes = 'TComboBox'#13#10'TColorBox'
-    ThirdParty.ThirdWWEdits = ' '
-    ThirdParty.ThirdVirtualTrees = ' '
-    ThirdParty.ThirdGridEh = ' '
-    ThirdParty.ThirdPageControl = 'TPageControl'
-    ThirdParty.ThirdTabControl = 'TTabControl'
-    ThirdParty.ThirdToolBar = 'TToolBar'
-    ThirdParty.ThirdStatusBar = 'TStatusBar'
-    ThirdParty.ThirdSpeedButton = 'TSpeedButton'
-    ThirdParty.ThirdScrollControl = 'TScrollBox'
-    ThirdParty.ThirdUpDown = 'TUpDown'
-    ThirdParty.ThirdScrollBar = 'TScrollBar'
-    ThirdParty.ThirdStaticText = 'TStaticText'
-    ThirdParty.ThirdNativePaint = ' '
+      'ListBox'#13#10'TRichEdit'#13#10'TDateTimePicker'#13#10
+    ThirdParty.ThirdButtons = 'TButton'#13#10
+    ThirdParty.ThirdBitBtns = 'TBitBtn'#13#10
+    ThirdParty.ThirdCheckBoxes = 'TCheckBox'#13#10'TRadioButton'#13#10'TGroupButton'#13#10
+    ThirdParty.ThirdGroupBoxes = 'TGroupBox'#13#10'TRadioGroup'#13#10
+    ThirdParty.ThirdListViews = 'TListView'#13#10
+    ThirdParty.ThirdPanels = 'TPanel'#13#10
+    ThirdParty.ThirdGrids = 'TStringGrid'#13#10'TDrawGrid'#13#10
+    ThirdParty.ThirdTreeViews = 'TTreeView'#13#10
+    ThirdParty.ThirdComboBoxes = 'TComboBox'#13#10'TColorBox'#13#10
+    ThirdParty.ThirdWWEdits = ' '#13#10
+    ThirdParty.ThirdVirtualTrees = ' '#13#10
+    ThirdParty.ThirdGridEh = ' '#13#10
+    ThirdParty.ThirdPageControl = 'TPageControl'#13#10
+    ThirdParty.ThirdTabControl = 'TTabControl'#13#10
+    ThirdParty.ThirdToolBar = 'TToolBar'#13#10
+    ThirdParty.ThirdStatusBar = 'TStatusBar'#13#10
+    ThirdParty.ThirdSpeedButton = 'TSpeedButton'#13#10
+    ThirdParty.ThirdScrollControl = 'TScrollBox'#13#10
+    ThirdParty.ThirdUpDown = 'TUpDown'#13#10
+    ThirdParty.ThirdScrollBar = 'TScrollBar'#13#10
+    ThirdParty.ThirdStaticText = 'TStaticText'#13#10
+    ThirdParty.ThirdNativePaint = ' '#13#10
     Left = 392
     Top = 8
   end
@@ -27688,16 +27700,16 @@ object Form1: TForm1
           8DB76700E72DC069C8D94400B34997856111F23B70CCCB69C8FF0798B1501BAA
           6C8FCA0000000049454E44AE426082}
       end>
-    Left = 232
-    Top = 296
+    Left = 392
+    Top = 128
     Bitmap = {}
   end
   object sVirtualImageList1: TsVirtualImageList
     Height = 28
     Width = 28
     AlphaImageList = sAlphaImageList1
-    Left = 232
-    Top = 368
+    Left = 392
+    Top = 200
     Bitmap = {}
   end
 end

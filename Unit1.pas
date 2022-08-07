@@ -10,7 +10,8 @@ uses
   FontRasterizer, UnicodeNames, Vcl.ButtonGroup, Vcl.Buttons, Vcl.ValEdit,
   System.Actions, Vcl.ActnList, IniFiles, SHFolder, sSkinProvider, sSkinManager,
   acImage, sDialogs, sSpeedButton, sGroupBox, sPanel, sSplitter, sStatusBar,
-  sTreeView, acAlphaImageList, System.ImageList, Vcl.ImgList;
+  sTreeView, acAlphaImageList, System.ImageList, Vcl.ImgList, Vcl.Mask,
+  sMaskEdit, sCustomComboEdit, sComboBox, sComboBoxes;
 
 type
   TForm1 = class(TForm)
@@ -129,6 +130,9 @@ type
     Image2: TImage;
     sAlphaImageList1: TsAlphaImageList;
     sVirtualImageList1: TsVirtualImageList;
+    appearance1: TMenuItem;
+    AShowAppearance: TAction;
+    sSkinSelector1: TsSkinSelector;
     procedure FR_FullRepaint(Sender: TObject);
     procedure FR_SelectFont(Sender: TObject);
     procedure FR_AddRange(Sender: TObject);
@@ -173,6 +177,7 @@ type
     procedure AGlyphFindLowestExecute(Sender: TObject);
     procedure AGlyphFindWidestExecute(Sender: TObject);
     procedure AGlyphFindNarrowestExecute(Sender: TObject);
+    procedure AShowAppearanceExecute(Sender: TObject);
   private
     move_btn: TMouseButton;
     isDown: Boolean;
@@ -478,7 +483,6 @@ begin
     + '       ';
   FR_CreateFont;
   ClearImg;
-  LoadConfig;
   if ParamCount = 1 then
   begin
     OpenDialog1.FileName := ParamStr(1);
@@ -487,6 +491,7 @@ begin
     Form1.Caption := 'NS Font Creator' + ' - ' + OpenDialog1.FileName;
     UpdateInfo;
   end;
+  LoadConfig;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -1030,6 +1035,11 @@ begin
   end;
 end;
 
+procedure TForm1.AShowAppearanceExecute(Sender: TObject);
+begin
+sSkinSelector1.PopupWindowShow;
+end;
+
 procedure TForm1.FR_RenameTable(Sender: TObject);
 var
   S, X: string;
@@ -1068,6 +1078,8 @@ begin
   MS.Position := 0;
   ini.WriteBinaryStream('GUI', 'WindowPos', MS);
   MS.Free;
+  ini.WriteString('GUI','SkinName', sSkinManager1.SkinName);
+  ini.WriteBool('GUI', 'isUseSkin', sSkinManager1.Active);
   ini.Free;
 end;
 
@@ -1091,6 +1103,8 @@ begin
   MS.Read(Wp, sizeof(TWindowPlacement));
   SetWindowPlacement(Form1.Handle, @Wp);
   MS.Free;
+  ini.ReadString('GUI','SkinName', sSkinManager1.SkinName);
+  ini.ReadBool('GUI', 'isUseSkin', sSkinManager1.Active);
   ini.Free;
 end;
 
