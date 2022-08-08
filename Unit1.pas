@@ -1037,7 +1037,7 @@ end;
 
 procedure TForm1.AShowAppearanceExecute(Sender: TObject);
 begin
-  sSkinSelector1.PopupWindowShow;
+  sSkinSelector1.DoDropDown;
 end;
 
 procedure TForm1.FR_RenameTable(Sender: TObject);
