@@ -525,7 +525,7 @@ begin
   rewrite(f, 1);
   TreeView1.SaveToStream(stream);
   i := stream.Size;
-  BlockWrite(f, i, sizeof(integer)); // запись размера дерева
+  BlockWrite(f, i, sizeof(LongWord)); // запись размера дерева
   BlockWrite(f, stream.Memory^, i); // запись дерева
   stream.Free;
 
@@ -543,7 +543,7 @@ begin
       b := 0; // 0 - корень
       BlockWrite(f, b, 1); // запись признака
       p := TreeView1.Items[i].Data;
-      BlockWrite(f, p^, sizeof(integer)); // запись первого символа
+      BlockWrite(f, p^, sizeof(LongWord)); // запись первого символа
     end;
   end;
 
@@ -556,21 +556,21 @@ begin
   begin
     b := 1; // 1 - есть данные о шрифте
     BlockWrite(f, b, 1);
-    BlockWrite(f, font_data^, sizeof(T_FR_Font) - sizeof(string));
+    BlockWrite(f, font_data^, 7 * sizeof(LongInt));
     b := Length(font_data.extended_font_name);
-    BlockWrite(f, b, sizeof(integer));
+    BlockWrite(f, b, sizeof(LongWord));
     BlockWrite(f, font_data.extended_font_name[1], b * sizeof(char));
 
     i := FontDialog1.Font.Charset;
-    BlockWrite(f, i, sizeof(integer));
+    BlockWrite(f, i, sizeof(LongWord));
     i := FontDialog1.Font.Color;
-    BlockWrite(f, i, sizeof(integer));
+    BlockWrite(f, i, sizeof(LongWord));
     i := FontDialog1.Font.Size;
-    BlockWrite(f, i, sizeof(integer));
+    BlockWrite(f, i, sizeof(LongWord));
     i := Byte(FontDialog1.Font.style);
-    BlockWrite(f, i, sizeof(integer));
+    BlockWrite(f, i, sizeof(LongWord));
     i := Length(FontDialog1.Font.Name);
-    BlockWrite(f, i, sizeof(integer));
+    BlockWrite(f, i, sizeof(LongWord));
     BlockWrite(f, FontDialog1.Font.Name[1], i * sizeof(char));
   end;
   CloseFile(f);
@@ -592,7 +592,7 @@ begin
   stream := TMemoryStream.Create; // загрузка дерева
   AssignFile(f, FName);
   reset(f, 1);
-  BlockRead(f, i, sizeof(integer));
+  BlockRead(f, i, sizeof(LongWord));
   stream.SetSize(i);
   BlockRead(f, stream.Memory^, i);
   TreeView1.LoadFromStream(stream);
@@ -612,7 +612,7 @@ begin
     else // корень
     begin
       new(p);
-      BlockRead(f, p^, sizeof(integer)); // чтение первого символа
+      BlockRead(f, p^, sizeof(LongWord)); // чтение первого символа
       TreeView1.Items[i].Data := p;
     end;
   end;
@@ -620,20 +620,20 @@ begin
   BlockRead(f, b, 1); // чтения наличия данных о шрифте
   if b = 1 then
   begin
-    BlockRead(f, font_data^, sizeof(T_FR_Font) - sizeof(string));
-    BlockRead(f, b, sizeof(integer));
+    BlockRead(f, font_data^, 7 * sizeof(LongInt));
+    BlockRead(f, b, sizeof(LongWord));
     SetLength(font_data.extended_font_name, b);
     BlockRead(f, font_data.extended_font_name[1], b * sizeof(char));
 
-    BlockRead(f, i, sizeof(integer));
+    BlockRead(f, i, sizeof(LongWord));
     FontDialog1.Font.Charset := TFontCharset(i);
-    BlockRead(f, i, sizeof(integer));
+    BlockRead(f, i, sizeof(LongWord));
     FontDialog1.Font.Color := TColor(i);
-    BlockRead(f, i, sizeof(integer));
+    BlockRead(f, i, sizeof(LongWord));
     FontDialog1.Font.Size := i;
-    BlockRead(f, i, sizeof(integer));
+    BlockRead(f, i, sizeof(LongWord));
     FontDialog1.Font.style := TFontStyles(Byte(i));
-    BlockRead(f, i, sizeof(integer));
+    BlockRead(f, i, sizeof(LongWord));
     SetLength(S, i);
     BlockRead(f, S[1], (i) * sizeof(char));
     FontDialog1.Font.Name := S;

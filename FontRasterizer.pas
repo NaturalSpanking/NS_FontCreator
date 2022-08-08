@@ -11,12 +11,12 @@ type
   TSymbol = class
   private
     sData: record
-      char_code: integer;
-      Width: integer;
-      Advance: integer;
-      BearingX: integer;
-      BearingY: integer;
-      BufferSize: integer;
+      char_code: LongInt;
+      Width: LongInt;
+      Advance: LongInt;
+      BearingX: LongInt;
+      BearingY: LongInt;
+      BufferSize: LongInt;
     end;
 
     Buffer: PByte;
@@ -60,13 +60,13 @@ type
   P_FR_Font = ^T_FR_Font;
 
   T_FR_Font = record
-    MaxAdvance: integer;
-    height: integer;
-    Ascender: integer;
-    Descender: integer;
-    bpc: integer;
-    min_w: integer;
-    max_w: integer;
+    MaxAdvance: LongInt;
+    height: LongInt;
+    Ascender: LongInt;
+    Descender: LongInt;
+    bpc: LongInt;
+    min_w: LongInt;
+    max_w: LongInt;
     extended_font_name: string;
   end;
 
