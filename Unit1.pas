@@ -1075,6 +1075,7 @@ begin
   ini.WriteBool('Cfg', 'AutoRepaint', Autorepaint1.Checked);
   ini.WriteString('GUI', 'SkinName', sSkinManager1.SkinName);
   ini.WriteBool('GUI', 'isUseSkin', sSkinManager1.Active);
+  ini.WriteInteger('GUI', 'TreeWidth', TreeView1.Width);
   MS := TMemoryStream.Create;
   if GetWindowPlacement(Form1.Handle, @Wp) then
     MS.Write(Wp, sizeof(TWindowPlacement));
@@ -1104,6 +1105,7 @@ begin
     sSkinManager1.Active);
   sSkinManager1.SkinName := ini.ReadString('GUI', 'SkinName',
     sSkinManager1.SkinName);
+  TreeView1.Width := ini.ReadInteger('GUI', 'TreeWidth', TreeView1.Width);
   MS := TMemoryStream.Create;
   ini.ReadBinaryStream('GUI', 'WindowPos', MS);
   MS.Position := 0;

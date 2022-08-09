@@ -28,6 +28,7 @@ object Form1: TForm1
     Top = 0
     Height = 602
     AutoSnap = False
+    OnMoved = FormResize
     ExplicitLeft = 248
     ExplicitTop = 400
     ExplicitHeight = 100
