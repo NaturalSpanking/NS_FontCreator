@@ -387,11 +387,11 @@ begin
   writeln(f);
   writeln(f, '#ifndef ' + UpperCase(mv_spaces(font_data.extended_font_name)));
   writeln(f);
-  writeln(f, '//Copy this to "NS_fonts.h"');
+  writeln(f, '#warning "Copy this to \"NS_fonts.h\""');
   writeln(f, '#define ' + UpperCase(mv_spaces(font_data.extended_font_name)) +
     #9 + '1');
   writeln(f);
-  writeln(f, '#ifdef ' + UpperCase(mv_spaces(font_data.extended_font_name)));
+  writeln(f, '#if ' + UpperCase(mv_spaces(font_data.extended_font_name)));
   writeln(f, 'extern const TFont ' +
     mv_spaces(font_data.extended_font_name) + ';');
   writeln(f, '#endif ');
