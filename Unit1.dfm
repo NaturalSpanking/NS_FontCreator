@@ -2,12 +2,12 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 641
+  ClientHeight = 621
   ClientWidth = 1424
   Color = clBtnFace
   Constraints.MaxHeight = 1440
   Constraints.MaxWidth = 2560
-  Constraints.MinHeight = 387
+  Constraints.MinHeight = 377
   Constraints.MinWidth = 600
   DoubleBuffered = True
   Font.Charset = RUSSIAN_CHARSET
@@ -26,7 +26,7 @@ object Form1: TForm1
   object Splitter1: TsSplitter
     Left = 151
     Top = 0
-    Height = 622
+    Height = 602
     AutoSnap = False
     ExplicitLeft = 248
     ExplicitTop = 400
@@ -36,7 +36,7 @@ object Form1: TForm1
     Left = 157
     Top = 0
     Width = 1083
-    Height = 622
+    Height = 602
     Align = alClient
     OnMouseDown = Image2MouseDown
     OnMouseMove = Image2MouseMove
@@ -50,18 +50,24 @@ object Form1: TForm1
     Left = 1240
     Top = 0
     Width = 184
-    Height = 622
+    Height = 602
     Align = alRight
+    BevelOuter = bvNone
     TabOrder = 0
     object sGroupBox1: TsGroupBox
       AlignWithMargins = True
-      Left = 4
-      Top = 4
-      Width = 176
+      Left = 3
+      Top = 0
+      Width = 178
       Height = 110
+      Margins.Top = 0
+      Margins.Bottom = 0
       Align = alTop
       Caption = 'Font'
       TabOrder = 0
+      ExplicitLeft = 4
+      ExplicitTop = 4
+      ExplicitWidth = 176
       object sSpeedButton1: TsSpeedButton
         Left = 7
         Top = 22
@@ -145,13 +151,18 @@ object Form1: TForm1
     end
     object sGroupBox2: TsGroupBox
       AlignWithMargins = True
-      Left = 4
-      Top = 120
-      Width = 176
+      Left = 3
+      Top = 110
+      Width = 178
       Height = 186
+      Margins.Top = 0
+      Margins.Bottom = 0
       Align = alTop
       Caption = 'Glyph'
       TabOrder = 1
+      ExplicitLeft = 4
+      ExplicitTop = 120
+      ExplicitWidth = 176
       object sSpeedButton9: TsSpeedButton
         Left = 7
         Top = 24
@@ -234,10 +245,11 @@ object Form1: TForm1
       end
     end
     object ValueListEditor1: TValueListEditor
-      Left = 1
-      Top = 309
-      Width = 182
-      Height = 312
+      AlignWithMargins = True
+      Left = 3
+      Top = 299
+      Width = 178
+      Height = 300
       TabStop = False
       Align = alClient
       DrawingStyle = gdsGradient
@@ -267,9 +279,13 @@ object Form1: TForm1
       TitleCaptions.Strings = (
         'Metric'
         'Value')
+      ExplicitLeft = 1
+      ExplicitTop = 309
+      ExplicitWidth = 182
+      ExplicitHeight = 292
       ColWidths = (
         115
-        61)
+        57)
       RowHeights = (
         18
         18
@@ -289,7 +305,7 @@ object Form1: TForm1
   end
   object StatusBar1: TsStatusBar
     Left = 0
-    Top = 622
+    Top = 602
     Width = 1424
     Height = 19
     Panels = <
@@ -311,7 +327,7 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 151
-    Height = 622
+    Height = 602
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
