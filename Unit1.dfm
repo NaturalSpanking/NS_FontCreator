@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'NS Font Creator'
-  ClientHeight = 596
+  ClientHeight = 576
   ClientWidth = 983
   Color = clBtnFace
   Constraints.MaxHeight = 1440
@@ -26,7 +26,7 @@ object Form1: TForm1
   object Splitter1: TsSplitter
     Left = 151
     Top = 0
-    Height = 577
+    Height = 557
     AutoSnap = False
     OnMoved = FormResize
     ExplicitLeft = 248
@@ -37,7 +37,7 @@ object Form1: TForm1
     Left = 157
     Top = 0
     Width = 642
-    Height = 577
+    Height = 557
     Align = alClient
     OnMouseDown = Image2MouseDown
     OnMouseMove = Image2MouseMove
@@ -51,12 +51,10 @@ object Form1: TForm1
     Left = 799
     Top = 0
     Width = 184
-    Height = 577
+    Height = 557
     Align = alRight
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 1240
-    ExplicitHeight = 582
     object sGroupBox1: TsGroupBox
       AlignWithMargins = True
       Left = 3
@@ -246,7 +244,7 @@ object Form1: TForm1
       Left = 3
       Top = 299
       Width = 178
-      Height = 275
+      Height = 255
       TabStop = False
       Align = alClient
       DrawingStyle = gdsGradient
@@ -276,7 +274,6 @@ object Form1: TForm1
       TitleCaptions.Strings = (
         'Metric'
         'Value')
-      ExplicitHeight = 280
       ColWidths = (
         115
         57)
@@ -299,7 +296,7 @@ object Form1: TForm1
   end
   object StatusBar1: TsStatusBar
     Left = 0
-    Top = 577
+    Top = 557
     Width = 983
     Height = 19
     Panels = <
@@ -316,14 +313,12 @@ object Form1: TForm1
         Alignment = taRightJustify
         Width = 150
       end>
-    ExplicitTop = 582
-    ExplicitWidth = 1424
   end
   object TreeView1: TsTreeView
     Left = 0
     Top = 0
     Width = 151
-    Height = 577
+    Height = 557
     Align = alLeft
     Constraints.MaxWidth = 300
     Constraints.MinWidth = 151
@@ -337,7 +332,6 @@ object Form1: TForm1
     OnDragDrop = TreeView1DragDrop
     OnDragOver = TreeView1DragOver
     OnKeyDown = TreeView1KeyDown
-    ExplicitHeight = 582
   end
   object sSkinSelector1: TsSkinSelector
     Left = 157
@@ -726,8 +720,7 @@ object Form1: TForm1
     ButtonsOptions.OldGlyphsMode = False
     Active = False
     InternalSkins = <>
-    SkinDirectory = 'D:\Projects\Delphi\Library\AlphaControls\Skins'
-    SkinName = 'Steam2'
+    SkinDirectory = 'Skins'
     SkinInfo = 'N/A'
     ThirdParty.ThirdEdits = 
       'TEdit'#13#10'TMemo'#13#10'TMaskEdit'#13#10'TLabeledEdit'#13#10'THotKey'#13#10'TListBox'#13#10'TCheck' +
